@@ -11,27 +11,15 @@
 #include "src/commandLineParser.h"
 
 
-
-double GalaxyMass(double t)
-{
-	double initialMass = galaxyM0;
-	double thickDisk = galaxyM1 * ( 1.0- exp(-t/galaxyB1));
-	double thinDisk = galaxyM2 * (1.0 - exp(-t/galaxyB2));
-	
-	return initialMass + thickDisk + thinDisk;
-}
-
-
 class Annulus
 {
 	double Radius;
+	double RadialCorrection;
 	double Width;
 	double Age;
-	
 	double MFe;
 	double MEu;
 	double MMg;
-	
 	
 	double alpha;
 	double beta;
@@ -47,9 +35,9 @@ class Annulus
 	std::vector<double> HVecSNIa;
 	
 	private:
-		inline const double radialMassCorrection()
+		inline const double calculateCorrection()
 		{
-			return Radius*Width/(galaxyScaleLength*galaxyScaleLength)*exp(-Radius/galaxyScaleLength);
+			RadialCorrection = Radius*Width/(galaxyScaleLength*galaxyScaleLength)*exp(-Radius/galaxyScaleLength);
 		}
 	
 		inline double RingMass(double t)
@@ -57,23 +45,24 @@ class Annulus
 			double thickDisk = galaxyM1 * (1 - exp(-t/galaxyB1));
 			double thinDisk = galaxyM2 * (1 - exp(-t/galaxyB2));
 			
-			return (galaxyM0 + thickDisk + thinDisk)*radialMassCorrection();
+			return (galaxyM0 + thickDisk + thinDisk)*RadialCorrection;
 		}
 	
 		double SFR(double t)
 		{
-				double basePart = galaxyM0*exp(-nuSFR*t);
-				double thickDiskBoost = galaxyM1/(nuSFR*galaxyB1-1) * (exp(-t/galaxyB1) - exp(-nuSFR*t));
-				double thinDiskBoost = galaxyM2/(nuSFR*galaxyB2-1) * (exp(-t/galaxyB2) - exp(-nuSFR*t));
+				double baseExp = exp(-nuSFR*t);
+				double basePart = galaxyM0*baseExp;
+				double thickDiskBoost = galaxyM1/(nuSFR*galaxyB1-1) * (exp(-t/galaxyB1) - baseExp);
+				double thinDiskBoost = galaxyM2/(nuSFR*galaxyB2-1) * (exp(-t/galaxyB2) - baseExp);
 				
-				return nuSFR*(basePart+thickDiskBoost+thinDiskBoost);
+				return RadialCorrection*nuSFR*(basePart+thickDiskBoost+thinDiskBoost);
 		}
 		
 		
 		double E(double t)
 		{
 			//simple first-order integrator
-			int Nsteps = 10000;
+			int Nsteps = 3000;
 			double deltaT = t/Nsteps;
 			double sum = 0;
 			for (double tPrime = 0; tPrime < t; tPrime +=deltaT)
@@ -99,7 +88,7 @@ class Annulus
 		double F(double t, double tau,double width)
 		{
 			//simple first-order integrator
-			int Nsteps = 10000;
+			int Nsteps = 3000;
 			double deltaT = t/Nsteps;
 			double sum = 0;
 			for (double tPrime = 0; tPrime < t; tPrime +=deltaT)
@@ -116,7 +105,7 @@ class Annulus
 				return 0;
 			}
 			//simple first-order integrator
-			int Nsteps = 1000;
+			int Nsteps = 2000;
 			double deltaT = t/Nsteps;
 			double sum = 0;
 			for (double tPrime = tau; tPrime < t; tPrime +=deltaT)
@@ -129,12 +118,14 @@ class Annulus
 		double H(double t, double tau, double nu)
 		{
 			//simple first-order integrator
-			int Nsteps = 1000;
+			int Nsteps = 2000;
+
 			double deltaT = t/Nsteps;
 			double sum = 0;
-			for (double tPrime = tau; tPrime < t; tPrime +=deltaT)
+
+			for (double tP = tau; tP < t  ; tP +=deltaT)
 			{
-				sum += G(tPrime,tau,nu)*deltaT;
+				sum+=G(tP,tau,nu)*deltaT;
 			}
 			return sum;
 		}
@@ -152,24 +143,24 @@ class Annulus
 			double HInf_SNIa = H(tauInf,tauSNIa,nuSNIa);
 			
 			alpha = RingMass(tauSNIa)/E0 * pow(10,FeH_SN);
-			std::cout << "Fe CCSN Yields Calibrated " << alpha << std::endl;
+			//std::cout << "Fe CCSN Yields Calibrated " << alpha << std::endl;
 			
 			beta = alpha*EInf/HInf_SNIa* (pow(10,MgFe_SN-MgFe_Sat)-1);
-			std::cout << "Fe SNIa Yields Calibrated" << beta << std::endl;
+			//std::cout << "Fe SNIa Yields Calibrated" << beta << std::endl;
 			
 			
 			double gammaFactor = sProcFrac*E0/EInf + collFrac*F0/FInf + (1 - collFrac - sProcFrac)*H0_NSM/HInf_NSM;
 			gamma = alpha * sProcFrac* E0/EInf/gammaFactor*pow(10,MgFe_SN + EuMg_SN);
-			std::cout << "Eu CCSN Yields Calibrated" << std::endl;
+			//std::cout << "Eu CCSN Yields Calibrated" << std::endl;
 			
 			delta = collFrac/sProcFrac * EInf/FInf * gamma;
-			std::cout << "Eu Collapsar Yields Calibrated" << std::endl;
+			//std::cout << "Eu Collapsar Yields Calibrated" << std::endl;
 			
 			epsilon = (1.0 - collFrac - sProcFrac)/sProcFrac * EInf/HInf_NSM * gamma;
-			std::cout << "Eu NSM Yields Calibrated" << std::endl;
+			//std::cout << "Eu NSM Yields Calibrated" << std::endl;
 			
 			eta  = alpha * pow(10,MgFe_SN);
-			std::cout << "Mg CCSN Yields Calibrated" << std::endl;
+			//std::cout << "Mg CCSN Yields Calibrated" << std::endl;
 		}
 	
 	
@@ -225,17 +216,51 @@ class Annulus
 			MMg = eta * EVec[index];
 		}
 	
+		void ResetCalibrate()
+		{
+			MFe = 0;
+			MEu = 0;
+			MMg = 0;			
+			CalibrateYields();
+		}
+	
+		void ResetCalibrate(double E0, double EInf, double F0, double FInf, double H0_NSM, double HInf_NSM, double HInf_SNIa)
+		{
+			MFe = 0;
+			MEu = 0;
+			MMg = 0;
+			
+			alpha = RingMass(tauSNIa)/E0 * pow(10,FeH_SN);
+
+			beta = alpha*EInf/HInf_SNIa* (pow(10,MgFe_SN-MgFe_Sat)-1);
+
+			
+			double gammaFactor = sProcFrac*E0/EInf + collFrac*F0/FInf + (1 - collFrac - sProcFrac)*H0_NSM/HInf_NSM;
+			gamma = alpha * sProcFrac* E0/EInf/gammaFactor*pow(10,MgFe_SN + EuMg_SN);
+
+			delta = collFrac/sProcFrac * EInf/FInf * gamma;
+
+			epsilon = (1.0 - collFrac - sProcFrac)/sProcFrac * EInf/HInf_NSM * gamma;
+
+			eta  = alpha * pow(10,MgFe_SN);
+
+		}
+	
+	
 	public: 
+	
 		Annulus(double r,double deltaR,double tMax)
 		{
 			std::cout << "An annulus has just been initialised..." << std::endl;
 			Age = tMax;
 			Radius = r;
-			Width = deltaR;
-			MFe = 0;
-			MEu = 0;
-			MMg = 0;			
-			
+			Width = deltaR;		
+			calculateCorrection();
+			ResetCalibrate();
+		}
+	
+		void Evolve()
+		{
 			EVec=std::vector(IntegrationSteps+1,0.0);
 			FVec=std::vector(IntegrationSteps+1,0.0);
 			GVec=std::vector(IntegrationSteps+1,0.0);
@@ -244,20 +269,13 @@ class Annulus
 			
 			PopulateVectors();
 			
-			CalibrateYields();
-			
-			
-		}
-	
-		void Evolve()
-		{
 			int NSteps = 100;
 			double sharpness = 2;
 			
 			std::ofstream saveFile;
-			std::string saveFileName =FILEROOT + ".dat";
+			std::string saveFileName =FILEROOT;
 			saveFile.open(saveFileName);
-			saveFile << std::setw(15);
+
 	
 	
 			for (int i = 0; i <= NSteps; ++i)
@@ -279,6 +297,156 @@ class Annulus
 			saveFile.close();
 		}
 	
+	
+		void FinalStateIterator()
+		{
+			
+			
+			int N = 150;
+			
+			int tauSteps = N;
+			double minTau = 0.02;
+			double maxTau = 15;
+			
+			int tauSNIaSteps = 15;
+			double minSNIa = 0;
+			double maxSNIa = 1;
+			
+			int cFracSteps = N;
+			double mincFrac = 0.05;
+			double maxcFrac = 1;
+			
+			int wSteps = 10;
+			double minW = 0.0001;
+			double maxW = 14;
+			
+			int sFracSteps = 20;
+			double minsFrac = 0.001;
+			double maxsFrac = 0.05;
+			
+			int IronOnsetSteps = 30;
+			double minIronOnset = -2;
+			double maxIronOnset = -0.5;
+			
+			int mgFePlatSteps = 10;
+			double minMgFePlat = 0.25;
+			double maxMgFePlat = 0.45;
+			
+			int mgFeSatSteps = 20;
+			double minMgFeSat = -0.3;
+			double maxMgFeSat = 0;
+			
+			int eumgSteps = 20;
+			double minEuMg = -0.05;
+			double maxEuMg = 0.1;
+			
+			double EInf = E(tauInf);
+			
+			
+			double HInf_NSM = H(tauInf,tauNSM,nuNSM);
+			
+			double MH = RingMass(tauInf)*0.7;
+			
+			int nModels = 0;
+			int nSuccessful = 0;
+			
+			double upperLimitFe = 0.1;
+			double lowerLimitFe = -0.1;
+			
+			double upperLimitMg = 0.2;
+			double lowerLimitMg = -0.2;
+			std::vector<std::vector<long int>> fracVec(tauSteps,std::vector<long int>( cFracSteps,0));
+			
+			
+			
+			
+			
+			for (int s = 0; s < tauSNIaSteps; ++s)
+			{
+				tauSNIa = (float)s/(tauSNIaSteps-1)*(maxSNIa - minSNIa) + minSNIa;
+				double E0 = E(tauSNIa);
+				double H0_NSM = H(tauSNIa,tauNSM,nuNSM);
+				double HInf_SNIa = H(tauInf,tauSNIa,nuSNIa);
+				
+				for (int i = 0; i < tauSteps; ++i)
+				{
+					tauColls = (float)i/(tauSteps-1)*(maxTau - minTau) + minTau;
+							
+					for (int k = 0; k < wSteps; ++k)
+					{
+						std::cout << s << " " << i << " " << k << std:: endl;
+						collWidth = (float)k/(wSteps-1)*(maxW - minW) + minW;
+						double FInf = F(tauInf,tauColls,collWidth);
+						double F0 = F(tauSNIa,tauColls,collWidth);
+						
+						
+						for (int j = 0; j < cFracSteps; ++j)
+						{
+							collFrac = (float)j/(cFracSteps-1)*(maxcFrac - mincFrac) + mincFrac;
+							
+							for (int l = 0; l < sFracSteps; ++l)
+							{
+								sProcFrac = (float)l/(sFracSteps-1)*(maxsFrac - minsFrac) + minsFrac;
+							
+								for (int a = 0; a < IronOnsetSteps; ++a)
+								{
+									FeH_SN = (float)a/(IronOnsetSteps - 1)*(maxIronOnset - minIronOnset) + minIronOnset;
+							
+									for (int b = 0; b < mgFePlatSteps; ++b)
+									{
+										
+										MgFe_SN = (float)b/(mgFePlatSteps-1)*(maxMgFePlat - minMgFePlat) + minMgFePlat;
+										
+										for (int c = 0; c < mgFeSatSteps; ++c)
+										{
+											
+											MgFe_Sat = (float)c/(mgFeSatSteps -1) *(maxMgFeSat - minMgFeSat) + minMgFeSat;
+											
+											for (int d = 0; d < eumgSteps; ++d)
+											{
+												
+												EuMg_SN = (float)d/(eumgSteps - 1) *(maxEuMg - minEuMg) + minEuMg;
+
+												ResetCalibrate(E0, EInf,F0, FInf,H0_NSM,HInf_NSM,HInf_SNIa);
+															
+												MFe = alpha*EInf + beta *HInf_NSM;
+												MEu = gamma*EInf + delta*FInf + epsilon*HInf_NSM;
+												MMg = eta*EInf;
+												double EuFe = log10(MEu/MFe);
+												double EuMg = log10(MEu/MMg);
+												if (EuFe >= lowerLimitFe && EuFe <=upperLimitFe && EuMg >=lowerLimitMg && EuMg <= upperLimitMg)
+												{
+													++fracVec[i][j]; 
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					
+					}
+					
+				}
+			}
+			
+			std::ofstream saveFile;
+			std::string saveFileName =FILEROOT;
+			saveFile.open(saveFileName);
+			
+			for (int i = 0; i < tauSteps; ++i)
+			{
+				saveFile << (float)i/(tauSteps-1)*(maxTau - minTau) + minTau;
+				for (int j = 0; j < cFracSteps; ++j)
+				{
+					saveFile << ", " << fracVec[i][j];
+				}
+				saveFile << "\n";
+			}
+			
+			saveFile.close();
+			
+		}
 };
 
 
@@ -303,5 +471,12 @@ int main(int argc, char** argv)
 	
 	Annulus A = Annulus(radius,width,14);
 	
-	A.Evolve();
+	if (Mode == 0)
+	{	
+		A.Evolve();
+	}
+	if (Mode == 1)
+	{
+		A.FinalStateIterator();
+	}
 }

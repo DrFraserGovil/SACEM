@@ -1,6 +1,7 @@
 #include "defaultValues.h"
-extern std::string FILEROOT = "Output/Data";
+extern std::string FILEROOT = "Output/Data.dat";
 extern int IntegrationSteps = 7000;
+extern int Mode = 0;
 
 // global variable store for command-line modification
 extern double FeH_SN = -1.2;
@@ -29,7 +30,7 @@ extern double nuColls = 0.5;
 extern double nuSNIa = 0.5;
 extern double tauColls = 20;
 extern double tauSNIa = 0.15;
-extern double tauInf = 150;
+extern double tauInf = 14;
 extern double collWidth = 2;
 extern double tauNSM = 0.05;
 extern double nuNSM = 0.4;
