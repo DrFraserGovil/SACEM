@@ -6,6 +6,8 @@
 
 extern std::string FILEROOT;
 extern int IntegrationSteps;
+extern int Mode;
+
 //calibration data
 
 extern double FeH_SN;
