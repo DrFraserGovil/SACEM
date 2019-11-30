@@ -9,8 +9,8 @@
 using namespace std;
 
 
-vector<string> integerGlobalTriggers = {"-steps"};
-vector<int *> integerGlobalPointers = {&IntegrationSteps};
+vector<string> integerGlobalTriggers = {"-steps","-mode"};
+vector<int *> integerGlobalPointers = {&IntegrationSteps,&Mode};
 
 
 vector<string> doubleGlobalTriggers =  {"-FeH","-MgFeSat","-MgFePlat","-EuMg","-M0","-M1", "-M2","-b1","-b2","-Rd","-nuSFR","-nuColl","-nuSN","-tauColl","-tauSN","-tauInf","-width"};
@@ -184,11 +184,11 @@ bool changeFileRoot(char* arg)
 			string command = "mkdir -p ";
 			command.append(FILEROOT);
 			const char *commandChar = command.c_str(); 
-			const int dir_err = system(commandChar);
-			if (needsSlash)
-			{
-				FILEROOT.append("/");
-			}	
+			//~const int dir_err = system(commandChar);
+			//~if (needsSlash)
+			//~{
+				//~FILEROOT.append("/");
+			//~}	
 		}
 		catch (const std::exception& e)
 		{

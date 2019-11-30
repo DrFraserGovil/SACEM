@@ -302,13 +302,13 @@ class Annulus
 		{
 			
 			
-			int N = 150;
+			int N = 100;
 			
 			int tauSteps = N;
 			double minTau = 0.02;
 			double maxTau = 15;
 			
-			int tauSNIaSteps = 15;
+			int tauSNIaSteps = 10;
 			double minSNIa = 0;
 			double maxSNIa = 1;
 			
@@ -316,15 +316,15 @@ class Annulus
 			double mincFrac = 0.05;
 			double maxcFrac = 1;
 			
-			int wSteps = 10;
+			int wSteps = 7;
 			double minW = 0.0001;
 			double maxW = 14;
 			
-			int sFracSteps = 20;
+			int sFracSteps = 10;
 			double minsFrac = 0.001;
 			double maxsFrac = 0.05;
 			
-			int IronOnsetSteps = 30;
+			int IronOnsetSteps = 10;
 			double minIronOnset = -2;
 			double maxIronOnset = -0.5;
 			
@@ -332,11 +332,11 @@ class Annulus
 			double minMgFePlat = 0.25;
 			double maxMgFePlat = 0.45;
 			
-			int mgFeSatSteps = 20;
+			int mgFeSatSteps = 10;
 			double minMgFeSat = -0.3;
 			double maxMgFeSat = 0;
 			
-			int eumgSteps = 20;
+			int eumgSteps = 10;
 			double minEuMg = -0.05;
 			double maxEuMg = 0.1;
 			
@@ -374,7 +374,7 @@ class Annulus
 							
 					for (int k = 0; k < wSteps; ++k)
 					{
-						std::cout << s << " " << i << " " << k << std:: endl;
+						
 						collWidth = (float)k/(wSteps-1)*(maxW - minW) + minW;
 						double FInf = F(tauInf,tauColls,collWidth);
 						double F0 = F(tauSNIa,tauColls,collWidth);
@@ -387,7 +387,7 @@ class Annulus
 							for (int l = 0; l < sFracSteps; ++l)
 							{
 								sProcFrac = (float)l/(sFracSteps-1)*(maxsFrac - minsFrac) + minsFrac;
-							
+								std::cout << s << " " << i << " " << k << " " << j << " " << l<< std:: endl;
 								for (int a = 0; a < IronOnsetSteps; ++a)
 								{
 									FeH_SN = (float)a/(IronOnsetSteps - 1)*(maxIronOnset - minIronOnset) + minIronOnset;

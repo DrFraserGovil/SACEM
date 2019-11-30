@@ -1,4 +1,4 @@
-tab = readtable("Data2.dat");
+tab = readtable("LargeRun.dat");
 % taus = [];
 % fs = [];
 % matrix = [];
