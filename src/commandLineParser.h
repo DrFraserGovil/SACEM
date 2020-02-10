@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
-#include "defaultValues.h"
+#include "ParameterPack.h"
 #include "stringManipulator.h"
 //See .cpp for initialisation values
 typedef bool (*parseFunctions) (char* arg);
@@ -14,7 +14,7 @@ bool changeFileRoot(char* arg);
 
 
 //Caller
-bool parseCommandLine(int argc, char** argv);
+ParameterPack parseCommandLine(int argc, char** argv);
 
 
 

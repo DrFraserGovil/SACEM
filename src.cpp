@@ -7,7 +7,7 @@
 #include <iostream>
 #include <math.h>
 #include <iomanip>
-#include "src/defaultValues.h"
+#include "src/ParameterPack.h"
 #include "src/commandLineParser.h"
 #include "src/MassReservoir.h"
 
@@ -21,27 +21,27 @@ int main(int argc, char** argv)
 	std::cout << "S-ChEM Routine Initialised" << std::endl;
 	
 	//Parse command line
-	bool parseSucceeded = parseCommandLine(argc, argv);
-	if (!(parseSucceeded))
+	ParameterPack pp = parseCommandLine(argc, argv);
+	if (!(pp.InitialisedCorrectly))
 	{
 		std::cout << "Parse failed. Quitting" << std::endl;
 		return 1;
 	}
-	
+	std::cout << "Parsed command line arguments" << std::endl;
 	
 	double radius = 7;
 	double width = 0.2;
-	densityToMassCorrection = 2 * 3.141592654*radius*width;
-	massToDensityCorrection = 1.0/massToDensityCorrection;
-	totalToRingMassCorrection = radius*width/(galaxyScaleLength*galaxyScaleLength)*exp(-radius/galaxyScaleLength);
+	pp.densityToMassCorrection = 2 * 3.141592654*radius*width;
+	pp.massToDensityCorrection = 1.0/pp.massToDensityCorrection;
+	pp.totalToRingMassCorrection = radius*width/(pp.galaxyScaleLength*pp.galaxyScaleLength)*exp(-radius/pp.galaxyScaleLength);
 
 	//Annulus A = Annulus(radius,width,tauInf);
 	
 
 	//~A.Evolve();
 	
-	double tMax = 14;
-	double deltaT = 0.001;
+	double tMax = pp.tMax;
+	double deltaT = pp.timeStep;
 	std::vector<double> time(0);
 	double t = 0;
 	while (t <= tMax)
@@ -50,8 +50,9 @@ int main(int argc, char** argv)
 		t+=deltaT;
 	}
 	
+
 	
-	MassReservoir ism = MassReservoir(time,true);
+	MassReservoir ism = MassReservoir(time,ppCopy,true);
 
 
 }

@@ -1,4 +1,5 @@
 #include "commandLineParser.h"
+#include "ParameterPack.h"
 #include <string.h>
 #include <iostream>
 #include <vector>
@@ -9,17 +10,19 @@
 using namespace std;
 
 
+ParameterPack pp = ParameterPack();
+
 vector<string> integerGlobalTriggers = {"-steps","-mode"};
-vector<int *> integerGlobalPointers = {&IntegrationSteps,&Mode};
+vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode};
 
 
 vector<string> doubleGlobalTriggers =  {"-FeH","-MgFeSat","-MgFePlat","-EuMg","-M0","-M1", "-M2","-b1","-b2","-Rd","-nuSFR","-nuColl","-nuSN","-tauColl","-tauSN","-tauInf","-width"};
-vector<double *> doubleGlobalPointers = { &FeH_SN,&MgFe_Sat,&MgFe_SN,&EuMg_SN,&galaxyM0,&galaxyM1,&galaxyM2,&galaxyB1,&galaxyB2,&galaxyScaleLength,&nuSFR,&nuColls,&nuSNIa,&tauColls,&tauSNIa,&tauInf,&collWidth};
+vector<double *> doubleGlobalPointers = { &pp.FeH_SN,&pp.MgFe_Sat,&pp.MgFe_SN,&pp.EuMg_SN,&pp.galaxyM0,&pp.galaxyM1,&pp.galaxyM2,&pp.galaxyB1,&pp.galaxyB2,&pp.galaxyScaleLength,&pp.nuSFR,&pp.nuColls,&pp.nuSNIa,&pp.tauColls,&pp.tauSNIa,&pp.tauInf,&pp.collWidth};
 
 
 //fractions are doubles that are constrained to be between zero and 1
-vector<string> fractionGlobalTriggers = {"-sFrac","-collFrac"}; 
-vector<double *> fractionGlobalPointers= {&sProcFrac,&collFrac};
+vector<string> fractionGlobalTriggers = {"-sFrac","-collFrac","-hotFrac"}; 
+vector<double *> fractionGlobalPointers= {&pp.sProcFrac,&pp.collFrac, &pp.hotFrac};
 
 
 //fraction pairs are pairs of doubles between 0 and 1, which sum to 1. Therefore two variables need to be passed, formatted as a vector.
@@ -161,7 +164,8 @@ bool help(char* arg)
 bool changeFileRoot(char* arg)
 {
 
-	FILEROOT = (string)arg;
+	string FILEROOT = (string)arg;
+	pp.FILEROOT = FILEROOT;
 	int n = FILEROOT.size();
 	std::string lastCharacter =FILEROOT.substr(n -1);
 	bool needsSlash = (lastCharacter.compare("/"));
@@ -173,7 +177,7 @@ bool changeFileRoot(char* arg)
 		cout << "Dir exists" << endl;
 		if (needsSlash)
 		{
-			FILEROOT.append("/");
+			pp.FILEROOT.append("/");
 		}	
 	}
 	else
@@ -213,7 +217,7 @@ bool helpNeeded(int argc, char** args)
 	}
 	return false;
 }
-bool parseCommandLine(int argc, char** argv)
+ParameterPack parseCommandLine(int argc, char** argv)
 {
 	//parse command line arguments
 	bool linesParsed = true;
@@ -294,6 +298,7 @@ bool parseCommandLine(int argc, char** argv)
 		cout << "\nWARNING: An uneven number of parameters was passed, so the final command (" << argv[argc-1] << ") was not examined. \nThis is a non-critical error, so code will continue.\n\n" << endl; 
 	}
 	
-	return linesParsed;
+	pp.InitialisedCorrectly = linesParsed;
+	return pp;
 }
 
