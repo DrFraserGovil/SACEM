@@ -26,7 +26,10 @@ extern double galaxyB1;
 extern double galaxyB2;
 extern double galaxyScaleLength;
 extern double nuSFR;
-
+extern double nuCool;
+extern double massToDensityCorrection;
+extern double densityToMassCorrection;
+extern double totalToRingMassCorrection;
 
 //uncalibrated stuff
 extern double nuColls;
@@ -37,3 +40,4 @@ extern double tauNSM;
 extern double nuNSM;
 extern double tauInf;
 extern double collWidth;
+extern double hotFrac;
