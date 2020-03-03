@@ -12,12 +12,12 @@ using namespace std;
 
 ParameterPack pp = ParameterPack();
 
-vector<string> integerGlobalTriggers = {"-steps","-mode"};
-vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode};
+vector<string> integerGlobalTriggers = {"-steps","-mode","-threads"};
+vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads};
 
 
-vector<string> doubleGlobalTriggers =  {"-FeH","-MgFeSat","-MgFePlat","-EuMg","-M0","-M1", "-M2","-b1","-b2","-Rd","-nuSFR","-nuColl","-nuSN","-tauColl","-tauSN","-tauInf","-width"};
-vector<double *> doubleGlobalPointers = { &pp.FeH_SN,&pp.MgFe_Sat,&pp.MgFe_SN,&pp.EuMg_SN,&pp.galaxyM0,&pp.galaxyM1,&pp.galaxyM2,&pp.galaxyB1,&pp.galaxyB2,&pp.galaxyScaleLength,&pp.nuSFR,&pp.nuColls,&pp.nuSNIa,&pp.tauColls,&pp.tauSNIa,&pp.tauInf,&pp.collWidth};
+vector<string> doubleGlobalTriggers =  {"-FeH","-MgFeSat","-MgFePlat","-EuMg","-M0","-M1", "-M2","-b1","-b2","-Rd","-nuSFR","-nuNSM","-nuSN","-tauColl","-tauSN","-tauInf","-width"};
+vector<double *> doubleGlobalPointers = { &pp.FeH_SN,&pp.MgFe_Sat,&pp.MgFe_SN,&pp.EuMg_SN,&pp.galaxyM0,&pp.galaxyM1,&pp.galaxyM2,&pp.galaxyB1,&pp.galaxyB2,&pp.galaxyScaleLength,&pp.nuSFR,&pp.nuNSM,&pp.nuSNIa,&pp.tauColls,&pp.tauSNIa,&pp.tauInf,&pp.collWidth};
 
 
 //fractions are doubles that are constrained to be between zero and 1
