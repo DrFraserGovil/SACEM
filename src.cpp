@@ -141,7 +141,7 @@ void IterationMode(ParameterPack pp)
 		noThreadAssigned = true;	
 		
 		++i;
-		if(i%100 == 0)
+		if(i%10 == 0)
 		{
 			printTimeSince(start,i,NLoops);
 		}
