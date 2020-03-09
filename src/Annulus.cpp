@@ -1,0 +1,213 @@
+#pragma once
+#include "Annulus.h"
+
+
+PathAnnulus::PathAnnulus(ParameterPack pp)
+{
+	PP = pp;
+	
+	double tMax = pp.tauInf*2.02;
+	double deltaT = pp.timeStep;
+	double t = 0;
+	while (t <= tMax)
+	{
+		TimeVector.push_back(t);
+		t+=deltaT;
+	}
+
+	int N = TimeVector.size();
+	Europium.resize(N);
+	Iron.resize(N);
+	Magnesium.resize(N);
+	ISM = MassReservoir(TimeVector, pp, true);
+		std::cout << "SFR Initialised" << std::endl;
+	
+	
+	Calibrate();
+			std::cout << "Calibration completed" << std::endl;
+}
+
+
+double cutoff(double t, double cutT, double wT)
+{
+	double lowT = cutT - wT/2;
+	double upT = cutT + wT/2;
+	
+	if (t < lowT)
+	{
+		return 1;
+	}
+	if (t > upT)
+	{
+		return 0;
+	}
+	
+	return (lowT - t)/wT + 1;
+}
+
+
+double PathAnnulus::Quick(double t, bool decayActive)
+{
+	int N = 1000;
+	double dt = t/(N+1);
+	
+	double start = ISM.ColdGas(0);
+	double end = ISM.ColdGas(t);
+	if(decayActive)
+	{
+		start*=cutoff(0,PP.tauColls, PP.collWidth);
+		end*=cutoff(t,PP.tauColls,PP.collWidth);
+	}
+	
+	double sum = 0.5*(start + end);
+	
+	for (double x= dt; x < t; x+=dt)
+	{
+		double temp = ISM.ColdGas(x);
+		if (decayActive)
+		{
+			temp*=cutoff(x,PP.tauColls,PP.collWidth);
+		}
+		sum+=temp;
+	}
+	
+	return sum*PP.nuSFR*dt;
+	
+}
+
+
+double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
+{
+	int N = 500;
+	double dt = t/(N+1);
+	double sum = 0;
+	for (double x = tau +dt; x < t; x+=dt)
+	{
+		sum += ISM.ColdGas(x) * exp(-nu*(x - tau));
+	} 
+	if (t > tau)
+	{
+		sum += 0.5*(ISM.ColdGas(tau)*exp(nu*tau) + ISM.ColdGas(t)*exp(-nu*(t - tau)));
+	}
+	return sum*dt*PP.nuSFR; 
+}
+
+double PathAnnulus::Slow(double t, double tau, double nu)
+{
+	if (t < tau)
+	{
+		return 0;
+	}
+	int N = 500;
+	double dt = t/(N+1);
+	double sum = 0;
+	for (double x = tau +dt; x < t; x+=dt)
+	{
+		sum+=SlowIntegrand(x,tau,nu);
+	} 
+	sum += 0.5*(SlowIntegrand(t,tau,nu) );
+	return sum*dt;
+}
+
+
+
+void PathAnnulus::Calibrate()
+{
+		double mass = ISM.ColdGas(PP.tauSNIa) + ISM.HotGas(PP.tauSNIa) + ISM.Stars(PP.tauSNIa);
+		
+		double EInf = Quick(PP.tauInf,false);
+		double E0 = Quick(PP.tauSNIa,false);
+		
+		double FInf = Quick(PP.tauInf,true);
+		double F0 = Quick(PP.tauSNIa,true);
+		
+		double HSNIa_Inf = Slow(PP.tauInf,PP.tauSNIa,PP.nuSNIa);
+		double HNSM_0 = Slow(PP.tauSNIa, PP.tauNSM, PP.nuNSM);	
+		double HNSM_Inf = Slow(PP.tauInf, PP.tauNSM, PP.nuNSM);
+		
+		double Fcal = PP.FeH_SN;
+		double M0 = PP.MgFe_SN;
+		double MInf = PP.MgFe_Sat;
+		double Eps = PP.EuMg_SN;
+		double zeta = PP.sProcFrac;
+		double omega = PP.collFrac;
+		double nsmFrac = 1.0 - zeta - omega;
+		
+		std::cout << PP.tauSNIa << std::endl;
+		
+		alpha = mass/E0 * pow(10.0,Fcal);
+		beta = alpha * EInf/HSNIa_Inf*(pow(10.0,M0 - MInf) - 1.0);
+		eta = alpha * pow(10.0,M0);
+		
+		
+		double gammaFrac = zeta*E0/EInf + omega * F0/FInf + nsmFrac*HNSM_0/HNSM_Inf;
+		
+		
+
+		gamma = eta * pow(10.0,Eps) * zeta * E0/EInf / gammaFrac;
+		
+		delta = omega/zeta * EInf/FInf * gamma;
+		
+		epsilon = nsmFrac/zeta * gamma * EInf;
+		
+		
+		
+		std::vector<double> vals = {alpha, beta, gamma, delta, epsilon, eta,F0,E0,FInf,EInf,HSNIa_Inf,HNSM_0,HNSM_Inf};
+		std::vector<std::string> names = {"alpha", "beta", "gamma", "delta", "epsilon", "eta","F0","E0","FInf","EInf","AInf","B0","BInf"};
+		
+		for (int i = 0; i < vals.size(); ++i)
+		{
+			std::cout << names[i] << ": " << vals[i] << std::endl;
+		}	
+}
+void PathAnnulus::Evolve()
+{
+	//clean vectors
+	int N = TimeVector.size();
+	
+	
+	std::ofstream saveFile;
+	std::string saveFileName =PP.FILEROOT + "Chemicals.dat";
+	saveFile.open(saveFileName);
+	std::vector<std::string> titles = {"Time", "Iron", "Magnesium", "Europium"};
+	int width = 15;
+	for (int i = 0; i < titles.size(); ++i)
+	{
+		saveFile << std::setw(width) << std::left << titles[i];  
+	}
+	saveFile << "\n";
+	int i = 0;
+	double t =0;
+
+	
+	while (i < N && t < PP.tMax)
+	{
+		t = TimeVector[i];
+		double qT = Quick(t,false);
+		double H = 0.7 * (ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
+		double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM, PP.nuNSM);
+		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa, PP.nuSNIa);
+		double mg = eta*qT;
+		
+		std::vector<double> vals = {t, log10(fe/H), log10(mg/H), log10(eu/H)};
+		for(int i = 0; i < vals.size(); ++i)
+		{
+			saveFile << std::setw(width) << vals[i];
+		}
+		saveFile << "\n";
+		
+		Europium[i] = eu;
+		Iron[i] = fe;
+		Magnesium[i] = mg;
+		
+		++i;
+	}
+	
+	saveFile.close();
+	
+	
+	
+
+	
+}
+
