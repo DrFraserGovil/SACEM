@@ -1,6 +1,8 @@
 #include "ParameterPack.h"
 
 
+std::random_device rd;
+std::mt19937 mt(rd());
 VariedParameter::VariedParameter()
 {
 	Value = 0.0;
@@ -9,6 +11,7 @@ VariedParameter::VariedParameter()
 	NSteps = 0;
 	bruch = 1;
 	CurrentIndex = 0;
+	dist =  std::uniform_real_distribution(0.0,1.0);
 }
 
 VariedParameter::VariedParameter(double value, double min, double max, int nSteps)
@@ -18,6 +21,7 @@ VariedParameter::VariedParameter(double value, double min, double max, int nStep
 	MaxValue = max;
 	NSteps = nSteps;
 	CurrentIndex = 0;
+	dist =  std::uniform_real_distribution(min,std::nextafter(max,DBL_MAX));
 	if (NSteps > 1)
 	{
 		bruch = (MaxValue - MinValue)/(NSteps - 1);
@@ -30,12 +34,6 @@ VariedParameter::VariedParameter(double value, double min, double max, int nStep
 	
 }
 
-int VariedParameter::Index()
-{
-	return CurrentIndex;
-}
-
-
 void VariedParameter::UpdateValue(int stepIndex)
 {
 	Value = MinValue + bruch*stepIndex;
@@ -44,6 +42,11 @@ void VariedParameter::UpdateValue(int stepIndex)
 double VariedParameter::IntermediateValue(int stepIndex)
 {
 	return MinValue + bruch*stepIndex;
+}
+
+void VariedParameter::RandomiseValue()
+{
+	
 }
 
 ParameterPack::ParameterPack()

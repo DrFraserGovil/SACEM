@@ -25,42 +25,11 @@ std::vector<double> TimeVector;
 std::vector<std::vector<int>> BigGrid;
 
 
-ParameterPack Dive(ParameterPack pp, std::vector<int> &pos)
+ParameterPack RandomiseGalaxy(ParameterPack pp)
 {
-	ParameterPack copy = pp;
-	std::vector<VariedParameter * > values =  {&copy.galaxyM0, &copy.galaxyM1, &copy.galaxyM2, &copy.galaxyB1, &copy.galaxyB2, &copy.galaxyScaleLength, &copy.nuSFR, &copy.nuCool,&copy.alphaKS, &copy.hotFrac};
 	
-	bool found = false;
-	int N = pos.size();
-	for (int j= 0; j < N; ++j)
-	{
-		pos[j] = pos[j] + 1;
-		
-		if (pos[j] >= values[j][0].NSteps )
-		{
-			pos[j] = 0;
-			found = false;
-		}
-		else
-		{
-			j = N;
-			found = true;
-		}
-	}
 	
-	copy.InitialisedCorrectly = found;
-	
-	if (found)
-	{
-		for (int j = 0; j < N; ++j)
-		{
-			values[j][0].UpdateValue(pos[j]);
-		}
-	}
-	
-	return copy;
 }
-
 
 void SaveGrid(ParameterPack copy)
 {
@@ -118,10 +87,7 @@ void IterationMode(ParameterPack pp)
 	
 	//preparing iterator values
 	ParameterPack copy = pp;
-	int NLoopsVariables = 10;
-	std::vector<int> pos = std::vector(NLoopsVariables,0);
-	pos[0] = -1;
-	
+		
 	//initialising threads
 	int currentThread = 0;
 	std::vector<std::thread> persei(pp.NThreads);
@@ -135,7 +101,7 @@ void IterationMode(ParameterPack pp)
 	while (copy.InitialisedCorrectly)
 	{	
 		//perform the recursive search through the provided parameters, and save them to a ParameterPack object. 
-		copy  = Dive(pp, pos);
+		copy  = RandomiseGalaxy(pp);
 		while (noThreadAssigned == true)
 		{
 			for (int j = 0; j < pp.NThreads; ++j)
@@ -199,10 +165,7 @@ int main(int argc, char** argv)
 	double width = 0.2;
 	
 	pp.UpdateRadius(radius,width);
-	//Annulus A = Annulus(radius,width,tauInf);
-	
 
-	//~A.Evolve();
 	
 	if (pp.Mode == 0)
 	{

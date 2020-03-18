@@ -2,25 +2,33 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <random>
 
 class VariedParameter
 {
 	public:
 		VariedParameter();
 		VariedParameter(double value, double min, double max, int NSteps);
+		
+		
 		int NSteps;
 		double Value;
+		
+		//stepthrough functions
 		void UpdateValue(int stepIndex);
 		double IntermediateValue(int stepIndex);
-	
-		double MinValue;
-		double MaxValue;
 		
-		int Index();
+		//randomiser
+		void RandomiseValue()
+		
 		
 	private:
+	
 		double bruch;
+		double MinValue;
+		double MaxValue;
 		int CurrentIndex;
+		 std::uniform_real_distribution<double> dist;
 };
 
 
