@@ -15,7 +15,7 @@
 #include "src/commandLineParser.h"
 #include "src/MassReservoir.h"
 #include "src/Annulus.h"
-#include "src/IteratorClasses.h"
+
 #include "src/TimeSystems.h"
 
 
@@ -52,7 +52,7 @@ void SaveGrid(ParameterPack copy)
 void LaunchProcess(ParameterPack copy, int id)
 {
 	std::vector<std::vector<int>> grid = std::vector(copy.tauColls.NSteps,std::vector(copy.collFrac.NSteps,0));
-	ISMIterator iterator = ISMIterator(copy,TimeVector, &grid);
+//	ISMIterator iterator = ISMIterator(copy,TimeVector, &grid);
 	
 	for (int i = 0; i < copy.tauColls.NSteps; ++i)
 	{

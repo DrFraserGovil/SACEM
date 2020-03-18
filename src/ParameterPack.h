@@ -19,7 +19,7 @@ class VariedParameter
 		double IntermediateValue(int stepIndex);
 		
 		//randomiser
-		void RandomiseValue()
+		void RandomiseValue();
 		
 		
 	private:

@@ -21,7 +21,7 @@ VariedParameter::VariedParameter(double value, double min, double max, int nStep
 	MaxValue = max;
 	NSteps = nSteps;
 	CurrentIndex = 0;
-	dist =  std::uniform_real_distribution(min,std::nextafter(max,DBL_MAX));
+	dist =  std::uniform_real_distribution(min,max);
 	if (NSteps > 1)
 	{
 		bruch = (MaxValue - MinValue)/(NSteps - 1);
