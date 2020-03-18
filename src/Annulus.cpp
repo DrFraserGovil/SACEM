@@ -55,8 +55,8 @@ double PathAnnulus::Quick(double t, bool decayActive)
 	double end = ISM.ColdGas(t);
 	if(decayActive)
 	{
-		start*=cutoff(0,PP.tauColls, PP.collWidth);
-		end*=cutoff(t,PP.tauColls,PP.collWidth);
+		start*=cutoff(0,PP.tauColls.Value, PP.collWidth.Value);
+		end*=cutoff(t,PP.tauColls.Value,PP.collWidth.Value);
 	}
 	
 	double sum = 0.5*(start + end);
@@ -66,12 +66,12 @@ double PathAnnulus::Quick(double t, bool decayActive)
 		double temp = ISM.ColdGas(x);
 		if (decayActive)
 		{
-			temp*=cutoff(x,PP.tauColls,PP.collWidth);
+			temp*=cutoff(x,PP.tauColls.Value,PP.collWidth.Value);
 		}
 		sum+=temp;
 	}
 	
-	return sum*PP.nuSFR*dt;
+	return sum*PP.nuSFR.Value*dt;
 	
 }
 
@@ -89,7 +89,7 @@ double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
 	{
 		sum += 0.5*(ISM.ColdGas(tau)*exp(nu*tau) + ISM.ColdGas(t)*exp(-nu*(t - tau)));
 	}
-	return sum*dt*PP.nuSFR; 
+	return sum*dt*PP.nuSFR.Value; 
 }
 
 double PathAnnulus::Slow(double t, double tau, double nu)
@@ -113,27 +113,25 @@ double PathAnnulus::Slow(double t, double tau, double nu)
 
 void PathAnnulus::Calibrate()
 {
-		double mass = ISM.ColdGas(PP.tauSNIa) + ISM.HotGas(PP.tauSNIa) + ISM.Stars(PP.tauSNIa);
+		double mass = ISM.ColdGas(PP.tauSNIa.Value) + ISM.HotGas(PP.tauSNIa.Value) + ISM.Stars(PP.tauSNIa.Value);
 		
 		double EInf = Quick(PP.tauInf,false);
-		double E0 = Quick(PP.tauSNIa,false);
+		double E0 = Quick(PP.tauSNIa.Value,false);
 		
 		double FInf = Quick(PP.tauInf,true);
-		double F0 = Quick(PP.tauSNIa,true);
+		double F0 = Quick(PP.tauSNIa.Value,true);
 		
-		double HSNIa_Inf = Slow(PP.tauInf,PP.tauSNIa,PP.nuSNIa);
-		double HNSM_0 = Slow(PP.tauSNIa, PP.tauNSM, PP.nuNSM);	
-		double HNSM_Inf = Slow(PP.tauInf, PP.tauNSM, PP.nuNSM);
+		double HSNIa_Inf = Slow(PP.tauInf,PP.tauSNIa.Value,PP.nuSNIa.Value);
+		double HNSM_0 = Slow(PP.tauSNIa.Value, PP.tauNSM.Value, PP.nuNSM.Value);	
+		double HNSM_Inf = Slow(PP.tauInf, PP.tauNSM.Value, PP.nuNSM.Value);
 		
-		double Fcal = PP.FeH_SN;
-		double M0 = PP.MgFe_SN;
-		double MInf = PP.MgFe_Sat;
-		double Eps = PP.EuMg_SN;
-		double zeta = PP.sProcFrac;
-		double omega = PP.collFrac;
+		double Fcal = PP.FeH_SN.Value;
+		double M0 = PP.MgFe_SN.Value;
+		double MInf = PP.MgFe_Sat.Value;
+		double Eps = PP.EuMg_SN.Value;
+		double zeta = PP.sProcFrac.Value;
+		double omega = PP.collFrac.Value;
 		double nsmFrac = 1.0 - zeta - omega;
-		
-		std::cout << PP.tauSNIa << std::endl;
 		
 		alpha = mass/E0 * pow(10.0,Fcal);
 		beta = alpha * EInf/HSNIa_Inf*(pow(10.0,M0 - MInf) - 1.0);
@@ -141,24 +139,10 @@ void PathAnnulus::Calibrate()
 		
 		
 		double gammaFrac = zeta*E0/EInf + omega * F0/FInf + nsmFrac*HNSM_0/HNSM_Inf;
-		
-		
-
 		gamma = eta * pow(10.0,Eps) * zeta * E0/EInf / gammaFrac;
-		
 		delta = omega/zeta * EInf/FInf * gamma;
-		
 		epsilon = nsmFrac/zeta * gamma * EInf;
-		
-		
-		
-		std::vector<double> vals = {alpha, beta, gamma, delta, epsilon, eta,F0,E0,FInf,EInf,HSNIa_Inf,HNSM_0,HNSM_Inf};
-		std::vector<std::string> names = {"alpha", "beta", "gamma", "delta", "epsilon", "eta","F0","E0","FInf","EInf","AInf","B0","BInf"};
-		
-		for (int i = 0; i < vals.size(); ++i)
-		{
-			std::cout << names[i] << ": " << vals[i] << std::endl;
-		}	
+			
 }
 void PathAnnulus::Evolve()
 {
@@ -185,8 +169,8 @@ void PathAnnulus::Evolve()
 		t = TimeVector[i];
 		double qT = Quick(t,false);
 		double H = 0.7 * (ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
-		double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM, PP.nuNSM);
-		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa, PP.nuSNIa);
+		double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM.Value, PP.nuNSM.Value);
+		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
 		double mg = eta*qT;
 		
 		std::vector<double> vals = {t, log10(fe/H), log10(mg/H), log10(eu/H)};

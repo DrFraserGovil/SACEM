@@ -22,15 +22,21 @@
 std::vector<bool> threadActive(1,false);
 std::vector<double> TimeVector;
 
-ParameterPack Dive(ParameterPack pp, std::vector<double> &minValues, std::vector<double> &maxValues, std::vector<int> &steps, std::vector<int> &pos)
+std::vector<std::vector<int>> BigGrid;
+
+
+ParameterPack Dive(ParameterPack pp, std::vector<int> &pos)
 {
+	ParameterPack copy = pp;
+	std::vector<VariedParameter * > values =  {&copy.galaxyM0, &copy.galaxyM1, &copy.galaxyM2, &copy.galaxyB1, &copy.galaxyB2, &copy.galaxyScaleLength, &copy.nuSFR, &copy.nuCool,&copy.alphaKS, &copy.hotFrac};
+	
 	bool found = false;
 	int N = pos.size();
 	for (int j= 0; j < N; ++j)
 	{
 		pos[j] = pos[j] + 1;
 		
-		if (pos[j] >= steps[j] )
+		if (pos[j] >= values[j][0].NSteps )
 		{
 			pos[j] = 0;
 			found = false;
@@ -41,30 +47,52 @@ ParameterPack Dive(ParameterPack pp, std::vector<double> &minValues, std::vector
 			found = true;
 		}
 	}
-	ParameterPack copy = pp;
+	
 	copy.InitialisedCorrectly = found;
 	
-	std::vector<double * > currentValues =  {&copy.galaxyM0, &copy.galaxyM1, &copy.galaxyM2, &copy.galaxyB1, &copy.galaxyB2, &copy.galaxyScaleLength, &copy.nuSFR, &copy.nuCool,&copy.alphaKS, &copy.hotFrac};
-
 	if (found)
 	{
-
 		for (int j = 0; j < N; ++j)
 		{
-			double bruch = (maxValues[j] - minValues[j])/(N - 1);
-		
-			currentValues[j][0] = minValues[j] + pos[j] * bruch;
+			values[j][0].UpdateValue(pos[j]);
 		}
 	}
-
 	
 	return copy;
 }
 
 
+void SaveGrid(ParameterPack copy)
+{
+	std::ofstream saveFile;
+	std::string saveFileName =copy.FILEROOT + "SuccessGrid.dat";
+	saveFile.open(saveFileName);
+	int width = 15;
+	for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	{
+		for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		{
+			saveFile << std::setw(width) << std::left << BigGrid[i][j];
+		}
+		saveFile << "\n";
+	}
+	
+	saveFile.close();
+}
+
 void LaunchProcess(ParameterPack copy, int id)
 {
-	ISMIterator iterator = ISMIterator(copy,TimeVector);
+	std::vector<std::vector<int>> grid = std::vector(copy.tauColls.NSteps,std::vector(copy.collFrac.NSteps,0));
+	ISMIterator iterator = ISMIterator(copy,TimeVector, &grid);
+	
+	for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	{
+		for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		{
+			BigGrid[i][j] += grid[i][j]; 
+		}
+	}
+
 	threadActive[id] = false;
 }
 
@@ -85,25 +113,16 @@ void IterationMode(ParameterPack pp)
 {
 	auto start = std::chrono::high_resolution_clock::now();
 	
-	
 	generateTimeVector(pp);
+	int NLoops = pp.CountThreadLoops();
 	
-	std::vector<double> minValues = {pp.galaxyM0_Min, pp.galaxyM1_Min, pp.galaxyM2_Min, pp.galaxyB1_Min, pp.galaxyB2_Min, pp.galaxyScaleLength_Min, pp.nuSFR_Min, pp.nuCool_Min,pp.alphaKS_Min, pp.hotFrac_Min};
-	std::vector<double> maxValues = {pp.galaxyM0_Max, pp.galaxyM1_Max, pp.galaxyM2_Max, pp.galaxyB1_Max, pp.galaxyB2_Max, pp.galaxyScaleLength_Max, pp.nuSFR_Max, pp.nuCool_Max,pp.alphaKS_Max, pp.hotFrac_Max};
-	
-	
-	std::vector<int>    valueSteps = {pp.galaxyM0_N, pp.galaxyM1_N, pp.galaxyM1_N, pp.galaxyB1_N, pp.galaxyB2_N, pp.galaxyScaleLength_N, pp.nuSFR_N, pp.nuCool_N,pp.alphaKS_N, pp.hotFrac_N};
-	std::vector<int> pos = std::vector(minValues.size(),0);
-	
-	int NLoops = 1;
-	for (int j = 0; j < minValues.size(); ++j)
-	{
-		NLoops *= valueSteps[j];
-	}
-	
-	int i = 0;
+	//preparing iterator values
 	ParameterPack copy = pp;
+	int NLoopsVariables = 10;
+	std::vector<int> pos = std::vector(NLoopsVariables,0);
+	pos[0] = -1;
 	
+	//initialising threads
 	int currentThread = 0;
 	std::vector<std::thread> persei(pp.NThreads);
 	threadActive.resize(pp.NThreads);
@@ -112,10 +131,11 @@ void IterationMode(ParameterPack pp)
 		threadActive[i] = false;
 	}
 	bool noThreadAssigned = false;
-	
+	int i = 0;
 	while (copy.InitialisedCorrectly)
 	{	
-		copy  = Dive(pp,minValues, maxValues, valueSteps, pos);
+		//perform the recursive search through the provided parameters, and save them to a ParameterPack object. 
+		copy  = Dive(pp, pos);
 		while (noThreadAssigned == true)
 		{
 			for (int j = 0; j < pp.NThreads; ++j)
@@ -191,7 +211,10 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		pp.LosePresets();		
+		BigGrid = std::vector(pp.tauColls.NSteps,std::vector(pp.collFrac.NSteps,0));
 		IterationMode(pp);
+		SaveGrid(pp);
 	}
 
 }

@@ -25,8 +25,8 @@ double IMF(double M,double alpha)
 
 double MassReservoir::accretionRate(double t)
 {
-	std::vector<double> Ms = {PP.galaxyM1,PP.galaxyM2};
-	std::vector<double> Bs = {PP.galaxyB1,PP.galaxyB2};
+	std::vector<double> Ms = {PP.galaxyM1.Value,PP.galaxyM2.Value};
+	std::vector<double> Bs = {PP.galaxyB1.Value,PP.galaxyB2.Value};
 	
 	double mass = 0;
 	for (int i = 0; i < Ms.size(); ++i)
@@ -63,7 +63,7 @@ MassReservoir::MassReservoir(std::vector<double> time,ParameterPack pp, bool sav
 	HotGasMass[0] = 0;
 	deathRate[0] = 0;
 	
-	ColdGasMass[0] = PP.galaxyM0*PP.totalToRingMassCorrection;
+	ColdGasMass[0] = PP.galaxyM0.Value*PP.totalToRingMassCorrection;
 	
 	timeStorage = time;
 	
@@ -146,9 +146,9 @@ void MassReservoir::Evolve(bool saveFileActive)
 	{
 		double t = timeStorage[i];
 		double D = 0.01*StarMass[i-1];//DeathFunction(timeStorage[i-1]);
-		double dmStar = PP.nuSFR*ColdGasMass[i-1] - D;
-		double dmCold = accretionRate(t) - PP.nuSFR*ColdGasMass[i-1] + PP.nuCool * HotGasMass[i-1] + (1.0 - PP.hotFrac)*D;
-		double dmHot = - PP.nuCool * HotGasMass[i-1] + PP.hotFrac*D;
+		double dmStar = PP.nuSFR.Value*ColdGasMass[i-1] - D;
+		double dmCold = accretionRate(t) - PP.nuSFR.Value*ColdGasMass[i-1] + PP.nuCool.Value * HotGasMass[i-1] + (1.0 - PP.hotFrac.Value)*D;
+		double dmHot = - PP.nuCool.Value * HotGasMass[i-1] + PP.hotFrac.Value*D;
 		
 		ColdGasMass[i] = ColdGasMass[i-1] + dt*dmCold;
 		StarMass[i] = StarMass[i-1] + dt*dmStar;
@@ -170,7 +170,7 @@ void MassReservoir::Evolve(bool saveFileActive)
 		saveFile << "\n";
 		for (int j = 0; j < Size; ++j)
 		{
-			std::vector<double> vals = { timeStorage[j], ColdGasMass[j], HotGasMass[j], StarMass[j], deathRate[j], PP.nuSFR*ColdGasMass[j]};
+			std::vector<double> vals = { timeStorage[j], ColdGasMass[j], HotGasMass[j], StarMass[j], deathRate[j], PP.nuSFR.Value*ColdGasMass[j]};
 			for(int i = 0; i < vals.size(); ++i)
 			{
 				saveFile << std::setw(width) << vals[i];
@@ -206,7 +206,7 @@ double MassReservoir::DeathFunction(double t)
 	double alpha = 2.3;
 	double gamma = 2.5;
 	double tauTilde = 10;
-	double prefactor = pow(tauTilde,1.0/gamma)*PP.nuSFR/gamma;
+	double prefactor = pow(tauTilde,1.0/gamma)*PP.nuSFR.Value/gamma;
 	int N = 200;
 	double h = 0.01;
 	double pi = 3.141592654;

@@ -16,13 +16,13 @@ vector<string> integerGlobalTriggers = {"-steps","-mode","-threads"};
 vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads};
 
 
-vector<string> doubleGlobalTriggers =  {"-FeH","-MgFeSat","-MgFePlat","-EuMg","-M0","-M1", "-M2","-b1","-b2","-Rd","-nuSFR","-nuNSM","-nuSN","-tauColl","-tauSN","-tauInf","-width"};
-vector<double *> doubleGlobalPointers = { &pp.FeH_SN,&pp.MgFe_Sat,&pp.MgFe_SN,&pp.EuMg_SN,&pp.galaxyM0,&pp.galaxyM1,&pp.galaxyM2,&pp.galaxyB1,&pp.galaxyB2,&pp.galaxyScaleLength,&pp.nuSFR,&pp.nuNSM,&pp.nuSNIa,&pp.tauColls,&pp.tauSNIa,&pp.tauInf,&pp.collWidth};
+vector<string> doubleGlobalTriggers =  {};
+vector<double *> doubleGlobalPointers = { };
 
 
 //fractions are doubles that are constrained to be between zero and 1
-vector<string> fractionGlobalTriggers = {"-sFrac","-collFrac","-hotFrac"}; 
-vector<double *> fractionGlobalPointers= {&pp.sProcFrac,&pp.collFrac, &pp.hotFrac};
+vector<string> fractionGlobalTriggers = {}; 
+vector<double *> fractionGlobalPointers= {};
 
 
 //fraction pairs are pairs of doubles between 0 and 1, which sum to 1. Therefore two variables need to be passed, formatted as a vector.
