@@ -188,11 +188,14 @@ bool changeFileRoot(char* arg)
 			string command = "mkdir -p ";
 			command.append(FILEROOT);
 			const char *commandChar = command.c_str(); 
-			//~const int dir_err = system(commandChar);
-			//~if (needsSlash)
-			//~{
-				//~FILEROOT.append("/");
-			//~}	
+			const int dir_err = system(commandChar);
+			if (needsSlash)
+			{
+				FILEROOT.append("/");
+			}	
+			command = "mkdir -p " +FILEROOT + "IterationChecker/";
+			const char *commandChar2 = command.c_str(); 
+			const int dir_err2 = system(commandChar2);
 		}
 		catch (const std::exception& e)
 		{
