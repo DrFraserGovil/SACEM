@@ -15,7 +15,7 @@
 #include "src/commandLineParser.h"
 #include "src/MassReservoir.h"
 #include "src/Annulus.h"
-
+#include "src/Parameters.h"
 #include "src/TimeSystems.h"
 
 
@@ -37,30 +37,30 @@ void SaveGrid(ParameterPack copy)
 	std::string saveFileName =copy.FILEROOT + "SuccessGrid.dat";
 	saveFile.open(saveFileName);
 	int width = 15;
-	for (int i = 0; i < copy.tauColls.NSteps; ++i)
-	{
-		for (int j = 0; j < copy.collFrac.NSteps; ++j)
-		{
-			saveFile << std::setw(width) << std::left << BigGrid[i][j];
-		}
-		saveFile << "\n";
-	}
+	//~ for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	//~ {
+		//~ for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		//~ {
+			//~ saveFile << std::setw(width) << std::left << BigGrid[i][j];
+		//~ }
+		//~ saveFile << "\n";
+	//~ }
 	
 	saveFile.close();
 }
 
 void LaunchProcess(ParameterPack copy, int id)
 {
-	std::vector<std::vector<int>> grid = std::vector(copy.tauColls.NSteps,std::vector(copy.collFrac.NSteps,0));
+	//std::vector<std::vector<int>> grid = std::vector(copy.tauColls.NSteps,std::vector(copy.collFrac.NSteps,0));
 //	ISMIterator iterator = ISMIterator(copy,TimeVector, &grid);
 	
-	for (int i = 0; i < copy.tauColls.NSteps; ++i)
-	{
-		for (int j = 0; j < copy.collFrac.NSteps; ++j)
-		{
-			BigGrid[i][j] += grid[i][j]; 
-		}
-	}
+	//~ for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	//~ {
+		//~ for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		//~ {
+			//~ BigGrid[i][j] += grid[i][j]; 
+		//~ }
+	//~ }
 
 	threadActive[id] = false;
 }
@@ -83,7 +83,7 @@ void IterationMode(ParameterPack pp)
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	generateTimeVector(pp);
-	int NLoops = pp.CountThreadLoops();
+	int NLoops = 10;//pp.CountThreadLoops();
 	
 	//preparing iterator values
 	ParameterPack copy = pp;
@@ -166,7 +166,6 @@ int main(int argc, char** argv)
 	
 	pp.UpdateRadius(radius,width);
 
-	
 	if (pp.Mode == 0)
 	{
 		PathAnnulus A = PathAnnulus(pp);
@@ -174,8 +173,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		pp.LosePresets();		
-		BigGrid = std::vector(pp.tauColls.NSteps,std::vector(pp.collFrac.NSteps,0));
+		//BigGrid = std::vector(pp.tauColls.NSteps,std::vector(pp.collFrac.NSteps,0));
 		IterationMode(pp);
 		SaveGrid(pp);
 	}

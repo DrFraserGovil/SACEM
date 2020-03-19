@@ -3,41 +3,16 @@
 #include <vector>
 #include <math.h>
 #include <random>
+#include "Parameters.h"
 
-class VariedParameter
-{
-	public:
-		VariedParameter();
-		VariedParameter(double value, double min, double max, int NSteps);
-		
-		
-		int NSteps;
-		double Value;
-		
-		//stepthrough functions
-		void UpdateValue(int stepIndex);
-		double IntermediateValue(int stepIndex);
-		
-		//randomiser
-		void RandomiseValue();
-		
-		
-	private:
-	
-		double bruch;
-		double MinValue;
-		double MaxValue;
-		int CurrentIndex;
-		 std::uniform_real_distribution<double> dist;
-};
-
+extern std::random_device global_rd;
+extern std::mt19937 global_mt;
 
 class ParameterPack
 {
 		public:
 		
 			ParameterPack();
-			void LosePresets();
 			bool InitialisedCorrectly;
 			
 			// global variable store for command-line modification
@@ -50,43 +25,44 @@ class ParameterPack
 			double tauInf;
 			//calibration data
 			
-			VariedParameter FeH_SN;
-			VariedParameter MgFe_SN;
-			VariedParameter MgFe_Sat;
-			VariedParameter EuMg_SN;
-			VariedParameter sProcFrac;
-			VariedParameter collFrac;
+			RandomisableParameter<double> FeH_SN;
+			RandomisableParameter<double> MgFe_SN;
+			RandomisableParameter<double> MgFe_Sat;
+			RandomisableParameter<double> EuMg_SN;
+			RandomisableParameter<double> sProcFrac;
+			RandomisableParameter<double> collFrac;
 			
 			//constraining values
 			double finalEuFe_Min;
 			double finalEuFe_Max;
 						
 			//accretion/infall parameter
-			VariedParameter galaxyM0;
-			VariedParameter galaxyM1;
-			VariedParameter galaxyM2;
-			VariedParameter galaxyB1;
-			VariedParameter galaxyB2;
-			VariedParameter galaxyScaleLength;
-			VariedParameter nuSFR;
-			VariedParameter nuCool;
-			VariedParameter alphaKS;
-			VariedParameter hotFrac;
+			RandomisableParameter<double> galaxyM0;
+			RandomisableParameter<double> galaxyM1;
+			RandomisableParameter<double> galaxyM2;
+			RandomisableParameter<double> galaxyB1;
+			RandomisableParameter<double> galaxyB2;
+			RandomisableParameter<double> galaxyScaleLength;
+			RandomisableParameter<double> nuSFR;
+			RandomisableParameter<double> nuCool;
+			RandomisableParameter<double> alphaKS;
+			RandomisableParameter<double> hotFrac;
 			
 			double massToDensityCorrection;
 			double densityToMassCorrection;
 			double totalToRingMassCorrection;
 					
 			//uncalibrated stuff		
-			VariedParameter tauColls;
-			VariedParameter collWidth;
-			VariedParameter tauSNIa;
-			VariedParameter nuSNIa;
-			VariedParameter tauNSM;
-			VariedParameter nuNSM;
+			RandomisableParameter<double> tauColls;
+			RandomisableParameter<double> collWidth;
+			RandomisableParameter<double> tauSNIa;
+			RandomisableParameter<double> nuSNIa;
+			RandomisableParameter<double> tauNSM;
+			RandomisableParameter<double> nuNSM;
 	
 			void UpdateRadius(double r, double deltaR);
-			int CountThreadLoops();
+
+
 	
 };
 

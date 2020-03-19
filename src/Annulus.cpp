@@ -153,7 +153,7 @@ void PathAnnulus::Evolve()
 	std::ofstream saveFile;
 	std::string saveFileName =PP.FILEROOT + "Chemicals.dat";
 	saveFile.open(saveFileName);
-	std::vector<std::string> titles = {"Time", "Iron", "Magnesium", "Europium"};
+	std::vector<std::string> titles = {"Time", "Hydrogen","Iron", "Magnesium", "Europium","Quick","NSM","SN"};
 	int width = 15;
 	for (int i = 0; i < titles.size(); ++i)
 	{
@@ -173,7 +173,7 @@ void PathAnnulus::Evolve()
 		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
 		double mg = eta*qT;
 		
-		std::vector<double> vals = {t, log10(fe/H), log10(mg/H), log10(eu/H)};
+		std::vector<double> vals = {t, log10(H), log10(fe), log10(mg), log10(eu),qT,Slow(t,PP.tauNSM.Value, PP.nuNSM.Value),Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value)};
 		for(int i = 0; i < vals.size(); ++i)
 		{
 			saveFile << std::setw(width) << vals[i];
