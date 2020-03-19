@@ -31,7 +31,7 @@ PathAnnulus::PathAnnulus(ParameterPack pp, MassReservoir ism)
 {
 	PP = pp;
 	
-	double tMax = pp.tauInf*2.02;
+	double tMax = pp.tMax*1.05;
 	double deltaT = pp.timeStep;
 	double t = 0;
 	while (t <= tMax)
@@ -70,7 +70,7 @@ double cutoff(double t, double cutT, double wT)
 
 double PathAnnulus::Quick(double t, bool decayActive)
 {
-	int N = 800;
+	int N = 700;
 	double dt = t/(N+1);
 	
 	double start = ISM.ColdGas(0);
@@ -100,7 +100,7 @@ double PathAnnulus::Quick(double t, bool decayActive)
 
 double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
 {
-	int N = 400;
+	int N = 300;
 	double dt = t/(N+1);
 	double sum = 0;
 	for (double x = tau +dt; x < t; x+=dt)
@@ -120,7 +120,7 @@ double PathAnnulus::Slow(double t, double tau, double nu)
 	{
 		return 0;
 	}
-	int N = 500;
+	int N = 300;
 	double dt = t/(N+1);
 	double sum = 0;
 	for (double x = tau +dt; x < t; x+=dt)

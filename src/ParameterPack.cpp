@@ -30,7 +30,7 @@ ParameterPack::ParameterPack()
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuMg_SN = RandomisableParameter<double>(0.05,-0.1,0.1,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.02,0.00001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.98,0,1.0,21);
+	collFrac = IterableParameter<double>(0.98,0,1.0,31);
 		
 	//constraining values
 	finalEuFe_Min = -0.2;
@@ -56,7 +56,7 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(900,0,20,21);
+	tauColls = IterableParameter<double>(900,0,20,31);
 	collWidth = RandomisableParameter<double>(2,0.1,10,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.15,0.01,1,&global_mt);
 	nuSNIa = RandomisableParameter<double>(0.15,0,2,&global_mt);
