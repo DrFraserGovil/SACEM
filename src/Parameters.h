@@ -46,6 +46,7 @@ template<typename T> class BoundedParameter : public Parameter<T>
 template<typename T> class IterableParameter : public BoundedParameter<T>
 {
 	public:
+		IterableParameter(){};
 		IterableParameter(T value, T min, T max, int steps)
 		{
 			this->Value = value;

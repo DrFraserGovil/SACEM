@@ -19,13 +19,35 @@ PathAnnulus::PathAnnulus(ParameterPack pp)
 	Europium.resize(N);
 	Iron.resize(N);
 	Magnesium.resize(N);
-	ISM = MassReservoir(TimeVector, pp, true);
-		std::cout << "SFR Initialised" << std::endl;
+	ISM = MassReservoir(TimeVector, pp, false);
+	//std::cout << "SFR Initialised" << std::endl;
 	
 	
 	Calibrate();
-			std::cout << "Calibration completed" << std::endl;
+		//	std::cout << "Calibration completed" << std::endl;
 }
+
+PathAnnulus::PathAnnulus(ParameterPack pp, MassReservoir ism)
+{
+	PP = pp;
+	
+	double tMax = pp.tauInf*2.02;
+	double deltaT = pp.timeStep;
+	double t = 0;
+	while (t <= tMax)
+	{
+		TimeVector.push_back(t);
+		t+=deltaT;
+	}
+
+	int N = TimeVector.size();
+	Europium.resize(N);
+	Iron.resize(N);
+	Magnesium.resize(N);
+	ISM = ism;
+	Calibrate();
+}
+
 
 
 double cutoff(double t, double cutT, double wT)
@@ -48,7 +70,7 @@ double cutoff(double t, double cutT, double wT)
 
 double PathAnnulus::Quick(double t, bool decayActive)
 {
-	int N = 1000;
+	int N = 800;
 	double dt = t/(N+1);
 	
 	double start = ISM.ColdGas(0);
@@ -78,7 +100,7 @@ double PathAnnulus::Quick(double t, bool decayActive)
 
 double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
 {
-	int N = 500;
+	int N = 400;
 	double dt = t/(N+1);
 	double sum = 0;
 	for (double x = tau +dt; x < t; x+=dt)
@@ -144,26 +166,16 @@ void PathAnnulus::Calibrate()
 		epsilon = nsmFrac/zeta * gamma * EInf;
 			
 }
+
+
 void PathAnnulus::Evolve()
 {
 	//clean vectors
 	int N = TimeVector.size();
 	
-	
-	std::ofstream saveFile;
-	std::string saveFileName =PP.FILEROOT + "Chemicals.dat";
-	saveFile.open(saveFileName);
-	std::vector<std::string> titles = {"Time", "Hydrogen","Iron", "Magnesium", "Europium","Quick","NSM","SN"};
-	int width = 15;
-	for (int i = 0; i < titles.size(); ++i)
-	{
-		saveFile << std::setw(width) << std::left << titles[i];  
-	}
-	saveFile << "\n";
 	int i = 0;
+	MaxIndex = 0;
 	double t =0;
-
-	
 	while (i < N && t < PP.tMax)
 	{
 		t = TimeVector[i];
@@ -173,25 +185,58 @@ void PathAnnulus::Evolve()
 		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
 		double mg = eta*qT;
 		
-		std::vector<double> vals = {t, log10(H), log10(fe), log10(mg), log10(eu),qT,Slow(t,PP.tauNSM.Value, PP.nuNSM.Value),Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value)};
-		for(int i = 0; i < vals.size(); ++i)
-		{
-			saveFile << std::setw(width) << vals[i];
-		}
-		saveFile << "\n";
-		
 		Europium[i] = eu;
 		Iron[i] = fe;
 		Magnesium[i] = mg;
 		
 		++i;
+		++MaxIndex;
+	}
+}
+
+bool PathAnnulus::Evaluate()
+{
+	int index = MaxIndex-1;
+	double EuFe_Sat = log10(Europium[index] / Iron[index]);
+	
+	if (EuFe_Sat >= PP.finalEuFe_Min && EuFe_Sat <= PP.finalEuFe_Max)
+	{
+		return true;
+	} 
+	return false;	
+}
+
+void PathAnnulus::SaveAnnulus(std::string fileName)
+{
+	std::ofstream saveFile;
+	int width = 15;
+	
+	std::string saveFileName =PP.FILEROOT + fileName + ".dat";
+	saveFile.open(saveFileName);
+	std::vector<std::string> titles = {"Time", "H","Fe/H", "Mg/H", "Eu/H",};
+	
+	for (int i = 0; i < titles.size(); ++i)
+	{
+		saveFile << std::setw(width) << std::left << titles[i];  
+	}
+	saveFile << "\n";
+	
+	for (int i = 0 ; i < MaxIndex; ++i)
+	{
+		double t = TimeVector[i];
+		double H = 0.7 * (ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
+		
+		double feh = log10(Iron[i]/H);
+		double mgh = log10(Magnesium[i]/H);
+		double euh = log10(Europium[i]/H);
+		
+		std::vector<double> vals = {t, H, feh,mgh,euh};
+		for(int i = 0; i < vals.size(); ++i)
+		{
+			saveFile << std::setw(width) << vals[i];
+		}
+		saveFile << "\n";
 	}
 	
 	saveFile.close();
-	
-	
-	
-
-	
 }
-

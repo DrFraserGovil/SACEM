@@ -11,7 +11,8 @@ ParameterPack::ParameterPack()
 
 	FILEROOT = "Output/";
 	IntegrationSteps = 5000;
-	NThreads = 10;
+	IterationSteps = 10;
+	NThreads = 12;
 	Mode = 0;
 	tMax = 14;
 	timeStep = 0.1;
@@ -29,7 +30,7 @@ ParameterPack::ParameterPack()
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuMg_SN = RandomisableParameter<double>(0.05,-0.1,0.1,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.02,0.00001,0.1,&global_mt);
-	collFrac = RandomisableParameter<double>(0.98,0,1.0,&global_mt);
+	collFrac = IterableParameter<double>(0.98,0,1.0,21);
 		
 	//constraining values
 	finalEuFe_Min = -0.2;
@@ -55,12 +56,37 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = RandomisableParameter<double>(900,0,20,&global_mt);
+	tauColls = IterableParameter<double>(900,0,20,21);
 	collWidth = RandomisableParameter<double>(2,0.1,10,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.15,0.01,1,&global_mt);
 	nuSNIa = RandomisableParameter<double>(0.15,0,2,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.05,0,1,&global_mt);
 	nuNSM = RandomisableParameter<double>(0.4,0,1,&global_mt);
+}
+
+
+
+void ParameterPack::ScrambleAll()
+{
+	FeH_SN.Scramble();
+	MgFe_SN.Scramble();
+	MgFe_Sat.Scramble();
+	EuMg_SN.Scramble();
+	sProcFrac.Scramble();
+	galaxyM0.Scramble();
+	galaxyM1.Scramble();
+	galaxyM2.Scramble();
+	galaxyB1.Scramble();
+	galaxyB2.Scramble();
+	galaxyScaleLength.Scramble();
+	nuSFR.Scramble();
+	nuCool.Scramble();
+	hotFrac.Scramble();
+	collWidth.Scramble();
+	tauSNIa.Scramble();
+	nuSNIa.Scramble();
+	tauNSM.Scramble();
+	nuNSM.Scramble();
 }
 
 void ParameterPack::UpdateRadius(double radius, double width)

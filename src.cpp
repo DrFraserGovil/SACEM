@@ -27,8 +27,11 @@ std::vector<std::vector<int>> BigGrid;
 
 ParameterPack RandomiseGalaxy(ParameterPack pp)
 {
+	ParameterPack copy = pp;
 	
+	copy.ScrambleAll();
 	
+	return copy;
 }
 
 void SaveGrid(ParameterPack copy)
@@ -37,30 +40,60 @@ void SaveGrid(ParameterPack copy)
 	std::string saveFileName =copy.FILEROOT + "SuccessGrid.dat";
 	saveFile.open(saveFileName);
 	int width = 15;
-	//~ for (int i = 0; i < copy.tauColls.NSteps; ++i)
-	//~ {
-		//~ for (int j = 0; j < copy.collFrac.NSteps; ++j)
-		//~ {
-			//~ saveFile << std::setw(width) << std::left << BigGrid[i][j];
-		//~ }
-		//~ saveFile << "\n";
-	//~ }
+	for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	{
+		for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		{
+			saveFile << std::setw(width) << std::left << BigGrid[i][j];
+		}
+		saveFile << "\n";
+	}
 	
 	saveFile.close();
 }
 
-void LaunchProcess(ParameterPack copy, int id)
-{
-	//std::vector<std::vector<int>> grid = std::vector(copy.tauColls.NSteps,std::vector(copy.collFrac.NSteps,0));
-//	ISMIterator iterator = ISMIterator(copy,TimeVector, &grid);
-	
-	//~ for (int i = 0; i < copy.tauColls.NSteps; ++i)
-	//~ {
-		//~ for (int j = 0; j < copy.collFrac.NSteps; ++j)
-		//~ {
-			//~ BigGrid[i][j] += grid[i][j]; 
-		//~ }
-	//~ }
+void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid, int id)
+{	
+	for (int i = 0; i < copy.collFrac.NSteps; ++i)
+	{
+		copy.collFrac.IterateValue(i);
+		for (int j = 0; j < copy.tauColls.NSteps; ++j)
+		{
+			copy.tauColls.IterateValue(j);
+			
+			//check if result is being saved
+			int q = rand() % 200;
+			bool beingSaved = false;
+			std::ostringstream fileName;
+			fileName << "IterationChecker/Iteration_" << id << "_" << i << "_" << j;
+			if (q == 0)
+			{
+				beingSaved = true;
+			}
+			
+			//create + evaluate an annulus using the given parameters
+			PathAnnulus A = PathAnnulus(copy);
+			A.Evolve();	
+			bool successfulModel = A.Evaluate();
+		
+			
+			if (successfulModel)
+			{
+				fileName << "_Successful";
+				++miniGrid[0][i][j];
+			}
+			else
+			{
+				fileName << "_Unsuccessful";
+			}
+			
+			
+			if (beingSaved)
+			{
+				A.SaveAnnulus(fileName.str());
+			}
+		}
+	}
 
 	threadActive[id] = false;
 }
@@ -82,14 +115,16 @@ void IterationMode(ParameterPack pp)
 {
 	auto start = std::chrono::high_resolution_clock::now();
 	
-	generateTimeVector(pp);
-	int NLoops = 10;//pp.CountThreadLoops();
+
+	int NLoops = 100;//pp.CountThreadLoops();
 	
 	//preparing iterator values
 	ParameterPack copy = pp;
 		
 	//initialising threads
 	int currentThread = 0;
+	
+	std::vector<std::vector<std::vector<int>>> miniGrids(pp.NThreads,std::vector(copy.collFrac.NSteps, std::vector<int>(copy.tauColls.NSteps,0)));
 	std::vector<std::thread> persei(pp.NThreads);
 	threadActive.resize(pp.NThreads);
 	for (int i = 0; i < pp.NThreads; ++i)
@@ -97,8 +132,11 @@ void IterationMode(ParameterPack pp)
 		threadActive[i] = false;
 	}
 	bool noThreadAssigned = false;
-	int i = 0;
-	while (copy.InitialisedCorrectly)
+
+
+	
+
+	for (int k = 0; k < NLoops; ++k)
 	{	
 		//perform the recursive search through the provided parameters, and save them to a ParameterPack object. 
 		copy  = RandomiseGalaxy(pp);
@@ -112,6 +150,14 @@ void IterationMode(ParameterPack pp)
 					if (persei[j].joinable())
 					{
 						persei[j].join();
+						for (int i = 0; i < copy.collFrac.NSteps; ++i)
+						{
+							copy.collFrac.IterateValue(i);
+							for (int k = 0; k < copy.tauColls.NSteps; ++k)
+							{
+								BigGrid[i][k] +=miniGrids[j][i][k];
+							}
+						}
 						
 					}
 					currentThread = j;
@@ -121,28 +167,35 @@ void IterationMode(ParameterPack pp)
 			}
 			
 		}
-			
+
 		threadActive[currentThread] = true;
-		persei[currentThread] = std::thread(LaunchProcess,copy,currentThread);
+		persei[currentThread] = std::thread(LaunchProcess,copy,&miniGrids[currentThread],currentThread);
 		noThreadAssigned = true;	
 		
-		++i;
-		if(i%10 == 0)
+		if(k%10 == 0)
 		{
-			printTimeSince(start,i,NLoops);
+			printTimeSince(start,k,NLoops);
 		}
 		
 		
 	}
-	
 	
 	for (int j = 0; j < pp.NThreads; ++j)
 	{
 		if (persei[j].joinable())
 		{
 			persei[j].join();
+			for (int i = 0; i < copy.collFrac.NSteps; ++i)
+						{
+							copy.collFrac.IterateValue(i);
+							for (int k = 0; k< copy.tauColls.NSteps; ++k)
+							{
+								BigGrid[i][k] +=miniGrids[j][i][k];
+							}
+						}
 		}
 	}
+	std::cout << "All threads closed" << std::endl;
 	
 }
 
@@ -161,19 +214,21 @@ int main(int argc, char** argv)
 	}
 	std::cout << "Parsed command line arguments" << std::endl;
 	
+	
 	double radius = 7;
 	double width = 0.2;
 	
 	pp.UpdateRadius(radius,width);
 
 	if (pp.Mode == 0)
-	{
+	{	
 		PathAnnulus A = PathAnnulus(pp);
 		A.Evolve();
+		A.SaveAnnulus("SingleEvaluation");
 	}
 	else
 	{
-		//BigGrid = std::vector(pp.tauColls.NSteps,std::vector(pp.collFrac.NSteps,0));
+		BigGrid = std::vector(pp.collFrac.NSteps,std::vector(pp.tauColls.NSteps,0));
 		IterationMode(pp);
 		SaveGrid(pp);
 	}

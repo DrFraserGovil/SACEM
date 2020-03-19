@@ -5,13 +5,15 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <string>
 class PathAnnulus
 {
 	public:
 		PathAnnulus(ParameterPack pp);
-	
+		PathAnnulus(ParameterPack pp, MassReservoir ism);
 		void Evolve();
-		
+		bool Evaluate();
+		void SaveAnnulus(std::string fileName);
 	private:
 		ParameterPack PP;
 		
@@ -37,7 +39,9 @@ class PathAnnulus
 		void Calibrate();
 		
 		
+		int MaxIndex;
 };
+
 
 
 

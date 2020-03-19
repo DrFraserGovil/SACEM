@@ -18,6 +18,7 @@ class ParameterPack
 			// global variable store for command-line modification
 			std::string FILEROOT;
 			int IntegrationSteps;
+			int IterationSteps;
 			int NThreads;
 			int Mode;
 			double tMax;
@@ -30,7 +31,7 @@ class ParameterPack
 			RandomisableParameter<double> MgFe_Sat;
 			RandomisableParameter<double> EuMg_SN;
 			RandomisableParameter<double> sProcFrac;
-			RandomisableParameter<double> collFrac;
+			IterableParameter<double> collFrac;
 			
 			//constraining values
 			double finalEuFe_Min;
@@ -53,7 +54,7 @@ class ParameterPack
 			double totalToRingMassCorrection;
 					
 			//uncalibrated stuff		
-			RandomisableParameter<double> tauColls;
+			IterableParameter<double> tauColls;
 			RandomisableParameter<double> collWidth;
 			RandomisableParameter<double> tauSNIa;
 			RandomisableParameter<double> nuSNIa;
@@ -62,7 +63,7 @@ class ParameterPack
 	
 			void UpdateRadius(double r, double deltaR);
 
-
+			void ScrambleAll();
 	
 };
 

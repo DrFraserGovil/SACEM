@@ -145,7 +145,7 @@ void MassReservoir::Evolve(bool saveFileActive)
 	for (int i = 1; i < Size; ++i)
 	{
 		double t = timeStorage[i];
-		double D = 0.01*StarMass[i-1];//DeathFunction(timeStorage[i-1]);
+		double D = DeathFunction(timeStorage[i-1]);
 		double dmStar = PP.nuSFR.Value*ColdGasMass[i-1] - D;
 		double dmCold = accretionRate(t) - PP.nuSFR.Value*ColdGasMass[i-1] + PP.nuCool.Value * HotGasMass[i-1] + (1.0 - PP.hotFrac.Value)*D;
 		double dmHot = - PP.nuCool.Value * HotGasMass[i-1] + PP.hotFrac.Value*D;
