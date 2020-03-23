@@ -63,7 +63,7 @@ void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid,
 			copy.tauColls.IterateValue(j);
 			
 			//check if result is being saved
-			int q = rand() % pp.SaveValue;
+			int q = rand() % copy.SaveValue;
 			bool beingSaved = false;
 			std::ostringstream fileName;
 			fileName << "IterationChecker/Iteration_" << id << "_" << i << "_" << j;
