@@ -12,7 +12,7 @@ ParameterPack::ParameterPack()
 	FILEROOT = "Output/";
 	IntegrationSteps = 5000;
 	IterationSteps = 10;
-	NThreads = 1;
+	NThreads = 12;
 	Mode = 0;
 	tMax = 14;
 	timeStep = 0.1;
