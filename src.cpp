@@ -175,7 +175,8 @@ void IterationMode(ParameterPack pp)
 		persei[currentThread] = std::thread(LaunchProcess,copy,&miniGrids[currentThread],currentThread);
 		noThreadAssigned = true;	
 		
-		if(k%1 == 0)
+		int nPrints = pp.NThreads + 1;
+		if(k%nPrints == 0)
 		{
 			printTimeSince(start,k,NLoops);
 		}
