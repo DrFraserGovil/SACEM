@@ -11,7 +11,7 @@ typedef bool (*parseFunctions) (char* arg);
 //designated "special functions" (see .cpp for more detail)
 bool help(char* arg);
 bool changeFileRoot(char* arg);
-
+bool changeGridSize(char* arg);
 
 //Caller
 ParameterPack parseCommandLine(int argc, char** argv);

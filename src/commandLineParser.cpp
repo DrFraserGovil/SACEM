@@ -10,8 +10,8 @@
 
 ParameterPack pp = ParameterPack();
 
-std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads","-random","-save","-grid"};
-std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies,&pp.SaveValue,&pp.NGrid};
+std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads","-random","-save"};
+std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies,&pp.SaveValue};
 
 
 std::vector<string> doubleGlobalTriggers =  {};
@@ -34,8 +34,8 @@ std::vector<bool *> booleanGlobalPointers = {};
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
 //special functions are forward-declared in the .h file. 
-std::vector<string> specialGlobalTriggers= {"-h", "-dir","grid"};
-parseFunctions specialFuncs[] = {help, changeFileRoot};
+std::vector<string> specialGlobalTriggers= {"-h", "-dir","-grid"};
+parseFunctions specialFuncs[] = {help, changeFileRoot,changeGridSize};
 
 
 
@@ -163,15 +163,26 @@ bool help(char* arg)
 
 bool changeGridSize(char* arg)
 {
-	int NGrid = stoi(arg);
-	
-	std::vector<IterableParameter<double> *> iters = {&pp.tauColls, &pp.collFrac};
-	
-	for (int i = 0; i < iters.size(); ++i)
+	try
 	{
-		iters[i][0] = IterableParameter<double>(iters[i]->Value, iters[i]->MinValue, iters[i]->MaxValue, NGrid);
+		int NGrid = stoi(arg);
+		
+		std::vector<IterableParameter<double> *> iters = {&pp.tauColls, &pp.collFrac};
+		
+		for (int i = 0; i < iters.size(); ++i)
+		{
+			iters[i][0] = IterableParameter<double>(iters[i]->Value, iters[i]->MinValue, iters[i]->MaxValue, NGrid);
+		}
+		pp.NGrid = NGrid;
+		std::cout << pp.tauColls.NSteps << std::endl;
+		return true;
+	} 
+	catch (const std::exception& e)
+	{
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse the gridchanges. Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
+		return false;
 	}
-	
 }
 
 bool changeFileRoot(char* arg)
