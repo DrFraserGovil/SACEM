@@ -11,8 +11,10 @@ class PathAnnulus
 	public:
 		PathAnnulus(ParameterPack pp);
 		PathAnnulus(ParameterPack pp, MassReservoir ism);
+		
 		void Evolve();
-		bool Evaluate();
+		
+		bool FinalStateEvaluate();
 		void SaveAnnulus(std::string fileName);
 	private:
 		ParameterPack PP;

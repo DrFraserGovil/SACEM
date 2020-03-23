@@ -12,7 +12,7 @@ ParameterPack::ParameterPack()
 	FILEROOT = "Output/";
 	IntegrationSteps = 5000;
 	IterationSteps = 10;
-	NThreads = 12;
+	NThreads = 15;
 	Mode = 0;
 	tMax = 14;
 	timeStep = 0.1;
@@ -22,15 +22,15 @@ ParameterPack::ParameterPack()
 	
 	// global variable store for command-line modification
 	
-	
-	//Iron value at SNIa turn on
+
+	int NGrid = 51;
 	
 	FeH_SN = RandomisableParameter<double>(-1.2,-1.5,-0.8,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.35,-1.5,-0.8,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.35,0.25,0.45,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuMg_SN = RandomisableParameter<double>(0.05,-0.1,0.1,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.02,0.00001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.98,0,1.0,51);
+	collFrac = IterableParameter<double>(0.98,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.2;
@@ -41,14 +41,14 @@ ParameterPack::ParameterPack()
 	// initial mass (10^10 solar mass)
 	galaxyM0 = RandomisableParameter<double>(8.5,4.0,10.0,&global_mt);
 	galaxyM1 = RandomisableParameter<double>(4.5,0.0,10.0,&global_mt);
-	galaxyM2 = RandomisableParameter<double>(46,10.0,50.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(46,0,100.0,&global_mt);
 	galaxyB1 = RandomisableParameter<double>(0.3,0.1,1.0,&global_mt);
 	galaxyB2 = RandomisableParameter<double>(14.0,5,25,&global_mt);
-	galaxyScaleLength = RandomisableParameter<double>(3.0,2.0,4.0,&global_mt);
-	nuSFR = RandomisableParameter<double>(0.5,0.1,1.0,&global_mt);
-	nuCool = RandomisableParameter<double>(1.0,0,2.0,&global_mt);
+	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
+	nuSFR = RandomisableParameter<double>(0.5,0.001,1.0,&global_mt);
+	nuCool = RandomisableParameter<double>(1.0,0.001,2.0,&global_mt);
 	alphaKS = RandomisableParameter<double>(2.3,2,2.6,&global_mt);
-	hotFrac = RandomisableParameter<double>(1.0,0,1.0,&global_mt);
+	hotFrac = RandomisableParameter<double>(1.0,0.001,1.0,&global_mt);
 			
 	massToDensityCorrection = 1;
 	densityToMassCorrection = 1;
@@ -56,12 +56,12 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(900,0,20,51);
-	collWidth = RandomisableParameter<double>(2,0.1,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.01,1,&global_mt);
-	nuSNIa = RandomisableParameter<double>(0.15,0,2,&global_mt);
-	tauNSM = RandomisableParameter<double>(0.05,0,1,&global_mt);
-	nuNSM = RandomisableParameter<double>(0.4,0,1,&global_mt);
+	tauColls = IterableParameter<double>(900,0,20,NGrid);
+	collWidth = RandomisableParameter<double>(2,0.01,14,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.001,2,&global_mt);
+	nuSNIa = RandomisableParameter<double>(0.15,0.0001,2,&global_mt);
+	tauNSM = RandomisableParameter<double>(0.05,0.0001,1,&global_mt);
+	nuNSM = RandomisableParameter<double>(0.4,0.0001,1,&global_mt);
 }
 
 

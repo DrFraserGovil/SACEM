@@ -194,10 +194,14 @@ void PathAnnulus::Evolve()
 	}
 }
 
-bool PathAnnulus::Evaluate()
+bool PathAnnulus::FinalStateEvaluate()
 {
-	int index = MaxIndex-1;
-	double EuFe_Sat = log10(Europium[index] / Iron[index]);
+	double t = PP.tMax;
+	double qT = Quick(t,false);
+	double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM.Value, PP.nuNSM.Value);
+	double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
+	
+	double EuFe_Sat = log10(eu / fe);
 	
 	if (EuFe_Sat >= PP.finalEuFe_Min && EuFe_Sat <= PP.finalEuFe_Max)
 	{

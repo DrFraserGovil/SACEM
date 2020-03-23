@@ -59,6 +59,7 @@ void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid,
 		copy.collFrac.IterateValue(i);
 		for (int j = 0; j < copy.tauColls.NSteps; ++j)
 		{
+			//std::cout << "Thread " << id << "  (" << i << ", " << j << ")" << std::endl;
 			copy.tauColls.IterateValue(j);
 			
 			//check if result is being saved
@@ -73,8 +74,7 @@ void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid,
 			
 			//create + evaluate an annulus using the given parameters
 			PathAnnulus A = PathAnnulus(copy);
-			A.Evolve();	
-			bool successfulModel = A.Evaluate();
+			bool successfulModel = A.FinalStateEvaluate();
 		
 			
 			if (successfulModel)
@@ -90,6 +90,7 @@ void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid,
 			
 			if (beingSaved)
 			{
+				A.Evolve();
 				A.SaveAnnulus(fileName.str());
 			}
 		}
@@ -116,7 +117,7 @@ void IterationMode(ParameterPack pp)
 	auto start = std::chrono::high_resolution_clock::now();
 	
 
-	int NLoops = 200;//pp.CountThreadLoops();
+	int NLoops = 100;//pp.CountThreadLoops();
 	
 	//preparing iterator values
 	ParameterPack copy = pp;
@@ -138,6 +139,7 @@ void IterationMode(ParameterPack pp)
 
 	for (int k = 0; k < NLoops; ++k)
 	{	
+		//std::cout << "Randomiser " << k << std::endl;
 		//perform the recursive search through the provided parameters, and save them to a ParameterPack object. 
 		copy  = RandomiseGalaxy(pp);
 		while (noThreadAssigned == true)
@@ -156,6 +158,7 @@ void IterationMode(ParameterPack pp)
 							for (int k = 0; k < copy.tauColls.NSteps; ++k)
 							{
 								BigGrid[i][k] +=miniGrids[j][i][k];
+								miniGrids[j][i][k] = 0;
 							}
 						}
 						
@@ -172,7 +175,7 @@ void IterationMode(ParameterPack pp)
 		persei[currentThread] = std::thread(LaunchProcess,copy,&miniGrids[currentThread],currentThread);
 		noThreadAssigned = true;	
 		
-		if(k%10 == 0)
+		if(k%1 == 0)
 		{
 			printTimeSince(start,k,NLoops);
 		}
