@@ -7,36 +7,34 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h> 
-using namespace std;
-
 
 ParameterPack pp = ParameterPack();
 
-vector<string> integerGlobalTriggers = {"-steps","-mode","-threads"};
-vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads};
+std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads"};
+std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads};
 
 
-vector<string> doubleGlobalTriggers =  {};
-vector<double *> doubleGlobalPointers = { };
+std::vector<string> doubleGlobalTriggers =  {};
+std::vector<double *> doubleGlobalPointers = { };
 
 
 //fractions are doubles that are constrained to be between zero and 1
-vector<string> fractionGlobalTriggers = {}; 
-vector<double *> fractionGlobalPointers= {};
+std::vector<string> fractionGlobalTriggers = {}; 
+std::vector<double *> fractionGlobalPointers= {};
 
 
-//fraction pairs are pairs of doubles between 0 and 1, which sum to 1. Therefore two variables need to be passed, formatted as a vector.
-vector<string> fractionPairGlobalTriggers = {};
-vector<vector<double *>> fractionPairGlobalPointers= {};
+//fraction pairs are pairs of doubles between 0 and 1, which sum to 1. Therefore two variables need to be passed, formatted as a std::vector.
+std::vector<string> fractionPairGlobalTriggers = {};
+std::vector<std::vector<double *>> fractionPairGlobalPointers= {};
 
 
-vector<string> booleanGlobalTriggers = {};
-vector<bool *> booleanGlobalPointers = {};
+std::vector<string> booleanGlobalTriggers = {};
+std::vector<bool *> booleanGlobalPointers = {};
 
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
 //special functions are forward-declared in the .h file. 
-vector<string> specialGlobalTriggers= {"-h", "-dir"};
+std::vector<string> specialGlobalTriggers= {"-h", "-dir"};
 parseFunctions specialFuncs[] = {help, changeFileRoot};
 
 
@@ -46,13 +44,13 @@ bool changeIntegerParameter(char * newValue, int * host, char * callName)
 	{
 		double convertedVal = stoi(newValue);
 		host[0] = convertedVal;
-		cout << "Changing the " << callName << " value. Value is now: " << convertedVal << endl;
+		std::cout << "Changing the " << callName << " value. Value is now: " << convertedVal << std::endl;
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << endl;
-		cout << e.what() << endl;
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
 		return false;
 	}
 }
@@ -63,13 +61,13 @@ bool changeDoubleParameter(char * newValue, double * host, char * callName)
 	{
 		double convertedVal = stod(newValue);
 		host[0] = convertedVal;
-		cout << "Changing the " << callName << " value. Value is now: " << convertedVal << endl;
+		std::cout << "Changing the " << callName << " value. Value is now: " << convertedVal << std::endl;
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << endl;
-		cout << e.what() << endl;
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
 		return false;
 	}
 }
@@ -82,42 +80,42 @@ bool changeFractionParameter(char * newValue, double * host, char * callName)
 		
 		if (convertedVal < 0 || convertedVal > 1)
 		{
-			cout << "\n\nERROR: The value passed to " << callName << " was not a valid fraction." << endl;
+			std::cout << "\n\nERROR: The value passed to " << callName << " was not a valid fraction." << std::endl;
 			return false;
 		}
 		
 		host[0] = convertedVal;
-		cout << "Changing the " << callName << " value. Value is now: " << convertedVal << endl;
+		std::cout << "Changing the " << callName << " value. Value is now: " << convertedVal << std::endl;
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << endl;
-		cout << e.what() << endl;
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
 		return false;
 	}
 }
 
-bool changeFractionPairParameter(char * newValue, vector<double *> host, char * callName)
+bool changeFractionPairParameter(char * newValue, std::vector<double *> host, char * callName)
 {
 	try
 	{
 		double convertedVal = stod(newValue);
 		if (convertedVal < 0 || convertedVal > 1)
 		{
-			cout << "\n\nERROR: The value passed to " << callName << " was not a valid fraction." << endl;
+			std::cout << "\n\nERROR: The value passed to " << callName << " was not a valid fraction." << std::endl;
 			return false;
 		}
 		
 		host[0][0] = convertedVal;
 		host[1][0] = 1.0 - convertedVal;
-		cout << "Changing the " << callName << " value. Value is now: " << convertedVal << endl;
+		std::cout << "Changing the " << callName << " value. Value is now: " << convertedVal << std::endl;
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << endl;
-		cout << e.what() << endl;
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
 		return false;
 	}
 }
@@ -128,13 +126,13 @@ bool changeBooleanParameter(char * newValue, bool * host, char * callName)
 	{
 		bool convertedVal = (bool)stoi(newValue);
 		host[0] = convertedVal;
-		cout << "Changing the " << callName << " value. Value is now: " << convertedVal << endl;
+		std::cout << "Changing the " << callName << " value. Value is now: " << convertedVal << std::endl;
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << endl;
-		cout << e.what() << endl;
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse" << callName << ". Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
 		return false;
 	}
 }
@@ -144,7 +142,7 @@ bool help(char* arg)
 	ifstream helpFile("DataFiles/helpList.dat");
 	if (!helpFile.is_open())
 	{
-		cout << "\n\nERROR: Could not find the help files. Something terrible has occured.\n\n" << endl;
+		std::cout << "\n\nERROR: Could not find the help files. Something terrible has occured.\n\n" << std::endl;
 		return false;
 	}
 	
@@ -154,9 +152,9 @@ bool help(char* arg)
 		std::vector<string> line = split(rawLine,'\t');
 		for (int i =0; i < line.size(); ++i)
 		{
-			cout << "\t" << setw(15) << left << line[i];
+			std::cout << "\t" << setw(15) << left << line[i];
 		}
-		cout << "\n";
+		std::cout << "\n";
 	}
 	return true;
 }
@@ -164,46 +162,43 @@ bool help(char* arg)
 bool changeFileRoot(char* arg)
 {
 
-	string FILEROOT = (string)arg;
-	pp.FILEROOT = FILEROOT;
-	int n = FILEROOT.size();
-	std::string lastCharacter =FILEROOT.substr(n -1);
+	string root = (string)arg;
+	pp.FILEROOT = root;
+	int n = root.size();
+	std::string lastCharacter = root.substr(n -1);
 	bool needsSlash = (lastCharacter.compare("/"));
-	cout << "Saving Files to directory '" << FILEROOT << "'. ";
-	const char *fileChar = FILEROOT.c_str();
+	std::cout << "Saving Files to directory '" << root << "'. ";
+	const char *fileChar = root.c_str();
 	DIR *dir = opendir(fileChar);
 	if (dir)
 	{
-		cout << "Dir exists" << endl;
-		if (needsSlash)
-		{
-			pp.FILEROOT.append("/");
-		}	
+		std::cout << "Dir exists" << std::endl;
 	}
 	else
 	{
-		cout << "Dir does not exist. Making Dir" << endl;
+		std::cout << "Dir does not exist. Making Dir" << std::endl;
 		try
 		{
 			string command = "mkdir -p ";
-			command.append(FILEROOT);
+			command.append(root);
 			const char *commandChar = command.c_str(); 
 			const int dir_err = system(commandChar);
-			if (needsSlash)
-			{
-				FILEROOT.append("/");
-			}	
-			command = "mkdir -p " +FILEROOT + "IterationChecker/";
+			
+			command = "mkdir -p " + root+ "/IterationChecker/";
 			const char *commandChar2 = command.c_str(); 
 			const int dir_err2 = system(commandChar2);
 		}
 		catch (const std::exception& e)
 		{
-			cout << "\n\n\nERROR: A problem was encountered trying to create directory. Error message is as follows" << endl;
-			cout << e.what() << endl;
+			std::cout << "\n\n\nERROR: A problem was encountered trying to create directory. Error message is as follows" << std::endl;
+			std::cout << e.what() << std::endl;
 			return false;
 		}
 	}
+	if (needsSlash)
+	{
+		pp.FILEROOT.append("/");
+	}	
 	return true;
 }
 
@@ -235,14 +230,14 @@ ParameterPack parseCommandLine(int argc, char** argv)
 	
 	if (argc > 1)
 	{
-		cout << "Processing " << argc - 1 << " command line arguments" << endl;
+		std::cout << "Processing " << argc - 1 << " command line arguments" << std::endl;
 		for (int i = 1; i < argc-1; i +=2)
 		{
 			string temp = argv[i];
 			bool found = false;
-			vector<vector<string>> triggers = {specialGlobalTriggers, integerGlobalTriggers, doubleGlobalTriggers, booleanGlobalTriggers, fractionGlobalTriggers, fractionPairGlobalTriggers};
+			std::vector<std::vector<string>> triggers = {specialGlobalTriggers, integerGlobalTriggers, doubleGlobalTriggers, booleanGlobalTriggers, fractionGlobalTriggers, fractionPairGlobalTriggers};
 			
-			//loop through the standard assignment vectors
+			//loop through the standard assignment std::vectors
 			for (int k = 0; k < triggers.size(); ++k)
 			{
 				int N = triggers[k].size();
@@ -250,7 +245,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 				{
 					if (temp.compare(triggers[k][p]) == 0)
 					{
-						//although the function calls here look identical (so could be compacted into a looped-array over a vector?), note that
+						//although the function calls here look identical (so could be compacted into a looped-array over a std::vector?), note that
 						//the vector-of-pointer-arguments contain different data types, so you'd need to construct some kind of wrapper to manage it. Too much effort. Switch/case does the job.
 						found = true;
 						switch(k)
@@ -276,7 +271,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 							default:
 								linesParsed = false;
 								found = false;
-								cout << "Something went wrong in the default parameter assignment routine" << endl;
+								std::cout << "Something went wrong in the default parameter assignment routine" << std::endl;
 								i = argc;
 								break;
 						}							
@@ -288,7 +283,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 			
 			if (!found)
 			{
-				cout << "\n\n ERROR: An unknown command (" << temp << ") was passed to the CLP. Quitting.";
+				std::cout << "\n\n ERROR: An unknown command (" << temp << ") was passed to the CLP. Quitting.";
 				i = argc;
 				linesParsed = false;
 			}
@@ -298,7 +293,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 	
 	if (argc % 2 == 0 && linesParsed)
 	{
-		cout << "\nWARNING: An uneven number of parameters was passed, so the final command (" << argv[argc-1] << ") was not examined. \nThis is a non-critical error, so code will continue.\n\n" << endl; 
+		std::cout << "\nWARNING: An uneven number of parameters was passed, so the final command (" << argv[argc-1] << ") was not examined. \nThis is a non-critical error, so code will continue.\n\n" << std::endl; 
 	}
 	
 	pp.InitialisedCorrectly = linesParsed;

@@ -37,7 +37,7 @@ ParameterPack RandomiseGalaxy(ParameterPack pp)
 void SaveGrid(ParameterPack copy)
 {
 	std::ofstream saveFile;
-	std::string saveFileName =copy.FILEROOT + "SuccessGrid.dat";
+	std::string saveFileName =copy.FILEROOT + "/SuccessGrid.dat";
 	saveFile.open(saveFileName);
 	int width = 15;
 	for (int i = 0; i < copy.tauColls.NSteps; ++i)
@@ -116,7 +116,7 @@ void IterationMode(ParameterPack pp)
 	auto start = std::chrono::high_resolution_clock::now();
 	
 
-	int NLoops = 2000;//pp.CountThreadLoops();
+	int NLoops = 200;//pp.CountThreadLoops();
 	
 	//preparing iterator values
 	ParameterPack copy = pp;

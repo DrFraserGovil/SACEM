@@ -212,6 +212,7 @@ void PathAnnulus::SaveAnnulus(std::string fileName)
 	int width = 15;
 	
 	std::string saveFileName =PP.FILEROOT + fileName + ".dat";
+	std::cout << "Saving file to: " << saveFileName << std::endl;
 	saveFile.open(saveFileName);
 	std::vector<std::string> titles = {"Time", "H","Fe/H", "Mg/H", "Eu/H",};
 	
