@@ -34,8 +34,10 @@ std::vector<bool *> booleanGlobalPointers = {};
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
 //special functions are forward-declared in the .h file. 
-std::vector<string> specialGlobalTriggers= {"-h", "-dir"};
+std::vector<string> specialGlobalTriggers= {"-h", "-dir","grid"};
 parseFunctions specialFuncs[] = {help, changeFileRoot};
+
+
 
 
 bool changeIntegerParameter(char * newValue, int * host, char * callName)
@@ -157,6 +159,19 @@ bool help(char* arg)
 		std::cout << "\n";
 	}
 	return true;
+}
+
+bool changeGridSize(char* arg)
+{
+	int NGrid = stoi(arg);
+	
+	std::vector<IterableParameter<double> *> iters = {&pp.tauColls, &pp.collFrac};
+	
+	for (int i = 0; i < iters.size(); ++i)
+	{
+		iters[i][0] = IterableParameter<double>(iters[i]->Value, iters[i]->MinValue, iters[i]->MaxValue, NGrid);
+	}
+	
 }
 
 bool changeFileRoot(char* arg)
