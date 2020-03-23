@@ -21,6 +21,9 @@ class ParameterPack
 			int IterationSteps;
 			int NThreads;
 			int Mode;
+			int NRandomGalaxies;
+			int SaveValue;
+			int NGrid;
 			double tMax;
 			double timeStep; 
 			double tauInf;

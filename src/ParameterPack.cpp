@@ -14,6 +14,8 @@ ParameterPack::ParameterPack()
 	IterationSteps = 10;
 	NThreads = 15;
 	Mode = 0;
+	NRandomGalaxies = 100;
+	SaveValue = 1000;
 	tMax = 14;
 	timeStep = 0.1;
 	
@@ -23,7 +25,7 @@ ParameterPack::ParameterPack()
 	// global variable store for command-line modification
 	
 
-	int NGrid = 51;
+	NGrid = 51;
 	
 	FeH_SN = RandomisableParameter<double>(-1.2,-1.5,-0.8,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.25,0.45,&global_mt);

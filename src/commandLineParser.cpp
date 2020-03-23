@@ -10,8 +10,8 @@
 
 ParameterPack pp = ParameterPack();
 
-std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads"};
-std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads};
+std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads","-random","-save","-grid"};
+std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies,&pp.SaveValue,&pp.NGrid};
 
 
 std::vector<string> doubleGlobalTriggers =  {};

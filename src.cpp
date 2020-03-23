@@ -117,7 +117,7 @@ void IterationMode(ParameterPack pp)
 	auto start = std::chrono::high_resolution_clock::now();
 	
 
-	int NLoops = 100;//pp.CountThreadLoops();
+	int NLoops = pp.NRandomGalaxies;
 	
 	//preparing iterator values
 	ParameterPack copy = pp;
