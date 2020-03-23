@@ -24,8 +24,7 @@ ParameterPack::ParameterPack()
 	
 	// global variable store for command-line modification
 	
-
-	NGrid = 51;
+	NGrid = 41;
 	
 	FeH_SN = RandomisableParameter<double>(-1.2,-1.5,-0.8,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.25,0.45,&global_mt);
