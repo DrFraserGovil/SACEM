@@ -63,6 +63,8 @@ ParameterPack::ParameterPack()
 	nuSNIa = RandomisableParameter<double>(0.15,0.0001,2,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.05,0.0001,1,&global_mt);
 	nuNSM = RandomisableParameter<double>(0.4,0.0001,1,&global_mt);
+	
+	WasSuccessful = false;
 }
 
 
@@ -88,12 +90,76 @@ void ParameterPack::ScrambleAll()
 	nuSNIa.Scramble();
 	tauNSM.Scramble();
 	nuNSM.Scramble();
+	
+	UpdateRadius(Radius, Width);
 }
 
 void ParameterPack::UpdateRadius(double radius, double width)
 {
+	Radius = radius;
+	Width = width;
 	densityToMassCorrection = 2 * 3.141592654*radius*width;
 	massToDensityCorrection = 1.0/massToDensityCorrection;
 	totalToRingMassCorrection = radius*width/(galaxyScaleLength.Value * galaxyScaleLength.Value) * exp(-radius/galaxyScaleLength.Value);
 }
 
+void ParameterPack::PrintState(std::string saveFileName)
+{
+	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
+	std::vector<IterableParameter<double>> keyParams = {collFrac, tauColls};
+	
+	std::vector<std::string> calibrationTitles = {"[Fe/H]_0", "[Mg/Fe]_0", "[Mg/Fe]_Inf", "[Eu/Mg]_0", "s-process Fraction"};
+	std::vector<RandomisableParameter<double>> calibrationParams = {FeH_SN, MgFe_SN, MgFe_Sat, EuMg_SN, sProcFrac};
+		
+	std::vector<std::string> galaxyTitles = {"Initial mass", "Thick disk mass", "Thin disk mass", "Thick disk infall time", "Thin disk infall time", "Galaxy Scale Length", "SFR frequency", "Cooling Frequency", "CCSN Hot Fraction"};
+	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, galaxyScaleLength, nuSFR, nuCool, hotFrac};
+	
+	std::vector<std::string> processTitles = {"SNIa delay time", "SNIa frequency", "NSM delay time", "NSM frequency", "Collapsar turnoff width"};
+	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth};
+
+		
+	std::ofstream saveFile;
+	saveFile.open(FILEROOT + saveFileName);
+	
+	if (!saveFile.is_open() )
+	{
+		std::cout << "Could not open file " << saveFileName << " for saving." << std::endl;
+	}
+	else
+	{
+		saveFile << "SIMULATION PARAMETERS:\n\nGrid Parameters:\n";
+		int width = 22;
+		for (int i = 0; i < keyParams.size(); ++i)
+		{
+			saveFile << std::setw(width) << std::right << keyTitles[i] << ":";
+			saveFile << std::setw(width) << std::right  << keyParams[i].Value << "\n";
+		}
+		saveFile << "\n\n";
+		
+		std::vector<std::string> sections = {"Data Calibration Values", "Macro-Galactic Properties", "Astrophysical Process Properties"};
+		std::vector<std::vector<std::string>> titles = {calibrationTitles, galaxyTitles, processTitles};
+		std::vector<std::vector<RandomisableParameter<double>>> params = {calibrationParams, galaxyParams, processParams};
+		
+		for (int i = 0; i < sections.size(); ++i)
+		{
+			saveFile << sections[i] << "\n\n";
+			for (int j = 0; j < titles[i].size(); ++j)
+			{
+				saveFile << std::setw(width) << std::right << titles[i][j] << ":";
+				saveFile << std::setw(width) << std::right <<  params[i][j].Value << "\n";
+			}
+			saveFile << "\n\n";
+		}
+		
+		saveFile << "Model Success: \t";
+		if (WasSuccessful)
+		{
+			saveFile << "SUCCESS";
+		}
+		else
+		{
+			saveFile << "FAILURE";
+		}
+	}
+	saveFile.close();
+}

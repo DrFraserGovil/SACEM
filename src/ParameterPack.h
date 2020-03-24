@@ -3,7 +3,10 @@
 #include <vector>
 #include <math.h>
 #include <random>
+#include <iostream>
+#include <fstream>
 #include "Parameters.h"
+#include <iomanip>
 
 extern std::random_device global_rd;
 extern std::mt19937 global_mt;
@@ -67,6 +70,10 @@ class ParameterPack
 			void UpdateRadius(double r, double deltaR);
 
 			void ScrambleAll();
-	
+			void PrintState(std::string saveFile);
+			bool WasSuccessful;
+		private:
+			double Radius;
+			double Width;
 };
 

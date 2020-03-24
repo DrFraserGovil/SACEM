@@ -210,9 +210,15 @@ bool changeFileRoot(char* arg)
 			const char *commandChar = command.c_str(); 
 			const int dir_err = system(commandChar);
 			
-			command = "mkdir -p " + root+ "/IterationChecker/";
-			const char *commandChar2 = command.c_str(); 
-			const int dir_err2 = system(commandChar2);
+			std::vector<std::string> subDirs = {"FullPaths", "ParamSaves"};
+			
+			for (int i = 0; i < subDirs.size(); ++i)
+			{
+					command = "mkdir -p " + root + "/" + subDirs[i] + "/";
+					const char *commandChar2 = command.c_str(); 
+					const int dir_err2 = system(commandChar2);
+			}
+			
 		}
 		catch (const std::exception& e)
 		{

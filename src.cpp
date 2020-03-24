@@ -52,46 +52,59 @@ void SaveGrid(ParameterPack copy)
 	saveFile.close();
 }
 
-void LaunchProcess(ParameterPack copy, std::vector<std::vector<int>> * miniGrid, int id)
-{	
-	for (int i = 0; i < copy.collFrac.NSteps; ++i)
+inline bool evaluateSaveConditions(ParameterPack state, int i, int j)
+{
+	int dist = abs(i - j);
+	int lowerBound = 25;
+	int upperBound = 50;
+	if (state.WasSuccessful || dist < lowerBound)
 	{
-		copy.collFrac.IterateValue(i);
-		for (int j = 0; j < copy.tauColls.NSteps; ++j)
+		return (rand() % state.SaveValue == 0);
+	}
+	else
+	{
+		if (dist > upperBound)
 		{
-			//std::cout << "Thread " << id << "  (" << i << ", " << j << ")" << std::endl;
-			copy.tauColls.IterateValue(j);
-			
-			//check if result is being saved
-			int q = rand() % copy.SaveValue;
-			bool beingSaved = false;
-			std::ostringstream fileName;
-			fileName << "IterationChecker/Iteration_" << id << "_" << i << "_" << j;
-			if (q == 0)
-			{
-				beingSaved = true;
-			}
-			
+			return true;
+		}
+		else
+		{
+			return  (rand() % (state.SaveValue/3) == 0);
+		}
+	}
+}
+
+void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid, int loopNumber, int id)
+{	
+	for (int i = 0; i < state.collFrac.NSteps; ++i)
+	{
+		state.collFrac.IterateValue(i);
+		for (int j = 0; j < state.tauColls.NSteps; ++j)
+		{
+			state.tauColls.IterateValue(j);
+						
 			//create + evaluate an annulus using the given parameters
-			PathAnnulus A = PathAnnulus(copy);
-			bool successfulModel = A.FinalStateEvaluate();
-		
+			PathAnnulus A = PathAnnulus(state);
+			state.WasSuccessful = A.FinalStateEvaluate();
 			
-			if (successfulModel)
+		
+			if (state.WasSuccessful)
 			{
-				fileName << "_Successful";
 				++miniGrid[0][i][j];
 			}
-			else
-			{
-				fileName << "_Unsuccessful";
-			}
 			
+			bool isBeingSaved = evaluateSaveConditions(state,i,j);
 			
-			if (beingSaved)
+			if (isBeingSaved)
 			{
+				ostringstream simFileName;
+				simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful << ".dat"; 
 				A.Evolve();
-				A.SaveAnnulus(fileName.str());
+				A.SaveAnnulus(simFileName.str());
+				
+				ostringstream stateSave;
+				stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
+				state.PrintState(stateSave.str());
 			}
 		}
 	}
@@ -172,7 +185,7 @@ void IterationMode(ParameterPack pp)
 		}
 
 		threadActive[currentThread] = true;
-		persei[currentThread] = std::thread(LaunchProcess,copy,&miniGrids[currentThread],currentThread);
+		persei[currentThread] = std::thread(LaunchProcess,copy,&miniGrids[currentThread],k,currentThread);
 		noThreadAssigned = true;	
 		
 		int nPrints = pp.NThreads + 1;
