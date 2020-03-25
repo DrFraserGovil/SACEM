@@ -69,7 +69,7 @@ inline bool evaluateSaveConditions(ParameterPack state, int i, int j)
 		}
 		else
 		{
-			return  (rand() % (state.SaveValue/3) == 0);
+			return  (rand() % (state.SaveValue/2) == 0);
 		}
 	}
 }
