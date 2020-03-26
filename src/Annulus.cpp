@@ -200,14 +200,17 @@ bool PathAnnulus::FinalStateEvaluate()
 	double qT = Quick(t,false);
 	double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM.Value, PP.nuNSM.Value);
 	double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
+	double h = 0.7*(ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
 	
 	double EuFe_Sat = log10(eu / fe);
+	double FeH_Sat = log10(fe/h);
 	
-	if (EuFe_Sat >= PP.finalEuFe_Min && EuFe_Sat <= PP.finalEuFe_Max)
-	{
-		return true;
-	} 
-	return false;	
+	bool satisfiesEuropiumCondition = (EuFe_Sat >= PP.finalEuFe_Min && EuFe_Sat <= PP.finalEuFe_Max);
+	bool satisfiesIronCondition = (FeH_Sat >=PP.finalFe_Min && FeH_Sat <= PP.finalFe_Max);
+
+	bool successCondition = satisfiesEuropiumCondition && satisfiesIronCondition;
+
+	return successCondition;	
 }
 
 void PathAnnulus::SaveAnnulus(std::string fileName)

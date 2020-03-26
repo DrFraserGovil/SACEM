@@ -42,7 +42,9 @@ class ParameterPack
 			//constraining values
 			double finalEuFe_Min;
 			double finalEuFe_Max;
-						
+			double finalFe_Min;
+			double finalFe_Max;
+				
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;
 			RandomisableParameter<double> galaxyM1;
