@@ -52,8 +52,8 @@ PathAnnulus::PathAnnulus(ParameterPack pp, MassReservoir ism)
 
 double cutoff(double t, double cutT, double wT)
 {
-	double lowT = cutT - wT/2;
-	double upT = cutT + wT/2;
+	double lowT = cutT - wT;
+	double upT = cutT;
 	
 	if (t < lowT)
 	{
@@ -100,7 +100,7 @@ double PathAnnulus::Quick(double t, bool decayActive)
 
 double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
 {
-	int N = 300;
+	int N = 500;
 	double dt = t/(N+1);
 	double sum = 0;
 	for (double x = tau +dt; x < t; x+=dt)
@@ -120,7 +120,7 @@ double PathAnnulus::Slow(double t, double tau, double nu)
 	{
 		return 0;
 	}
-	int N = 300;
+	int N = 500;
 	double dt = t/(N+1);
 	double sum = 0;
 	for (double x = tau +dt; x < t; x+=dt)

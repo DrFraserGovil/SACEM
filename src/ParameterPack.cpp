@@ -17,7 +17,7 @@ ParameterPack::ParameterPack()
 	NRandomGalaxies = 100;
 	SaveValue = 1000;
 	tMax = 14;
-	timeStep = 0.1;
+	timeStep = 0.05;
 	
 	tauInf = 14;
 	
@@ -29,7 +29,7 @@ ParameterPack::ParameterPack()
 	FeH_SN = RandomisableParameter<double>(-1.2,-1.5,-0.8,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.25,0.45,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
-	EuMg_SN = RandomisableParameter<double>(0.05,-0.1,0.1,&global_mt);
+	EuMg_SN = RandomisableParameter<double>(0.05,-0.05,0.1,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.02,0.00001,0.1,&global_mt);
 	collFrac = IterableParameter<double>(0.98,0,1.0,NGrid);
 		

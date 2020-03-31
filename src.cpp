@@ -40,9 +40,9 @@ void SaveGrid(ParameterPack copy)
 	std::string saveFileName =copy.FILEROOT + "/SuccessGrid.dat";
 	saveFile.open(saveFileName);
 	int width = 15;
-	for (int i = 0; i < copy.tauColls.NSteps; ++i)
+	for (int i = 0; i < copy.collFrac.NSteps; ++i)
 	{
-		for (int j = 0; j < copy.collFrac.NSteps; ++j)
+		for (int j = 0; j < copy.tauColls.NSteps; ++j)
 		{
 			saveFile << std::setw(width) << std::left << BigGrid[i][j];
 		}
@@ -167,7 +167,6 @@ void IterationMode(ParameterPack pp)
 						persei[j].join();
 						for (int i = 0; i < copy.collFrac.NSteps; ++i)
 						{
-							copy.collFrac.IterateValue(i);
 							for (int k = 0; k < copy.tauColls.NSteps; ++k)
 							{
 								BigGrid[i][k] +=miniGrids[j][i][k];
