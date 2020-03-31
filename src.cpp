@@ -55,7 +55,7 @@ void SaveGrid(ParameterPack copy)
 inline bool evaluateSaveConditions(ParameterPack state, int i, int j)
 {
 	int dist = abs(i - j);
-	int lowerBound = 70;
+	int lowerBound = 75;
 	int upperBound = 90;
 	if (!(state.WasSuccessful) || dist < lowerBound)
 	{
