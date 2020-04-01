@@ -203,7 +203,7 @@ double MassReservoir::Integrand(double Q,double t,double alpha, double gamma,dou
 
 double MassReservoir::DeathFunction(double t)
 {
-	double alpha = PP.AlphaKS;
+	double alpha = PP.alphaKS.Value;
 	double gamma = 2.5;
 	double tauTilde = 10;
 	double prefactor = pow(tauTilde,1.0/gamma)*PP.nuSFR.Value/gamma;
