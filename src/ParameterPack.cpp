@@ -51,6 +51,7 @@ ParameterPack::ParameterPack()
 	nuSFR = RandomisableParameter<double>(0.5,0.001,1.0,&global_mt);
 	nuCool = RandomisableParameter<double>(1.0,0.001,2.0,&global_mt);
 	alphaKS = RandomisableParameter<double>(2.3,2,2.6,&global_mt);
+	StellarLifeTimeSlope =  RandomisableParameter<double>(2.3,1.5,3.5,&global_mt);
 	hotFrac = RandomisableParameter<double>(1.0,0.3,1.0,&global_mt);
 			
 	massToDensityCorrection = 1;
@@ -92,7 +93,8 @@ void ParameterPack::ScrambleAll()
 	nuSNIa.Scramble();
 	tauNSM.Scramble();
 	nuNSM.Scramble();
-	
+	alphaKS.Scramble();
+	StellarLifeTimeSlope.Scramble();
 	UpdateRadius(Radius, Width);
 }
 

@@ -55,6 +55,7 @@ class ParameterPack
 			RandomisableParameter<double> nuSFR;
 			RandomisableParameter<double> nuCool;
 			RandomisableParameter<double> alphaKS;
+			RandomisableParameter<double> StellarLifeTimeSlope;
 			RandomisableParameter<double> hotFrac;
 			
 			double massToDensityCorrection;
