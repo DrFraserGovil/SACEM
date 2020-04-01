@@ -6,7 +6,7 @@ PathAnnulus::PathAnnulus(ParameterPack pp)
 {
 	PP = pp;
 	
-	double tMax = pp.tauInf*2.02;
+	double tMax = pp.tauInf*1.02;
 	double deltaT = pp.timeStep;
 	double t = 0;
 	while (t <= tMax)
