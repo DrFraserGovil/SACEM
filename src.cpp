@@ -93,19 +93,19 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 				++miniGrid[0][i][j];
 			}
 			
-			bool isBeingSaved = evaluateSaveConditions(state,i,j);
+			//~ bool isBeingSaved = evaluateSaveConditions(state,i,j);
 			
-			if (isBeingSaved)
-			{
+			//~ if (isBeingSaved)
+			//~ {
 				//~ ostringstream simFileName;
 				//~ simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful << ".dat"; 
 				//~ A.Evolve();
 				//~ A.SaveAnnulus(simFileName.str());
 				
-				ostringstream stateSave;
-				stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
-				state.PrintState(stateSave.str());
-			}
+				//~ ostringstream stateSave;
+				//~ stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
+				//~ state.PrintState(stateSave.str());
+			//~ }
 		}
 	}
 
