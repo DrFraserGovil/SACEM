@@ -1,4 +1,4 @@
-tab = readtable("NewTest/SuccessGrid.dat");
+tab = readtable("LabPC/SuccessGrid.dat");
 
 tab = table2array(tab);
 

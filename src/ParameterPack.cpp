@@ -14,7 +14,7 @@ ParameterPack::ParameterPack()
 	IterationSteps = 10;
 	NThreads = 4;
 	Mode = 0;
-	NRandomGalaxies = 2000;
+	NRandomGalaxies = 100000;
 	SaveValue = 1000;
 	tMax = 14;
 	timeStep = 0.05;
@@ -25,7 +25,7 @@ ParameterPack::ParameterPack()
 	// global variable store for command-line modification
 	
 
-	NGrid = 51;
+	NGrid = 101;
 	
 	HFrac = RandomisableParameter<double>(0.714,0.68,0.8,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.12,0,0.6,&global_mt);
