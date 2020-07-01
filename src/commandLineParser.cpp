@@ -11,11 +11,11 @@
 ParameterPack pp = ParameterPack();
 
 std::vector<string> integerGlobalTriggers = {"-steps","-mode","-threads","-random","-save"};
-std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies,&pp.SaveValue};
+std::vector<int *> integerGlobalPointers = {&pp.IntegrationSteps,&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies,&pp.SaveValue,};
 
 
-std::vector<string> doubleGlobalTriggers =  {};
-std::vector<double *> doubleGlobalPointers = { };
+std::vector<string> doubleGlobalTriggers =  {"-dt"};
+std::vector<double *> doubleGlobalPointers = {&pp.timeStep };
 
 
 //fractions are doubles that are constrained to be between zero and 1

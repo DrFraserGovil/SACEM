@@ -13,7 +13,6 @@
 
 #include "src/ParameterPack.h"
 #include "src/commandLineParser.h"
-#include "src/MassReservoir.h"
 #include "src/Annulus.h"
 #include "src/Parameters.h"
 #include "src/TimeSystems.h"
@@ -44,7 +43,12 @@ void SaveGrid(ParameterPack copy)
 	{
 		for (int j = 0; j < copy.tauColls.NSteps; ++j)
 		{
+			if (j > 0)
+			{
+				saveFile << ", ";
+			}
 			saveFile << std::setw(width) << std::left << BigGrid[i][j];
+			
 		}
 		saveFile << "\n";
 	}
@@ -84,13 +88,19 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 			state.tauColls.IterateValue(j);
 						
 			//create + evaluate an annulus using the given parameters
-			PathAnnulus A = PathAnnulus(state);
+			Annulus A = Annulus(state);
 			state.WasSuccessful = A.FinalStateEvaluate();
 			
 		
 			if (state.WasSuccessful)
 			{
-				++miniGrid[0][i][j];
+				state.MeetsValueLimits = A.ValueAnalysis();
+				
+				if (state.MeetsValueLimits)
+				{
+					++miniGrid[0][i][j];
+				}
+				
 			}
 			
 			//~ bool isBeingSaved = evaluateSaveConditions(state,i,j);
@@ -238,9 +248,11 @@ int main(int argc, char** argv)
 
 	if (pp.Mode == 0)
 	{	
-		PathAnnulus A = PathAnnulus(pp);
+		
+		Annulus A = Annulus(pp);
 		A.Evolve();
 		A.SaveAnnulus("SingleEvaluation");
+		
 	}
 	else
 	{
@@ -248,6 +260,8 @@ int main(int argc, char** argv)
 		IterationMode(pp);
 		SaveGrid(pp);
 	}
+
+
 
 }
 

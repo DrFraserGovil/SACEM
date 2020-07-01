@@ -2,225 +2,174 @@
 #include "Annulus.h"
 
 
-PathAnnulus::PathAnnulus(ParameterPack pp)
+Annulus::Annulus(ParameterPack pp)
 {
 	PP = pp;
 	
-	double tMax = pp.tauInf*1.02;
+	double tMax = pp.tauInf;
 	double deltaT = pp.timeStep;
-	double t = 0;
-	while (t <= tMax)
-	{
-		TimeVector.push_back(t);
-		t+=deltaT;
-	}
-
-	int N = TimeVector.size();
-	Europium.resize(N);
-	Iron.resize(N);
-	Magnesium.resize(N);
-	ISM = MassReservoir(TimeVector, pp, false);
-	//std::cout << "SFR Initialised" << std::endl;
 	
+	NSteps = ceil(tMax/(deltaT));
+	
+	PP.timeStep = tMax/(NSteps);
+	
+	NSteps +=1;
+	
+	Europium.resize(NSteps);
+	Europium_S.resize(NSteps);
+	Europium_NSM.resize(NSteps);
+	Europium_Coll.resize(NSteps);
+	Iron.resize(NSteps);
+	Magnesium.resize(NSteps);
+	
+	
+	MassTracker = Accretion(pp);
+	CCSNTracker = CCSN(pp);
+	CollapsarTracker = Collapsar(pp);
+	
+	
+	NSMTracker = Decayer(pp, pp.NSMCool.Value, pp.nuNSM.Value, pp.tauNSM.Value, pp.NSMHotFrac.Value);
+	
+	SFRTracker = StarFormation(pp,0,0);
+
+	SNIaTracker = Decayer(pp, pp.SNIaCool.Value, pp.nuSNIa.Value, pp.tauSNIa.Value, pp.SNIaHotFrac.Value);
 	
 	Calibrate();
-		//	std::cout << "Calibration completed" << std::endl;
-}
-
-PathAnnulus::PathAnnulus(ParameterPack pp, MassReservoir ism)
-{
-	PP = pp;
-	
-	double tMax = pp.tMax*1.05;
-	double deltaT = pp.timeStep;
-	double t = 0;
-	while (t <= tMax)
-	{
-		TimeVector.push_back(t);
-		t+=deltaT;
-	}
-
-	int N = TimeVector.size();
-	Europium.resize(N);
-	Iron.resize(N);
-	Magnesium.resize(N);
-	ISM = ism;
-	Calibrate();
-}
-
-
-
-double cutoff(double t, double cutT, double wT)
-{
-	double lowT = cutT - wT;
-	double upT = cutT;
-	
-	if (t < lowT)
-	{
-		return 1;
-	}
-	if (t > upT)
-	{
-		return 0;
-	}
-	
-	return (lowT - t)/wT + 1;
-}
-
-
-double PathAnnulus::Quick(double t, bool decayActive)
-{
-	int N = 700;
-	double dt = t/(N+1);
-	
-	double start = ISM.ColdGas(0);
-	double end = ISM.ColdGas(t);
-	if(decayActive)
-	{
-		start*=cutoff(0,PP.tauColls.Value, PP.collWidth.Value);
-		end*=cutoff(t,PP.tauColls.Value,PP.collWidth.Value);
-	}
-	
-	double sum = 0.5*(start + end);
-	
-	for (double x= dt; x < t; x+=dt)
-	{
-		double temp = ISM.ColdGas(x);
-		if (decayActive)
-		{
-			temp*=cutoff(x,PP.tauColls.Value,PP.collWidth.Value);
-		}
-		sum+=temp;
-	}
-	
-	return sum*PP.nuSFR.Value*dt;
 	
 }
 
 
-double PathAnnulus::SlowIntegrand(double t, double tau, double nu)
+void Annulus::Calibrate()
 {
-	int N = 500;
-	double dt = t/(N+1);
-	double sum = 0;
-	for (double x = tau +dt; x < t; x+=dt)
-	{
-		sum += ISM.ColdGas(x) * exp(-nu*(x - tau));
-	} 
-	if (t > tau)
-	{
-		sum += 0.5*(ISM.ColdGas(tau)*exp(nu*tau) + ISM.ColdGas(t)*exp(-nu*(t - tau)));
-	}
-	return sum*dt*PP.nuSFR.Value; 
-}
-
-double PathAnnulus::Slow(double t, double tau, double nu)
-{
-	if (t < tau)
-	{
-		return 0;
-	}
-	int N = 500;
-	double dt = t/(N+1);
-	double sum = 0;
-	for (double x = tau +dt; x < t; x+=dt)
-	{
-		sum+=SlowIntegrand(x,tau,nu);
-	} 
-	sum += 0.5*(SlowIntegrand(t,tau,nu) );
-	return sum*dt;
-}
-
-
-
-void PathAnnulus::Calibrate()
-{
-		double mass = ISM.ColdGas(PP.tauSNIa.Value) + ISM.HotGas(PP.tauSNIa.Value) + ISM.Stars(PP.tauSNIa.Value);
+		double tI = 15;
+		double t0Cutoff = 0.002;
+		//double t0 = std::max(std::min(std::min(PP.tauSNIa.Value, PP.tauColls.Value),PP.tauNSM),t0Cutoff);   // chooses the smallest time before weird stuff happens. Iff this owuld result in an answer below the cutoff, use cutoff instead
+	
+		double t0 = 0.002;
+	
+		double Hmass = PP.HFrac.Value * MassTracker.Mass(tI);
 		
-		double EInf = Quick(PP.tauInf,false);
-		double E0 = Quick(PP.tauSNIa.Value,false);
+		//CCSN counts
+		double S0 = CCSNTracker.Count(t0);
+		double SInf = CCSNTracker.Count(tI);
+		double St = CCSNTracker.Count(PP.tauSNIa.Value);
+		double STotal = CCSNTracker.Total(tI);
 		
-		double FInf = Quick(PP.tauInf,true);
-		double F0 = Quick(PP.tauSNIa.Value,true);
+		//collapsar counts
+		double C0 = CollapsarTracker.Count(t0);
+		double CInf = CollapsarTracker.Count(tI);
+		double Ct = CollapsarTracker.Count(PP.tauSNIa.Value);
+		double CTotal = CollapsarTracker.Total(tI);
 		
-		double HSNIa_Inf = Slow(PP.tauInf,PP.tauSNIa.Value,PP.nuSNIa.Value);
-		double HNSM_0 = Slow(PP.tauSNIa.Value, PP.tauNSM.Value, PP.nuNSM.Value);	
-		double HNSM_Inf = Slow(PP.tauInf, PP.tauNSM.Value, PP.nuNSM.Value);
+		//nsm counts
+		double N0 = NSMTracker.Count(t0);
+		double NInf = NSMTracker.Count(tI);
+		double Nt = NSMTracker.Count(PP.tauSNIa.Value);
+		double NTotal = NSMTracker.Total(tI);
 		
-		double Fcal = PP.FeH_SN.Value;
+		//SNIa counts
+		double WInf = SNIaTracker.Count(tI);
+
+
+		double FInf = PP.FeH_Sat.Value;
 		double M0 = PP.MgFe_SN.Value;
 		double MInf = PP.MgFe_Sat.Value;
-		double Eps = PP.EuMg_SN.Value;
-		double zeta = PP.sProcFrac.Value;
-		double omega = PP.collFrac.Value;
-		double nsmFrac = 1.0 - zeta - omega;
+		double Et = PP.EuFe_SN.Value;
+		double xi = PP.sProcFrac.Value;
+		double Omega = PP.collFrac.Value;
+		double nsmFrac = 1.0 - xi - Omega;
 		
-		alpha = mass/E0 * pow(10.0,Fcal);
-		beta = alpha * EInf/HSNIa_Inf*(pow(10.0,M0 - MInf) - 1.0);
+		alpha = Hmass/SInf * pow(10.0,FInf + MInf - M0);
+		
+		beta = alpha * SInf/WInf * (pow(10.0,M0 - MInf) - 1.0);
+		
 		eta = alpha * pow(10.0,M0);
 		
 		
-		double gammaFrac = zeta*E0/EInf + omega * F0/FInf + nsmFrac*HNSM_0/HNSM_Inf;
-		gamma = eta * pow(10.0,Eps) * zeta * E0/EInf / gammaFrac;
-		delta = omega/zeta * EInf/FInf * gamma;
-		epsilon = nsmFrac/zeta * gamma * EInf;
-			
+
+		
+		//RETROFIT TO USE TOTAL GENERATION
+
+		double epsDenom = xi * St/STotal + Omega * Ct/CTotal + nsmFrac * Nt/NTotal;
+	
+		double epsFrac = St/NTotal * alpha * pow(10.0,Et) /epsDenom;
+		
+		
+		epsilon = nsmFrac * epsFrac;
+		delta = Omega * NTotal/CTotal * epsFrac;
+		gamma = xi * NTotal/STotal * epsFrac;
+	
+		//PrintCalibration();
 }
 
 
-void PathAnnulus::Evolve()
+void Annulus::PrintCalibration()
+{
+	std::vector<std::string> names = {"alpha","beta", "gamma", "delta", "epsilon", "eta"};
+	std::vector<double> vals = {alpha, beta, gamma, delta, epsilon, eta};
+	
+	for (int i = 0; i < names.size(); ++i)
+	{
+		std::cout << names[i] << ":\t" << vals[i] << "\n";
+	}
+	
+}
+
+void Annulus::Evolve()
 {
 	//clean vectors
-	int N = TimeVector.size();
-	
-	int i = 0;
-	MaxIndex = 0;
-	double t =0;
-	while (i < N && t < PP.tMax)
+	double t = 0;
+	for (int i = 0; i < NSteps; ++i)
 	{
-		t = TimeVector[i];
-		double qT = Quick(t,false);
-		double H = 0.7 * (ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
-		double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM.Value, PP.nuNSM.Value);
-		double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
+
+		double qT = CCSNTracker.Count(t);
+		double H = PP.HFrac.Value * MassTracker.Mass(t);
+		
+		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+		double fe = alpha * qT + beta * SNIaTracker.Count(t);
 		double mg = eta*qT;
 		
-		Europium[i] = eu;
-		Iron[i] = fe;
-		Magnesium[i] = mg;
-		
-		++i;
-		++MaxIndex;
+		Europium[i] = log10(eu/H);
+		Iron[i] = log10(fe/H);
+		Magnesium[i] = log10(mg/H);
+
+		Europium_S[i] = log10(gamma*qT/H);
+		Europium_NSM[i] = log10(epsilon*NSMTracker.Count(t)/H);
+		Europium_Coll[i] = log10(delta*CollapsarTracker.Count(t)/H);
+
+		t+=PP.timeStep;
 	}
 }
 
-bool PathAnnulus::FinalStateEvaluate()
+bool Annulus::FinalStateEvaluate()
 {
 	double t = PP.tMax;
-	double qT = Quick(t,false);
-	double eu = gamma*qT + delta*Quick(t,true) + epsilon*Slow(t,PP.tauNSM.Value, PP.nuNSM.Value);
-	double fe = alpha * qT + beta * Slow(t,PP.tauSNIa.Value, PP.nuSNIa.Value);
-	double h = 0.7*(ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
 	
-	double EuFe_Sat = log10(eu / fe);
-	double FeH_Sat = log10(fe/h);
 	
-	bool satisfiesEuropiumCondition = (EuFe_Sat >= PP.finalEuFe_Min && EuFe_Sat <= PP.finalEuFe_Max);
-	bool satisfiesIronCondition = (FeH_Sat >=PP.finalFe_Min && FeH_Sat <= PP.finalFe_Max);
+	double qT = CCSNTracker.Count(t);
+	double H = PP.HFrac.Value * MassTracker.Mass(t);
+	
+	double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+	double fe = alpha * qT + beta * SNIaTracker.Count(t);
+	double mg = eta*qT;
+	
+	
+	double EuFe = log10(eu/fe);
+	bool satisfiesEuropiumCondition = (EuFe >= PP.finalEuFe_Min && EuFe <= PP.finalEuFe_Max);
+	bool successCondition = satisfiesEuropiumCondition ;
 
-	bool successCondition = satisfiesEuropiumCondition && satisfiesIronCondition;
 
 	return successCondition;	
 }
 
-void PathAnnulus::SaveAnnulus(std::string fileName)
+void Annulus::SaveAnnulus(std::string fileName)
 {
 	std::ofstream saveFile;
 	int width = 15;
 	
 	std::string saveFileName =PP.FILEROOT + fileName + ".dat";
 	saveFile.open(saveFileName);
-	std::vector<std::string> titles = {"Time", "H","Fe/H", "Mg/H", "Eu/H",};
+	std::vector<std::string> titles = {"Time","Fe/H", "Mg/H", "Eu/H","Collapsar","NSM","s-Process","SFR","CCSN (cold)", "CCSN (all)" , "Collapsar (cold)", "Collapsar (All)"};
 	
 	for (int i = 0; i < titles.size(); ++i)
 	{
@@ -228,16 +177,21 @@ void PathAnnulus::SaveAnnulus(std::string fileName)
 	}
 	saveFile << "\n";
 	
-	for (int i = 0 ; i < MaxIndex; ++i)
+	for (int i = 0 ; i < Iron.size(); ++i)
 	{
-		double t = TimeVector[i];
-		double H = 0.7 * (ISM.ColdGas(t) + ISM.HotGas(t) + ISM.Stars(t));
 		
-		double feh = log10(Iron[i]/H);
-		double mgh = log10(Magnesium[i]/H);
-		double euh = log10(Europium[i]/H);
+		double t = i*PP.timeStep;
+		double feh = Iron[i];
+		double mgh = Magnesium[i];
+		double euh = Europium[i];
 		
-		std::vector<double> vals = {t, H, feh,mgh,euh};
+		double sfr = SFRTracker.Rho(t);
+		double ccsnCold = CCSNTracker.Count(t);
+		double ccsnAll = CCSNTracker.Total(t);
+		double collapsarCold = CollapsarTracker.Count(t);
+		double collapsarAll = CollapsarTracker.Total(t);
+		
+		std::vector<double> vals = {i*PP.timeStep, feh,mgh,euh,Europium_Coll[i],Europium_NSM[i], Europium_S[i],sfr,ccsnCold,ccsnAll,collapsarCold,collapsarAll};
 		for(int i = 0; i < vals.size(); ++i)
 		{
 			saveFile << std::setw(width) << vals[i];
@@ -246,4 +200,43 @@ void PathAnnulus::SaveAnnulus(std::string fileName)
 	}
 	
 	saveFile.close();
+}
+
+
+bool Annulus::ValueAnalysis()
+{
+	//clean vectors
+	double t = 0;
+	for (int i = 0; i < NSteps; ++i)
+	{
+
+		double qT = CCSNTracker.Count(t);
+		double H = PP.HFrac.Value * MassTracker.Mass(t);
+		
+		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+		double fe = alpha * qT + beta * SNIaTracker.Count(t);
+		double mg = eta*qT;
+		
+		double euH = log10(eu/H);
+		double feH = log10(fe/H);
+		double mgH = log10(mg/H);
+		
+		
+		bool meetsEuFeCriteria = ((euH - feH) < PP.maxEuFe);
+		bool meetsFeHCriteria = (feH < PP.maxFeH);
+		
+		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria;
+		
+		if (criteriaMet == false)
+		{
+			return false;
+		}
+		
+		
+		t+=PP.timeStep;
+	}
+	
+	return true;
+	
+	
 }

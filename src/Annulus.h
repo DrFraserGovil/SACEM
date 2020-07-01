@@ -1,29 +1,43 @@
 #pragma once
 #include <vector>
-#include "MassReservoir.h"
 #include <math.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
-class PathAnnulus
+#include <algorithm>
+#include "ProcessClasses.h"
+class Annulus
 {
 	public:
-		PathAnnulus(ParameterPack pp);
-		PathAnnulus(ParameterPack pp, MassReservoir ism);
+		Annulus(ParameterPack pp);
+
 		
 		void Evolve();
 		
 		bool FinalStateEvaluate();
 		void SaveAnnulus(std::string fileName);
+		bool ValueAnalysis();
 	private:
 		ParameterPack PP;
-		
-		MassReservoir ISM;
+		int NSteps;
 		
 		std::vector<double> Europium;
+		
+		std::vector<double> Europium_NSM;
+		std::vector<double> Europium_Coll;
+		std::vector<double> Europium_S;
+		
 		std::vector<double> Iron;
 		std::vector<double> Magnesium;
+	
+		Accretion MassTracker;
+		StarFormation SFRTracker;
+		
+		CCSN CCSNTracker;
+		Collapsar CollapsarTracker;
+		Decayer NSMTracker;
+		Decayer SNIaTracker;
 		
 		//normalised constants
 		double alpha;
@@ -33,15 +47,9 @@ class PathAnnulus
 		double epsilon;
 		double eta;
 		
-		std::vector<double> TimeVector;
-		
-		double Quick(double t, bool FMode);
-		double SlowIntegrand(double t, double tau, double nu);
-		double Slow(double t, double tau, double nu);
+	
 		void Calibrate();
-		
-		
-		int MaxIndex;
+		void PrintCalibration();
 };
 
 
