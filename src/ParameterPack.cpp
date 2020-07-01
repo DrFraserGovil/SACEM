@@ -14,7 +14,7 @@ ParameterPack::ParameterPack()
 	IterationSteps = 10;
 	NThreads = 4;
 	Mode = 0;
-	NRandomGalaxies = 100000;
+	NRandomGalaxies = 200000;
 	SaveValue = 1000;
 	tMax = 14;
 	timeStep = 0.05;

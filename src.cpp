@@ -98,6 +98,19 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 				
 				if (state.MeetsValueLimits)
 				{
+					
+					if (state.collFrac.Value > 0.7 & state.tauColls.Value < 4)
+					{
+						ostringstream simFileName;
+						simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful; 
+						A.Evolve();
+						A.SaveAnnulus(simFileName.str());
+						
+						ostringstream stateSave;
+						stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
+						state.PrintState(stateSave.str());
+					}
+					
 					++miniGrid[0][i][j];
 				}
 				
