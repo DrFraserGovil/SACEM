@@ -26,8 +26,8 @@ ParameterPack::ParameterPack()
 	NGrid = 101;
 	
 	HFrac = RandomisableParameter<double>(0.759,0.68,0.8,&global_mt);
-	FeH_Sat = RandomisableParameter<double>(0.037,0,0.4,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.3379,0.25,0.4,&global_mt);
+	FeH_Sat = RandomisableParameter<double>(0.037,0.1,0.4,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.3379,0.3,0.4,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(0.092,-0.1,0.1,&global_mt);
 	EuFe_SN = RandomisableParameter<double>(0.39,0.3,0.45,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.0079,0.0000001,0.1,&global_mt);
@@ -42,7 +42,8 @@ ParameterPack::ParameterPack()
 	//limiting values
 	maxEuFe = 0.7;
 	maxFeH = 0.5;
-	maxLoopBack = 0.2;
+	maxLoopBack = 0.05;
+	maxEuMg = 0.;
 	
 	//accretion/infall parameters
 	

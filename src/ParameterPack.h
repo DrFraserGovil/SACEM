@@ -48,6 +48,7 @@ class ParameterPack
 			double maxEuFe;
 			double maxFeH;	
 			double maxLoopBack;
+			double maxEuMg;
 			
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;

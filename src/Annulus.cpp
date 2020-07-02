@@ -237,7 +237,7 @@ bool Annulus::ValueAnalysis()
 		
 		bool meetsEuFeCriteria = (eufe < PP.maxEuFe);
 		bool meetsFeHCriteria = (feH < PP.maxFeH);
-		
+		bool meetsEuMgCriteria = (feH < PP.maxEuMg);
 		bool meetsLoopBackCriteria = true;
 		if (feH + PP.maxLoopBack < maxReachFe)
 		{
@@ -245,7 +245,13 @@ bool Annulus::ValueAnalysis()
 		}
 		
 		
-		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria & meetsLoopBackCriteria;
+		bool meetsNoPeakCriteria = true;
+		if (eufe > PP.EuFe_SN.Value & feH > 0)
+		{
+			meetsNoPeakCriteria = false;
+		}
+		
+		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria & meetsEuMgCriteria & meetsLoopBackCriteria & meetsNoPeakCriteria;
 		
 		if (criteriaMet == false)
 		{
