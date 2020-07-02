@@ -21,12 +21,10 @@ class ParameterPack
 			
 			// global variable store for command-line modification
 			std::string FILEROOT;
-			int IntegrationSteps;
-			int IterationSteps;
+		
 			int NThreads;
 			int Mode;
 			int NRandomGalaxies;
-			int SaveValue;
 			int NGrid;
 			double tMax;
 			double timeStep; 
@@ -49,7 +47,7 @@ class ParameterPack
 			
 			double maxEuFe;
 			double maxFeH;	
-			
+			double maxLoopBack;
 			
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;
@@ -63,10 +61,7 @@ class ParameterPack
 			
 			RandomisableParameter<double> galaxyScaleLength;
 			RandomisableParameter<double> nuSFR;
-			RandomisableParameter<double> nuCool;
-			RandomisableParameter<double> alphaKS;
-			RandomisableParameter<double> StellarLifeTimeSlope;
-			RandomisableParameter<double> hotFrac;
+			
 			RandomisableParameter<double> stellarDeathParameter;
 			
 			
@@ -94,6 +89,7 @@ class ParameterPack
 	
 			void UpdateRadius(double r, double deltaR);
 			void UpdateInfall();
+			void ValueChecks();
 
 			void ScrambleAll();
 			void PrintState(std::string saveFile);

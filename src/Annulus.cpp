@@ -207,6 +207,9 @@ bool Annulus::ValueAnalysis()
 {
 	//clean vectors
 	double t = 0;
+	
+	double maxReachEu = -999999;
+	double maxReachFe = -999999;
 	for (int i = 0; i < NSteps; ++i)
 	{
 
@@ -221,11 +224,27 @@ bool Annulus::ValueAnalysis()
 		double feH = log10(fe/H);
 		double mgH = log10(mg/H);
 		
+		double eufe = euH = feH;
+		if (eufe > maxReachEu)
+		{
+			maxReachEu = eufe;
+		}
+		if (feH > maxReachFe)
+		{
+			maxReachFe = feH;
+		}
 		
 		bool meetsEuFeCriteria = ((euH - feH) < PP.maxEuFe);
 		bool meetsFeHCriteria = (feH < PP.maxFeH);
 		
-		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria;
+		bool meetsLoopBackCriteria = true;
+		if (eufe +PP.maxLoopBack < maxReachEu || feH + PP.maxLoopBack < maxReachFe)
+		{
+			meetsLoopBackCriteria = false;
+		}
+		
+		
+		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria & meetsLoopBackCriteria;
 		
 		if (criteriaMet == false)
 		{

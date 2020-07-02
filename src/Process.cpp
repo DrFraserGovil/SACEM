@@ -14,8 +14,8 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 	//calculate the SFR parameters
 	double mu = PP.stellarDeathParameter.Value;
 	double nu = PP.nuSFR.Value;
-	double lambda = PP.nuCool.Value;
-	double f = PP.hotFrac.Value;
+	double lambda = PP.CCSNCool.Value;
+	double f = PP.CCSNHotFrac.Value;
 	
 	double p = mu + nu + lambda;
 	double q = mu*nu*f + lambda*(mu + nu);

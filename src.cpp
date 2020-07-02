@@ -56,27 +56,7 @@ void SaveGrid(ParameterPack copy)
 	saveFile.close();
 }
 
-inline bool evaluateSaveConditions(ParameterPack state, int i, int j)
-{
-	int dist = abs(i - j);
-	int lowerBound = 75;
-	int upperBound = 90;
-	if (!(state.WasSuccessful) || dist < lowerBound)
-	{
-		return (rand() % state.SaveValue == 0);
-	}
-	else
-	{
-		if (dist > upperBound)
-		{
-			return true;
-		}
-		else
-		{
-			return  (rand() % (int)(state.SaveValue/1.4) == 0);
-		}
-	}
-}
+
 
 void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid, int loopNumber, int id)
 {	
@@ -103,7 +83,10 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 					{
 						ostringstream simFileName;
 						simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful; 
+						double tTemp = state.timeStep;
+						state.timeStep = 0.001;
 						A.Evolve();
+						state.timeStep = tTemp;
 						A.SaveAnnulus(simFileName.str());
 						
 						ostringstream stateSave;
