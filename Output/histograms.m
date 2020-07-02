@@ -1,4 +1,4 @@
-tab = readtable("VeryLong/SuccessGrid.dat");
+tab = readtable("VeryLong2/SuccessGrid.dat");
 
 tab = table2array(tab);
 
@@ -7,7 +7,7 @@ tab = table2array(tab);
 
 cla;
 %colormap(flipud(gray));
-image([0,1],[0,20],transpose(tab(2:end,2:end)),'CDataMapping','scaled')
+image([0,1],[0,20],transpose(tab),'CDataMapping','scaled')
 set(gca,'YDir','normal')
 title("Model Counting","Interpreter","latex","FontSize",20)
 xlabel("Collapsar Fraction, $f_{coll}$","Interpreter","latex","FontSize",20);

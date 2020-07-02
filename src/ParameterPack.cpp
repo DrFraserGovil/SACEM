@@ -25,13 +25,13 @@ ParameterPack::ParameterPack()
 
 	NGrid = 101;
 	
-	HFrac = RandomisableParameter<double>(0.714,0.68,0.8,&global_mt);
-	FeH_Sat = RandomisableParameter<double>(0.12,0,0.4,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.38,0.25,0.4,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(0.015,-0.1,0.1,&global_mt);
-	EuFe_SN = RandomisableParameter<double>(0.31,0.3,0.45,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.06,0.0000001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.92,0,1.0,NGrid);
+	HFrac = RandomisableParameter<double>(0.759,0.68,0.8,&global_mt);
+	FeH_Sat = RandomisableParameter<double>(0.037,0,0.4,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.3379,0.25,0.4,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(0.092,-0.1,0.1,&global_mt);
+	EuFe_SN = RandomisableParameter<double>(0.39,0.3,0.45,&global_mt);
+	sProcFrac = RandomisableParameter<double>(0.0079,0.0000001,0.1,&global_mt);
+	collFrac = IterableParameter<double>(0.71666,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.1;
@@ -47,13 +47,13 @@ ParameterPack::ParameterPack()
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
-	galaxyM0 = RandomisableParameter<double>(0.82,0.1,1.0,&global_mt);
-	galaxyM1 = RandomisableParameter<double>(8.79,1,10.0,&global_mt);
-	galaxyM2 = RandomisableParameter<double>(43.16,10,50.0,&global_mt);
-	galaxyB1 = RandomisableParameter<double>(0.68,0.01,1.0,&global_mt);
-	galaxyB2 = RandomisableParameter<double>(20.2,5,25,&global_mt);
+	galaxyM0 = RandomisableParameter<double>(0.52,0.1,1.0,&global_mt);
+	galaxyM1 = RandomisableParameter<double>(1.93,1,10.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(31.05,10,50.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(0.11,0.01,1.0,&global_mt);
+	galaxyB2 = RandomisableParameter<double>(23,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
-	nuSFR = RandomisableParameter<double>(0.99,0.01,2.0,&global_mt);
+	nuSFR = RandomisableParameter<double>(0.066737,0.01,2.0,&global_mt);
 	
 	stellarDeathParameter = RandomisableParameter<double>(0.19,0.000001,0.1,&global_mt);
 	UpdateInfall();
@@ -63,14 +63,14 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(0.8,0,20,NGrid);
-	collWidth = RandomisableParameter<double>(9.47,0.001,10,&global_mt);
+	tauColls = IterableParameter<double>(3.333,0,20,NGrid);
+	collWidth = RandomisableParameter<double>(3.333,0.001,10,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.499,0.001,0.5,&global_mt);
 	nuSNIa = RandomisableParameter<double>(0.37,0.0001,2,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.7,0.0001,0.3,&global_mt);
 	nuNSM = RandomisableParameter<double>(2.01,0.01,3,&global_mt);
 	
-	double hotMin = 0.3;
+	double hotMin = 0.4;
 	double hotMax = 0.99;
 	CollapsarHotFrac = RandomisableParameter<double>(0.505,hotMin,hotMax,&global_mt);
 	CCSNHotFrac = RandomisableParameter<double>(0.82,hotMin,hotMax,&global_mt);

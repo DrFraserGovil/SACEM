@@ -126,8 +126,9 @@ void Collapsar::GeneratePrefactors()
 	
 	if (T - Delta > 0)
 	{
-		TotalConst = RealDot(InitialTotal, F(T-Delta) - F(0) );
-		TotalConst -= TotalMid(T- Delta);
+		double c = RealDot(InitialTotal, F(T-Delta) - F(0) );
+		c -= TotalMid(T- Delta);
+		TotalConst = c;
 	}
 	else
 	{
