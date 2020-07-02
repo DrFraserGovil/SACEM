@@ -127,14 +127,14 @@ void ParameterPack::ScrambleAll()
 	UpdateRadius(Radius, Width);
 	UpdateInfall();
 	
-	
+	ValueChecks();
 }
 
 void ParameterPack::ValueChecks()
 {
 	if (collWidth.Value > tauColls.Value)
 	{
-		collWidth.Value = tauColls.Value;
+		collWidth.Value = tauColls.Value*0.99;
 	}
 
 	
