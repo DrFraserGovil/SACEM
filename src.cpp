@@ -83,10 +83,8 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 					{
 						ostringstream simFileName;
 						simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful; 
-						double tTemp = state.timeStep;
-						state.timeStep = 0.001;
+						
 						A.Evolve();
-						state.timeStep = tTemp;
 						A.SaveAnnulus(simFileName.str());
 						
 						ostringstream stateSave;
