@@ -35,7 +35,7 @@ class ParameterPack
 			RandomisableParameter<double> FeH_Sat;
 			RandomisableParameter<double> MgFe_SN;
 			RandomisableParameter<double> MgFe_Sat;
-			RandomisableParameter<double> EuFe_SN;
+			RandomisableParameter<double> EuFe_Sat;
 			RandomisableParameter<double> sProcFrac;
 			IterableParameter<double> collFrac;
 			
@@ -45,10 +45,10 @@ class ParameterPack
 			double finalFe_Min;
 			double finalFe_Max;
 			
-			double maxEuFe;
-			double maxFeH;	
+			double EuFeCeiling;
+			double EuFeFloor;	
 			double maxLoopBack;
-			double maxEuMg;
+
 			
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;
@@ -62,7 +62,7 @@ class ParameterPack
 			
 			RandomisableParameter<double> galaxyScaleLength;
 			RandomisableParameter<double> nuSFR;
-			
+			RandomisableParameter<double> content_modified_nuSFR;
 			RandomisableParameter<double> stellarDeathParameter;
 			
 			

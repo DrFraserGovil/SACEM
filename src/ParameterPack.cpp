@@ -25,13 +25,13 @@ ParameterPack::ParameterPack()
 
 	NGrid = 101;
 	
-	HFrac = RandomisableParameter<double>(0.759,0.68,0.8,&global_mt);
-	FeH_Sat = RandomisableParameter<double>(0.037,0.1,0.4,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.3379,0.3,0.4,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(0.092,-0.1,0.1,&global_mt);
-	EuFe_SN = RandomisableParameter<double>(0.39,0.3,0.45,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.0079,0.0000001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.71666,0,1.0,NGrid);
+	HFrac = RandomisableParameter<double>(0.7,0.68,0.8,&global_mt);
+	FeH_Sat = RandomisableParameter<double>(0.3,0.1,0.4,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
+	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
+	sProcFrac = RandomisableParameter<double>(0.005,0.0000001,0.1,&global_mt);
+	collFrac = IterableParameter<double>(0,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.1;
@@ -40,23 +40,23 @@ ParameterPack::ParameterPack()
 	finalFe_Max = 0.4;
 	
 	//limiting values
-	maxEuFe = 0.7;
-	maxFeH = 0.5;
+	EuFeCeiling = 0.6;
+	EuFeFloor = 0.3;
 	maxLoopBack = 0.05;
-	maxEuMg = 0.;
+
 	
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
-	galaxyM0 = RandomisableParameter<double>(0.52,0.1,1.0,&global_mt);
-	galaxyM1 = RandomisableParameter<double>(1.93,1,10.0,&global_mt);
-	galaxyM2 = RandomisableParameter<double>(31.05,10,50.0,&global_mt);
-	galaxyB1 = RandomisableParameter<double>(0.11,0.01,1.0,&global_mt);
-	galaxyB2 = RandomisableParameter<double>(23,5,25,&global_mt);
+	galaxyM0 = RandomisableParameter<double>(0.8,0.1,1.0,&global_mt);
+	galaxyM1 = RandomisableParameter<double>(4,1,10.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(46,10,50.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(0.3,0.01,1.0,&global_mt);
+	galaxyB2 = RandomisableParameter<double>(14,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
-	nuSFR = RandomisableParameter<double>(0.066737,0.01,2.0,&global_mt);
-	
-	stellarDeathParameter = RandomisableParameter<double>(0.19,0.000001,0.1,&global_mt);
+	nuSFR = RandomisableParameter<double>(1.1,0.01,2.0,&global_mt);
+	content_modified_nuSFR = RandomisableParameter<double>(0.1,0.01,2.0,&global_mt);
+	stellarDeathParameter = RandomisableParameter<double>(0.02,0.001,0.1,&global_mt);
 	UpdateInfall();
 	massToDensityCorrection = 1;
 	densityToMassCorrection = 1;
@@ -66,25 +66,25 @@ ParameterPack::ParameterPack()
 	
 	tauColls = IterableParameter<double>(3.333,0,20,NGrid);
 	collWidth = RandomisableParameter<double>(3.333,0.001,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.499,0.001,0.5,&global_mt);
-	nuSNIa = RandomisableParameter<double>(0.37,0.0001,2,&global_mt);
-	tauNSM = RandomisableParameter<double>(0.7,0.0001,0.3,&global_mt);
-	nuNSM = RandomisableParameter<double>(2.01,0.01,3,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.001,0.5,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.0001,30,&global_mt);
+	tauNSM = RandomisableParameter<double>(0.05,0.0001,0.3,&global_mt);
+	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt);
 	
 	double hotMin = 0.4;
 	double hotMax = 0.99;
-	CollapsarHotFrac = RandomisableParameter<double>(0.505,hotMin,hotMax,&global_mt);
-	CCSNHotFrac = RandomisableParameter<double>(0.82,hotMin,hotMax,&global_mt);
-	SNIaHotFrac = RandomisableParameter<double>(0.73,hotMin,hotMax,&global_mt);
-	NSMHotFrac = RandomisableParameter<double>(0.78,hotMin,hotMax,&global_mt);
+	CollapsarHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
+	CCSNHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
+	SNIaHotFrac = RandomisableParameter<double>(0.99,hotMin,hotMax,&global_mt);
+	NSMHotFrac = RandomisableParameter<double>(0.5,hotMin,hotMax,&global_mt);
 	
 	
 	double coolMin = 0.1;
 	double coolMax = 2;
 	CollapsarCool = RandomisableParameter<double>(1.7,coolMin,coolMax,&global_mt);
-	CCSNCool = RandomisableParameter<double>(0.13,coolMin,coolMax,&global_mt);
-	SNIaCool = RandomisableParameter<double>(0.93,coolMin,coolMax,&global_mt);
-	NSMCool = RandomisableParameter<double>(1.81,coolMin,coolMax,&global_mt);
+	CCSNCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
+	SNIaCool = RandomisableParameter<double>(1.3,coolMin,coolMax,&global_mt);
+	NSMCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
 	
 	WasSuccessful = false;
 }
@@ -97,7 +97,7 @@ void ParameterPack::ScrambleAll()
 	FeH_Sat.Scramble();
 	MgFe_SN.Scramble();
 	MgFe_Sat.Scramble();
-	EuFe_SN.Scramble();
+	EuFe_Sat.Scramble();
 	sProcFrac.Scramble();
 	galaxyM0.Scramble();
 	galaxyM1.Scramble();
@@ -106,7 +106,7 @@ void ParameterPack::ScrambleAll()
 	galaxyB2.Scramble();
 	galaxyScaleLength.Scramble();
 	nuSFR.Scramble();
-	
+	content_modified_nuSFR.Scramble();
 	collWidth.Scramble();
 	tauSNIa.Scramble();
 	nuSNIa.Scramble();
@@ -161,14 +161,14 @@ void ParameterPack::PrintState(std::string saveFileName)
 	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
 	std::vector<IterableParameter<double>> keyParams = {collFrac, tauColls};
 	
-	std::vector<std::string> calibrationTitles = {"Hydrogen Fraction", "[Fe/H]_Inf", "[Mg/Fe]_0", "[Mg/Fe]_Inf", "[Eu/Fe]_0", "s-process Fraction"};
-	std::vector<RandomisableParameter<double>> calibrationParams = {HFrac, FeH_Sat, MgFe_SN, MgFe_Sat, EuFe_SN, sProcFrac};
+	std::vector<std::string> calibrationTitles = {"Hydrogen Fraction", "[Fe/H]_Inf", "[Mg/Fe]_0", "[Mg/Fe]_Inf", "[Eu/Fe]_Inf", "s-process Fraction"};
+	std::vector<RandomisableParameter<double>> calibrationParams = {HFrac, FeH_Sat, MgFe_SN, MgFe_Sat, EuFe_Sat, sProcFrac};
 		
 	std::vector<std::string> galaxyTitles = {"Initial mass", "Thick disk mass", "Thin disk mass", "Thick disk infall time", "Thin disk infall time", "SFR frequency", "Cooling Frequency", "CCSN Hot Fraction","Stellar Death Mu"};
 	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, nuSFR, CCSNCool, CCSNHotFrac,stellarDeathParameter};
 	
-	std::vector<std::string> processTitles = {"SNIa delay time", "SNIa frequency", "NSM delay time", "NSM frequency", "Collapsar turnoff width"};
-	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth};
+	std::vector<std::string> processTitles = {"SNIa delay time", "SNIa frequency", "NSM delay time", "NSM frequency", "Collapsar turnoff width","Modified Removal Frequency"};
+	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth,content_modified_nuSFR};
 
 	std::vector<std::string> coolingTitles = {"CCSN Hot Frac", "CCSN Cooling Frequency", "SNIa hot frac", "SNIa cooling frequency", "Collapsar Hot Frac", "Collapsar Cooling Frequency", "NSM Hot Frac", "NSM Cooling Frequency"};
 	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, CCSNCool, SNIaHotFrac, SNIaCool, CollapsarHotFrac, CollapsarCool, NSMHotFrac, NSMCool};

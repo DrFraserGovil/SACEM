@@ -15,7 +15,7 @@ class Annulus
 		
 		void Evolve();
 		
-		bool FinalStateEvaluate();
+		bool QuickAnalysis();
 		void SaveAnnulus(std::string fileName);
 		bool ValueAnalysis();
 	private:

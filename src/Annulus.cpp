@@ -52,19 +52,16 @@ void Annulus::Calibrate()
 		//CCSN counts
 		double S0 = CCSNTracker.Count(t0);
 		double SInf = CCSNTracker.Count(tI);
-		double St = CCSNTracker.Count(PP.tauSNIa.Value);
 		double STotal = CCSNTracker.Total(tI);
 		
 		//collapsar counts
 		double C0 = CollapsarTracker.Count(t0);
 		double CInf = CollapsarTracker.Count(tI);
-		double Ct = CollapsarTracker.Count(PP.tauSNIa.Value);
 		double CTotal = CollapsarTracker.Total(tI);
 		
 		//nsm counts
 		double N0 = NSMTracker.Count(t0);
 		double NInf = NSMTracker.Count(tI);
-		double Nt = NSMTracker.Count(PP.tauSNIa.Value);
 		double NTotal = NSMTracker.Total(tI);
 		
 		//SNIa counts
@@ -74,7 +71,7 @@ void Annulus::Calibrate()
 		double FInf = PP.FeH_Sat.Value;
 		double M0 = PP.MgFe_SN.Value;
 		double MInf = PP.MgFe_Sat.Value;
-		double Et = PP.EuFe_SN.Value;
+		double Et = PP.EuFe_Sat.Value;
 		double xi = PP.sProcFrac.Value;
 		double Omega = PP.collFrac.Value;
 		double nsmFrac = 1.0 - xi - Omega;
@@ -90,16 +87,25 @@ void Annulus::Calibrate()
 		
 		//RETROFIT TO USE TOTAL GENERATION
 
-		double epsDenom = xi * St/STotal + Omega * Ct/CTotal + nsmFrac * Nt/NTotal;
-	
-		double epsFrac = St/NTotal * alpha * pow(10.0,Et) /epsDenom;
+		double denominator = NTotal * (xi * SInf/STotal + Omega * CInf/CTotal + nsmFrac*NInf/NTotal);
 		
+		double epsFrac = (alpha * SInf + beta * WInf) * pow(10.0,Et) /denominator;
 		
 		epsilon = nsmFrac * epsFrac;
-		delta = Omega * NTotal/CTotal * epsFrac;
-		gamma = xi * NTotal/STotal * epsFrac;
+		gamma = xi * epsFrac * NTotal/STotal;
+		delta = Omega * epsFrac * NTotal / CTotal;
 	
-		//PrintCalibration();
+		double euInf = gamma * SInf + delta * CInf + epsilon * NInf;
+		double feInf = alpha * SInf + beta * WInf;
+		
+		
+		//~ std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
+		//~ std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
+		
+		//~ for (int i = 0; i < vals.size(); ++i)
+		//~ {
+			//~ std::cout << vars[i] << ":\t" << vals[i] << std::endl;
+		//~ }
 }
 
 
@@ -141,25 +147,30 @@ void Annulus::Evolve()
 	}
 }
 
-bool Annulus::FinalStateEvaluate()
+bool Annulus::QuickAnalysis()
 {
-	double t = PP.tMax;
+	//does a trivial check to see if model is successful or not
+	
+	
+	double t = PP.tauSNIa.Value;
 	
 	
 	double qT = CCSNTracker.Count(t);
-	double H = PP.HFrac.Value * MassTracker.Mass(t);
+	//double H = PP.HFrac.Value * MassTracker.Mass(t);
 	
 	double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
 	double fe = alpha * qT + beta * SNIaTracker.Count(t);
-	double mg = eta*qT;
+	//double mg = eta*qT;
 	
 	
-	double EuFe = log10(eu/fe);
-	bool satisfiesEuropiumCondition = (EuFe >= PP.finalEuFe_Min && EuFe <= PP.finalEuFe_Max);
-	bool successCondition = satisfiesEuropiumCondition ;
+	if ( log10(eu/fe) > PP.EuFeCeiling)
+	{
+		return false;
+	}
 
 
-	return successCondition;	
+	return true;
+	//~ return successCondition;	
 }
 
 void Annulus::SaveAnnulus(std::string fileName)
@@ -177,13 +188,24 @@ void Annulus::SaveAnnulus(std::string fileName)
 	}
 	saveFile << "\n";
 	
-	for (int i = 0 ; i < Iron.size(); ++i)
+	double t = 0;
+	while (t < PP.tMax)
 	{
 		
-		double t = i*PP.timeStep;
-		double feh = Iron[i];
-		double mgh = Magnesium[i];
-		double euh = Europium[i];
+		double qT = CCSNTracker.Count(t);
+		double H = PP.HFrac.Value * MassTracker.Mass(t);
+		
+		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+		double fe = alpha * qT + beta * SNIaTracker.Count(t);
+		double mg = eta*qT;
+		
+		double euH = log10(eu/H);
+		double feH = log10(fe/H);
+		double mgH = log10(mg/H);
+
+		double eu_S = log10(gamma*qT/H);
+		double eu_NSM = log10(epsilon*NSMTracker.Count(t)/H);
+		double eu_Coll = log10(delta*CollapsarTracker.Count(t)/H);
 		
 		double sfr = SFRTracker.Rho(t);
 		double ccsnCold = CCSNTracker.Count(t);
@@ -191,12 +213,21 @@ void Annulus::SaveAnnulus(std::string fileName)
 		double collapsarCold = CollapsarTracker.Count(t);
 		double collapsarAll = CollapsarTracker.Total(t);
 		
-		std::vector<double> vals = {i*PP.timeStep, feh,mgh,euh,Europium_Coll[i],Europium_NSM[i], Europium_S[i],sfr,ccsnCold,ccsnAll,collapsarCold,collapsarAll};
+		std::vector<double> vals = {t, feH,mgH,euH,eu_Coll,eu_NSM, eu_S,sfr,ccsnCold,ccsnAll,collapsarCold,collapsarAll};
 		for(int i = 0; i < vals.size(); ++i)
 		{
 			saveFile << std::setw(width) << vals[i];
 		}
 		saveFile << "\n";
+		
+		if (t < PP.tauSNIa.Value)
+		{
+			t+=PP.timeStep/100;
+		}
+		else
+		{
+			t+=PP.timeStep;
+		}
 	}
 	
 	saveFile.close();
@@ -211,7 +242,9 @@ bool Annulus::ValueAnalysis()
 	double maxReachEu = -999999;
 	double maxReachFe = -999999;
 	
-	for (int i = 0; i < NSteps; ++i)
+	bool exceededFloor = false;
+
+	while (t <= PP.tMax)
 	{
 
 		double qT = CCSNTracker.Count(t);
@@ -235,34 +268,44 @@ bool Annulus::ValueAnalysis()
 			maxReachFe = feH;
 		}
 		
-		bool meetsEuFeCriteria = (eufe < PP.maxEuFe);
-		bool meetsFeHCriteria = (feH < PP.maxFeH);
-		bool meetsEuMgCriteria = (feH < PP.maxEuMg);
-		bool meetsLoopBackCriteria = true;
-		if (feH + PP.maxLoopBack < maxReachFe)
+		
+		if (eufe > PP.EuFeFloor)
 		{
-			meetsLoopBackCriteria = false;
+			exceededFloor = true;
 		}
 		
 		
-		bool meetsNoPeakCriteria = true;
-		if (eufe > PP.EuFe_SN.Value & feH > 0)
-		{
-			meetsNoPeakCriteria = false;
-		}
 		
-		bool criteriaMet = meetsEuFeCriteria & meetsFeHCriteria & meetsEuMgCriteria & meetsLoopBackCriteria & meetsNoPeakCriteria;
+		bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
+		bool noDrop = (eufe > 0.3) && (feH > PP.EuFe_Sat.Value -0.05);
+		bool mgThickDiscMissing = (mgH-feH < PP.MgFe_SN.Value*0.9 & feH > -1.5);
+		bool loopedBack = (feH < maxReachFe - 0.05);
 		
-		if (criteriaMet == false)
+		bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing;
+		
+		if (autoFail)
 		{
 			return false;
 		}
 		
 		
-		t+=PP.timeStep;
+		if (t < PP.tauSNIa.Value)
+		{
+			t+=PP.timeStep/100;
+		}
+		else
+		{
+			t+=PP.timeStep;
+		}
 	}
 	
-	return true;
-	
+	if (exceededFloor)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 	
 }

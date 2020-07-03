@@ -69,7 +69,7 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 						
 			//create + evaluate an annulus using the given parameters
 			Annulus A = Annulus(state);
-			state.WasSuccessful = A.FinalStateEvaluate();
+			state.WasSuccessful = A.QuickAnalysis();
 			
 		
 			if (state.WasSuccessful)
@@ -84,7 +84,7 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 						ostringstream simFileName;
 						simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful; 
 						
-						A.Evolve();
+						
 						A.SaveAnnulus(simFileName.str());
 						
 						ostringstream stateSave;

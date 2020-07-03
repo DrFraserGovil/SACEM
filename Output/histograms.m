@@ -1,4 +1,4 @@
-tab = readtable("VeryLong3/SuccessGrid.dat");
+tab = readtable("Tester/SuccessGrid.dat");
 
 tab = table2array(tab);
 
@@ -16,5 +16,5 @@ c = colorbar;
 c.Label.String = "Number of Successful Models";
 c.Label.FontSize = 24;
 c.Label.Interpreter = "Latex";
-caxis([0 200])
+%caxis([0 200])
 set(gca,'colorscale','linear')
