@@ -93,7 +93,8 @@ class ParameterPack
 			void ValueChecks();
 
 			void ScrambleAll();
-			void PrintState(std::string saveFile);
+			std::string PrintState();
+			void SaveState(std::string saveFile);
 			bool WasSuccessful;
 			bool MeetsValueLimits;
 			

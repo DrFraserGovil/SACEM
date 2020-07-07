@@ -52,17 +52,17 @@ void Annulus::Calibrate()
 		//CCSN counts
 		double S0 = CCSNTracker.Count(t0);
 		double SInf = CCSNTracker.Count(tI);
-		double STotal = CCSNTracker.Total(tI);
+		double STotal = SInf; //CCSNTracker.Total(tI);
 		
 		//collapsar counts
 		double C0 = CollapsarTracker.Count(t0);
 		double CInf = CollapsarTracker.Count(tI);
-		double CTotal = CollapsarTracker.Total(tI);
+		double CTotal = CInf; //CollapsarTracker.Total(tI);
 		
 		//nsm counts
 		double N0 = NSMTracker.Count(t0);
 		double NInf = NSMTracker.Count(tI);
-		double NTotal = NSMTracker.Total(tI);
+		double NTotal = NInf; //NSMTracker.Total(tI);
 		
 		//SNIa counts
 		double WInf = SNIaTracker.Count(tI);
@@ -92,13 +92,17 @@ void Annulus::Calibrate()
 		double epsFrac = (alpha * SInf + beta * WInf) * pow(10.0,Et) /denominator;
 		
 		epsilon = nsmFrac * epsFrac;
+		if (epsilon < 0)
+		{
+			epsilon = 0;
+		}
 		gamma = xi * epsFrac * NTotal/STotal;
 		delta = Omega * epsFrac * NTotal / CTotal;
 	
 		double euInf = gamma * SInf + delta * CInf + epsilon * NInf;
 		double feInf = alpha * SInf + beta * WInf;
 		
-		
+		//~ PrintCalibration();
 		//~ std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
 		//~ std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
 		
@@ -222,7 +226,7 @@ void Annulus::SaveAnnulus(std::string fileName)
 		
 		if (t < PP.tauSNIa.Value)
 		{
-			t+=PP.timeStep/100;
+			t+=PP.timeStep/10;
 		}
 		else
 		{
@@ -237,7 +241,7 @@ void Annulus::SaveAnnulus(std::string fileName)
 bool Annulus::ValueAnalysis()
 {
 	//clean vectors
-	double t = 0;
+	double t = 0.02;
 	
 	double maxReachEu = -999999;
 	double maxReachFe = -999999;
@@ -258,40 +262,62 @@ bool Annulus::ValueAnalysis()
 		double feH = log10(fe/H);
 		double mgH = log10(mg/H);
 		
-		double eufe = euH - feH;
-		if (eufe > maxReachEu)
+		double minimumCheckValue = -2.5;
+		if (feH > minimumCheckValue)
 		{
-			maxReachEu = eufe;
-		}
-		if (feH > maxReachFe)
-		{
-			maxReachFe = feH;
-		}
-		
-		
-		if (eufe > PP.EuFeFloor)
-		{
-			exceededFloor = true;
-		}
-		
-		
-		
-		bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
-		bool noDrop = (eufe > 0.3) && (feH > PP.EuFe_Sat.Value -0.05);
-		bool mgThickDiscMissing = (mgH-feH < PP.MgFe_SN.Value*0.9 & feH > -1.5);
-		bool loopedBack = (feH < maxReachFe - 0.05);
-		
-		bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing;
-		
-		if (autoFail)
-		{
-			return false;
-		}
-		
+			double eufe = euH - feH;
+			if (eufe > maxReachEu)
+			{
+				maxReachEu = eufe;
+			}
+			if (feH > maxReachFe)
+			{
+				maxReachFe = feH;
+			}
+			
+			
+			if (eufe > PP.EuFeFloor)
+			{
+				exceededFloor = true;
+			}
+			
+			
+			
+			bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
+			bool noDrop = (eufe > 0.3) && (feH > 0);
+			bool mgThickDiscMissing = (mgH-feH < PP.MgFe_SN.Value*0.9 & feH < -1.5);
+			bool loopedBack = (feH < maxReachFe - 0.05);
+			
+			bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing;
+			
+			if (autoFail)
+			{
+				//~ std::cout << "Autofailed at t = " << t << " for :\n";
+				//~ std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
+				//~ std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
+				//~ std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
+				//~ std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
+				//~ std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
+				//~ std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
+				
+				//~ for (int i = 0; i < fails.size(); ++i)
+				//~ {
+					//~ std::cout << i << std::endl;
+					//~ if (fails[i] == true)
+					//~ {
+						//~ std::cout << "\t-" << reasons[i] <<std::endl;
+					//~ }
+				//~ }
+				
+				return false;
+				
+				
+			}
+		}	
 		
 		if (t < PP.tauSNIa.Value)
 		{
-			t+=PP.timeStep/100;
+			t+=PP.timeStep/10;
 		}
 		else
 		{
@@ -305,6 +331,7 @@ bool Annulus::ValueAnalysis()
 	}
 	else
 	{
+		//std::cout << "Failed at end of analysis, as did not rise above the floor" << std::endl;
 		return false;
 	}
 	

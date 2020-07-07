@@ -30,8 +30,8 @@ ParameterPack::ParameterPack()
 	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.005,0.0000001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0,0,1.0,NGrid);
+	sProcFrac = RandomisableParameter<double>(0.05,0.0000001,0.1,&global_mt);
+	collFrac = IterableParameter<double>(80,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.1;
@@ -55,8 +55,8 @@ ParameterPack::ParameterPack()
 	galaxyB2 = RandomisableParameter<double>(14,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
 	nuSFR = RandomisableParameter<double>(1.1,0.01,2.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.1,0.01,2.0,&global_mt);
-	stellarDeathParameter = RandomisableParameter<double>(0.02,0.001,0.1,&global_mt);
+	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.01,2.0,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(0.02,0.0001,0.1,&global_mt,true);
 	UpdateInfall();
 	massToDensityCorrection = 1;
 	densityToMassCorrection = 1;
@@ -65,11 +65,11 @@ ParameterPack::ParameterPack()
 	//uncalibrated stuff
 	
 	tauColls = IterableParameter<double>(3.333,0,20,NGrid);
-	collWidth = RandomisableParameter<double>(3.333,0.001,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.001,0.5,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.0001,30,&global_mt);
-	tauNSM = RandomisableParameter<double>(0.05,0.0001,0.3,&global_mt);
-	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt);
+	collWidth = RandomisableParameter<double>(7.333,0.001,10,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.0001,0.5,&global_mt,true);
+	nuSNIa = RandomisableParameter<double>(30.01,0.00001,30,&global_mt,true);
+	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
+	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt,true);
 	
 	double hotMin = 0.4;
 	double hotMax = 0.99;
@@ -81,7 +81,7 @@ ParameterPack::ParameterPack()
 	
 	double coolMin = 0.1;
 	double coolMax = 2;
-	CollapsarCool = RandomisableParameter<double>(1.7,coolMin,coolMax,&global_mt);
+	CollapsarCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
 	CCSNCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
 	SNIaCool = RandomisableParameter<double>(1.3,coolMin,coolMax,&global_mt);
 	NSMCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
@@ -156,8 +156,12 @@ void ParameterPack::UpdateRadius(double radius, double width)
 	totalToRingMassCorrection = radius*width/(galaxyScaleLength.Value * galaxyScaleLength.Value) * exp(-radius/galaxyScaleLength.Value);
 }
 
-void ParameterPack::PrintState(std::string saveFileName)
+
+
+std::string ParameterPack::PrintState()
 {
+	std::ostringstream output;
+	
 	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
 	std::vector<IterableParameter<double>> keyParams = {collFrac, tauColls};
 	
@@ -174,8 +178,51 @@ void ParameterPack::PrintState(std::string saveFileName)
 	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, CCSNCool, SNIaHotFrac, SNIaCool, CollapsarHotFrac, CollapsarCool, NSMHotFrac, NSMCool};
 		
 		
+	
+	output << "SIMULATION PARAMETERS:\n\nGrid Parameters:\n";
+	int width = 22;
+	for (int i = 0; i < keyParams.size(); ++i)
+	{
+		output << std::setw(width) << std::right << keyTitles[i] << ":";
+		output << std::setw(width) << std::right  << keyParams[i].Value << "\n";
+	}
+	output << "\n\n";
+	
+	std::vector<std::string> sections = {"Data Calibration Values", "Macro-Galactic Properties", "Astrophysical Process Properties","Cooling Properties"};
+	std::vector<std::vector<std::string>> titles = {calibrationTitles, galaxyTitles, processTitles,coolingTitles};
+	std::vector<std::vector<RandomisableParameter<double>>> params = {calibrationParams, galaxyParams, processParams,coolingParams};
+	
+	for (int i = 0; i < sections.size(); ++i)
+	{
+		output << sections[i] << "\n\n";
+		for (int j = 0; j < titles[i].size(); ++j)
+		{
+			output << std::setw(width) << std::right << titles[i][j] << ":";
+			output << std::setw(width) << std::right <<  params[i][j].Value << "\n";
+		}
+		output << "\n\n";
+	}
+	
+	output << "Model Success: \t";
+	if (WasSuccessful)
+	{
+		output << "SUCCESS";
+	}
+	else
+	{
+		output << "FAILURE";
+	}
+	
+	return output.str();
+
+}
+
+void ParameterPack::SaveState(std::string saveFileName)
+{
+	std::string output = PrintState();
+	std::string name = FILEROOT + saveFileName + ".dat";
 	std::ofstream saveFile;
-	saveFile.open(FILEROOT + saveFileName);
+	saveFile.open(name);
 	
 	if (!saveFile.is_open() )
 	{
@@ -183,39 +230,8 @@ void ParameterPack::PrintState(std::string saveFileName)
 	}
 	else
 	{
-		saveFile << "SIMULATION PARAMETERS:\n\nGrid Parameters:\n";
-		int width = 22;
-		for (int i = 0; i < keyParams.size(); ++i)
-		{
-			saveFile << std::setw(width) << std::right << keyTitles[i] << ":";
-			saveFile << std::setw(width) << std::right  << keyParams[i].Value << "\n";
-		}
-		saveFile << "\n\n";
-		
-		std::vector<std::string> sections = {"Data Calibration Values", "Macro-Galactic Properties", "Astrophysical Process Properties","Cooling Properties"};
-		std::vector<std::vector<std::string>> titles = {calibrationTitles, galaxyTitles, processTitles,coolingTitles};
-		std::vector<std::vector<RandomisableParameter<double>>> params = {calibrationParams, galaxyParams, processParams,coolingParams};
-		
-		for (int i = 0; i < sections.size(); ++i)
-		{
-			saveFile << sections[i] << "\n\n";
-			for (int j = 0; j < titles[i].size(); ++j)
-			{
-				saveFile << std::setw(width) << std::right << titles[i][j] << ":";
-				saveFile << std::setw(width) << std::right <<  params[i][j].Value << "\n";
-			}
-			saveFile << "\n\n";
-		}
-		
-		saveFile << "Model Success: \t";
-		if (WasSuccessful)
-		{
-			saveFile << "SUCCESS";
-		}
-		else
-		{
-			saveFile << "FAILURE";
-		}
+		saveFile << output;
 	}
+	
 	saveFile.close();
 }

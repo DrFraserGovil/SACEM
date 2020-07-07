@@ -103,11 +103,14 @@ template<typename T> class IterableParameter : public BoundedParameter<T>
 template<typename T> class RandomisableParameter : public BoundedParameter<T>
 {
 	public:
+		bool Logarithmic;
+	
 		RandomisableParameter()
 		{
 			Initialised = false;
+			Logarithmic = false;
 		}
-		RandomisableParameter(T value, T min, T max, std::mt19937  * engine)
+		RandomisableParameter(T value, T min, T max, std::mt19937  * engine, bool logarithmic)
 		{
 			this->Value = value;
 			this->MinValue = min;
@@ -115,7 +118,20 @@ template<typename T> class RandomisableParameter : public BoundedParameter<T>
 			Randomiser = std::uniform_real_distribution(0.0,1.0);
 			Engine = engine;
 			Initialised = true;
+			Logarithmic = logarithmic;
 		}
+		RandomisableParameter(T value, T min, T max, std::mt19937  * engine)
+		{
+			
+			this->Value = value;
+			this->MinValue = min;
+			this->MaxValue = max;
+			Randomiser = std::uniform_real_distribution(0.0,1.0);
+			Engine = engine;
+			Initialised = true;
+			Logarithmic = false;
+		}
+		
 		RandomisableParameter(T min, T max, std::mt19937 * engine)
 		{
 			this->Value = min;
@@ -132,7 +148,15 @@ template<typename T> class RandomisableParameter : public BoundedParameter<T>
 			bool init = Initialised;
 			assert(init);
 			double bruch = Randomiser(*Engine);
-			this->Value = this->MinValue + bruch * (this->MaxValue - this->MinValue);
+			
+			if (!Logarithmic)
+			{
+				this->Value = this->MinValue + bruch * (this->MaxValue - this->MinValue);
+			}
+			else
+			{
+				this->Value = pow(this->MaxValue,bruch)/pow(this->MinValue,bruch -1);
+			}
 		}
 		
 		

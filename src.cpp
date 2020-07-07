@@ -89,7 +89,7 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 						
 						ostringstream stateSave;
 						stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
-						state.PrintState(stateSave.str());
+						state.SaveState(stateSave.str());
 					}
 					
 					++miniGrid[0][i][j];
@@ -219,6 +219,37 @@ void IterationMode(ParameterPack pp)
 	
 }
 
+void VerificationMode(ParameterPack pp)
+{
+	int N = 100;
+	ParameterPack currentState;
+	for (int i = 0; i < N; ++i)
+	{
+		currentState = RandomiseGalaxy(pp);
+		std::string name = "verificationRun_" + std::to_string(i);
+		Annulus A = Annulus(currentState);
+		A.Evolve();
+		A.SaveAnnulus(name);
+		
+		bool success = A.ValueAnalysis();
+		currentState.WasSuccessful = success;
+		std::cout << currentState.PrintState() <<std::endl;
+		
+		std::string command = "gnuplot -p -e \"filename = '" + pp.FILEROOT + name + ".dat'\" plotter.gp";
+		const char *com = command.c_str();
+		system(com);
+		
+		//~ command = "gedit " + pp.FILEROOT + name + "_state.dat";
+		//~ const char *com2 = command.c_str();
+		//~ system(com2);
+		
+		
+		std::cin.get();
+		std::cin.clear();
+	}
+	
+	
+}
 
 int main(int argc, char** argv)
 {
@@ -248,13 +279,18 @@ int main(int argc, char** argv)
 		A.SaveAnnulus("SingleEvaluation");
 		
 	}
-	else
+	
+	if (pp.Mode == 1)
 	{
 		BigGrid = std::vector(pp.collFrac.NSteps,std::vector(pp.tauColls.NSteps,0));
 		IterationMode(pp);
 		SaveGrid(pp);
 	}
 
+	if (pp.Mode == 2)
+	{
+		VerificationMode(pp);
+	}
 
 
 }
