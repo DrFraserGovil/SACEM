@@ -104,14 +104,14 @@ void Annulus::Calibrate()
 		double euInf = gamma * SInf + delta * CInf + epsilon * NInf;
 		double feInf = alpha * SInf + beta * WInf;
 		
-		PrintCalibration();
-		std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
-		std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
+		//~ PrintCalibration();
+		//~ std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
+		//~ std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
 		
-		for (int i = 0; i < vals.size(); ++i)
-		{
-			std::cout << vars[i] << ":\t" << vals[i] << std::endl;
-		}
+		//~ for (int i = 0; i < vals.size(); ++i)
+		//~ {
+			//~ std::cout << vars[i] << ":\t" << vals[i] << std::endl;
+		//~ }
 }
 
 
@@ -294,21 +294,21 @@ bool Annulus::ValueAnalysis()
 			
 			if (autoFail)
 			{
-				std::cout << "Autofailed at t = " << t << " for :\n";
-				std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
-				std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
-				std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
-				std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
-				std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
-				std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
+				//~ std::cout << "Autofailed at t = " << t << " for :\n";
+				//~ std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
+				//~ std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
+				//~ std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
+				//~ std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
+				//~ std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
+				//~ std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
 				
-				for (int i = 0; i < fails.size(); ++i)
-				{
-					if (fails[i] == true)
-					{
-						std::cout << "\t-" << reasons[i] <<std::endl;
-					}
-				}
+				//~ for (int i = 0; i < fails.size(); ++i)
+				//~ {
+					//~ if (fails[i] == true)
+					//~ {
+						//~ std::cout << "\t-" << reasons[i] <<std::endl;
+					//~ }
+				//~ }
 				
 				return false;
 				
