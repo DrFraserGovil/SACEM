@@ -31,7 +31,7 @@ ParameterPack::ParameterPack()
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.99,0,1.0,NGrid);
+	collFrac = IterableParameter<double>(0.4,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.1;
@@ -40,8 +40,8 @@ ParameterPack::ParameterPack()
 	finalFe_Max = 0.4;
 	
 	//limiting values
-	EuFeCeiling = 0.6;
-	EuFeFloor = 0.3;
+	EuFeCeiling = 0.62;
+	EuFeFloor = 0.25;
 	maxLoopBack = 0.05;
 
 	
@@ -140,6 +140,7 @@ void ParameterPack::ValueChecks()
 
 	if (sProcFrac.Value + collFrac.Value > 1.0)
 	{
+		//std::cout << "Emergency! Sprocess Reduced" << std::endl;
 		sProcFrac.Value = 1.0 - collFrac.Value;
 	}
 	

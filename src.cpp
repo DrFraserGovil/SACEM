@@ -60,6 +60,7 @@ void SaveGrid(ParameterPack copy)
 
 void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid, int loopNumber, int id)
 {	
+	double sprocFrac = state.sProcFrac.Value;
 	bool folderMade = false;
 	for (int i = 0; i < state.collFrac.NSteps; ++i)
 	{
@@ -68,21 +69,21 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 		{
 			state.tauColls.IterateValue(j);
 			
-			ParameterPack safeState = state;
-			safeState.ValueChecks();
+			state.sProcFrac.Value = sprocFrac;
+			state.ValueChecks();
 			//create + evaluate an annulus using the given parameters
-			Annulus A = Annulus(safeState);
-			safeState.WasSuccessful = A.QuickAnalysis();
+			Annulus A = Annulus(state);
+			state.WasSuccessful = A.QuickAnalysis();
 			
 		
 			if (state.WasSuccessful)
 			{
-				safeState.MeetsValueLimits = A.ValueAnalysis();
+				state.MeetsValueLimits = A.ValueAnalysis();
 				
-				if (safeState.MeetsValueLimits)
+				if (state.MeetsValueLimits)
 				{
 					
-					if (safeState.collFrac.Value > 0.7 & safeState.tauColls.Value < 4)
+					if (state.collFrac.Value > 0.7 & state.tauColls.Value < 4)
 					{
 						if (folderMade == false)
 						{
@@ -102,9 +103,10 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 						
 						ostringstream stateSave;
 						stateSave << "ParamSaves/Iteration" << loopNumber << "/Param_"  << i << "_" << j;
-						safeState.SaveState(stateSave.str());
+						state.SaveState(stateSave.str());
 					}
 					
+					//std::cout << "A successful model was foundd, stop worrying!" << std::endl;
 					++miniGrid[0][i][j];
 				}
 				
@@ -235,10 +237,18 @@ void IterationMode(ParameterPack pp)
 void VerificationMode(ParameterPack pp)
 {
 	int N = 100;
+	srand (time(NULL));
+
 	ParameterPack currentState;
 	for (int i = 0; i < N; ++i)
 	{
-		currentState = pp;//RandomiseGalaxy(pp);
+		currentState = RandomiseGalaxy(pp);
+		int s1 = rand() % pp.NGrid;
+		int s2 = rand() % pp.NGrid;
+		
+		currentState.tauColls.IterateValue(s1);
+		currentState.collFrac.IterateValue(s2);
+		
 		std::string name = "verificationRun_" + std::to_string(i);
 		Annulus A = Annulus(currentState);
 		A.Evolve();
