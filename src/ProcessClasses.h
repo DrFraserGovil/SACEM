@@ -6,7 +6,7 @@ class Accretion : public Process
 {
 	public:
 		Accretion(){};
-		Accretion(ParameterPack pp) : Process{pp,0,0}
+		Accretion(ParameterPack pp) : Process{pp,-0.001,-0.002}
 		{
 			
 		};
@@ -38,7 +38,7 @@ class CCSN : public Process
 	
 	public:
 		CCSN(){};
-		CCSN(ParameterPack pp) : Process {pp,pp.CCSNCool.Value, 0}
+		CCSN(ParameterPack pp) : Process {pp,pp.CCSNCool.Value, -0.1}
 		{
 			hotFrac = pp.CCSNHotFrac.Value;
 			GeneratePrefactors();
@@ -70,7 +70,7 @@ class Collapsar : public Process
 	
 	public:
 		Collapsar(){};
-		Collapsar(ParameterPack pp) : Process {pp,pp.CollapsarCool.Value, 0}
+		Collapsar(ParameterPack pp) : Process {pp,pp.CollapsarCool.Value, -0.1}
 		{
 			hotFrac = pp.CollapsarHotFrac.Value;
 			

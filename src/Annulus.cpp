@@ -30,7 +30,7 @@ Annulus::Annulus(ParameterPack pp)
 	
 	NSMTracker = Decayer(pp, pp.NSMCool.Value, pp.nuNSM.Value, pp.tauNSM.Value, pp.NSMHotFrac.Value);
 	
-	SFRTracker = StarFormation(pp,0,0);
+	SFRTracker = StarFormation(pp,-0.1,-0.2);
 
 	SNIaTracker = Decayer(pp, pp.SNIaCool.Value, pp.nuSNIa.Value, pp.tauSNIa.Value, pp.SNIaHotFrac.Value);
 	
@@ -87,17 +87,18 @@ void Annulus::Calibrate()
 		
 		//RETROFIT TO USE TOTAL GENERATION
 
+	
 		double denominator = NTotal * (xi * SInf/STotal + Omega * CInf/CTotal + nsmFrac*NInf/NTotal);
 		
 		double epsFrac = (alpha * SInf + beta * WInf) * pow(10.0,Et) /denominator;
 		
 		epsilon = nsmFrac * epsFrac;
 	
-		//~ if (epsilon < 0)
-		//~ {
-			//~ epsilon = 0;
-		//~ }
-	
+		if (epsilon < 0)
+		{
+			epsilon = 0;
+		}
+
 		gamma = xi * epsFrac * NTotal/STotal;
 		delta = Omega * epsFrac * NTotal / CTotal;
 	
@@ -228,7 +229,7 @@ void Annulus::SaveAnnulus(std::string fileName)
 		
 		if (t < PP.tauSNIa.Value)
 		{
-			t+=PP.timeStep/10;
+			t+=PP.timeStep/100;
 		}
 		else
 		{
@@ -240,13 +241,18 @@ void Annulus::SaveAnnulus(std::string fileName)
 }
 
 
-bool Annulus::ValueAnalysis()
+bool Annulus::ValueAnalysis(bool printMode)
 {
 	//clean vectors
 	double t = 0.02;
 	
 	double maxReachEu = -999999;
 	double maxReachFe = -999999;
+	
+	bool beganEuFeDescent = false;
+	double previousEuFeValue =-999999;
+	bool beganMgFeDescent = false;
+	double previousMgFeValue = -9999;
 	
 	bool exceededFloor = false;
 
@@ -276,40 +282,70 @@ bool Annulus::ValueAnalysis()
 			{
 				maxReachFe = feH;
 			}
-			
-			
+						
 			if (eufe > PP.EuFeFloor)
 			{
 				exceededFloor = true;
 			}
 			
+			if ((previousEuFeValue > eufe)  & (feH > -1))
+			{
+				beganEuFeDescent = true;
+			}
+			if ( (previousMgFeValue > mgH - feH) & (feH > -1))
+			{
+				beganMgFeDescent = true;
+			}
+			
+			bool mgFeRisingAgain = false;
+			if (beganMgFeDescent == true)
+			{
+				if (previousMgFeValue < mgH - feH)
+				{
+					mgFeRisingAgain = true;
+				}
+			}
+			
+			bool euFeRisingAgain = false;
+			if (beganEuFeDescent == true)
+			{
+				if (previousEuFeValue < eufe)
+				{
+					euFeRisingAgain = true;
+				}
+			}
+			previousEuFeValue = eufe;
+			previousMgFeValue=  mgH - feH;
 			
 			
 			bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
-			bool noDrop = (eufe > (-feH + 0.2)) && (feH < 0);
+			bool noDrop = ((eufe > (-5.0/6*feH + 0.25)) && (feH < 0)) || ( (feH > 0) && eufe > 0.25);
 			bool mgThickDiscMissing = (mgH-feH <0.2 & feH < -1.1);
-			bool loopedBack = (feH < maxReachFe - 0.05);
-			
-			bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing;
+			bool loopedBack = (feH < maxReachFe);
+			bool euMgOutOfRange = (feH > -1) && ( euH-mgH < -0.1 || euH - mgH > 0.2);
+			bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing || euMgOutOfRange || euFeRisingAgain || mgFeRisingAgain;
 			
 			if (autoFail)
 			{
-				//~ std::cout << "Autofailed at t = " << t << " for :\n";
-				//~ std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
-				//~ std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
-				//~ std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
-				//~ std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
-				//~ std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
-				//~ std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
-				
-				//~ for (int i = 0; i < fails.size(); ++i)
-				//~ {
-					//~ if (fails[i] == true)
-					//~ {
-						//~ std::cout << "\t-" << reasons[i] <<std::endl;
-					//~ }
-				//~ }
-				
+				if (printMode == true)
+				{
+					std::cout << "Autofailed at t = " << t << " for :\n";
+					std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack,euMgOutOfRange,euFeRisingAgain, mgFeRisingAgain};
+					std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
+					std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
+					std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
+					std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
+					std::string euMgString = "[Eu/Mg] went out of bounds: [Eu/Mg] = " + std::to_string(euH - mgH);
+					std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString,euMgString, "EuFe Looped Back Up", "MgFe Looped back up"};
+					
+					for (int i = 0; i < fails.size(); ++i)
+					{
+						if (fails[i] == true)
+						{
+							std::cout << "\t-" << reasons[i] <<std::endl;
+						}
+					}
+				}
 				return false;
 				
 				
@@ -318,7 +354,7 @@ bool Annulus::ValueAnalysis()
 		
 		if (t < PP.tauSNIa.Value)
 		{
-			t+=PP.timeStep/10;
+			t+=PP.timeStep/100;
 		}
 		else
 		{
@@ -332,7 +368,10 @@ bool Annulus::ValueAnalysis()
 	}
 	else
 	{
-		//std::cout << "Failed at end of analysis, as did not rise above the floor" << std::endl;
+		if (printMode == true)
+		{
+			std::cout << "Failed at end of analysis, as did not rise above the floor" << std::endl;
+		}
 		return false;
 	}
 	

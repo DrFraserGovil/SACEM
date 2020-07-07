@@ -69,41 +69,47 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 		{
 			state.tauColls.IterateValue(j);
 			
-			state.sProcFrac.Value = sprocFrac;
-			state.ValueChecks();
+			
 			//create + evaluate an annulus using the given parameters
 			Annulus A = Annulus(state);
 			state.WasSuccessful = A.QuickAnalysis();
-			
+		
+			//std::cout << state.WasSuccessful << std::endl;
 		
 			if (state.WasSuccessful)
 			{
-				state.MeetsValueLimits = A.ValueAnalysis();
+				state.MeetsValueLimits = A.ValueAnalysis(false);
 				
 				if (state.MeetsValueLimits)
 				{
 					
 					if (state.collFrac.Value > 0.7 & state.tauColls.Value < 4)
 					{
-						if (folderMade == false)
-						{
-							std::string commandStr= "mkdir FullPaths/Iteration" +std::to_string(loopNumber);
-							const char * command = commandStr.c_str();
-							std::cout << "Attempted to create a folder" << std::endl;
+						//~ if (folderMade == false)
+						//~ {
+							//~ std::string commandStr= "mkdir " + state.FILEROOT + "/FullPaths/Iteration" +std::to_string(loopNumber) + "/";
+							//~ const char * command = commandStr.c_str();
+							//~ std::cout << "Attempted to create a folder" << std::endl;
 							
-							system(command); 
+							//~ system(command); 
 							
-							folderMade = true;
-						}
+							//~ folderMade = true;
+						//~ }
+						
+						
+						std::string commandStr= "mkdir -p " + state.FILEROOT + "Iteration" +std::to_string(loopNumber);
+						const char * command = commandStr.c_str();
+						
+						system(command); 
 						
 						ostringstream simFileName;
-						simFileName << "FullPaths/Iteration " << loopNumber << "/Grid_" << i << "_" << j; 
+						simFileName << "Iteration" << loopNumber << "/Grid_" << i << "_" << j; 
 						
 						
 						A.SaveAnnulus(simFileName.str());
 						
 						ostringstream stateSave;
-						stateSave << "ParamSaves/Iteration" << loopNumber << "/Param_"  << i << "_" << j;
+						stateSave << "Iteration" << loopNumber << "/Param_"  << i << "_" << j;
 						state.SaveState(stateSave.str());
 					}
 					
@@ -113,19 +119,7 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 				
 			}
 			
-			//~ bool isBeingSaved = evaluateSaveConditions(state,i,j);
-			
-			//~ if (isBeingSaved)
-			//~ {
-				//~ ostringstream simFileName;
-				//~ simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful << ".dat"; 
-				//~ A.Evolve();
-				//~ A.SaveAnnulus(simFileName.str());
-				
-				//~ ostringstream stateSave;
-				//~ stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
-				//~ state.PrintState(stateSave.str());
-			//~ }
+
 		}
 	}
 
@@ -243,19 +237,19 @@ void VerificationMode(ParameterPack pp)
 	ParameterPack currentState;
 	for (int i = 0; i < N; ++i)
 	{
-		currentState = RandomiseGalaxy(pp);
+		currentState = pp; //RandomiseGalaxy(pp);
 		int s1 = rand() % pp.NGrid;
 		int s2 = rand() % pp.NGrid;
 		
-		currentState.tauColls.IterateValue(s1);
-		currentState.collFrac.IterateValue(s2);
+		//currentState.tauColls.IterateValue(s1);
+		//currentState.collFrac.IterateValue(s2);
 		
 		std::string name = "verificationRun_" + std::to_string(i);
 		Annulus A = Annulus(currentState);
 		A.Evolve();
 		A.SaveAnnulus(name);
 		
-		bool success = A.ValueAnalysis();
+		bool success = A.ValueAnalysis(true);
 		currentState.WasSuccessful = success;
 		std::cout << currentState.PrintState() <<std::endl;
 		

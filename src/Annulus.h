@@ -17,7 +17,7 @@ class Annulus
 		
 		bool QuickAnalysis();
 		void SaveAnnulus(std::string fileName);
-		bool ValueAnalysis();
+		bool ValueAnalysis(bool printMode);
 	private:
 		ParameterPack PP;
 		int NSteps;

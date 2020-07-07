@@ -31,7 +31,7 @@ ParameterPack::ParameterPack()
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
 	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.1,&global_mt);
-	collFrac = IterableParameter<double>(0.4,0,1.0,NGrid);
+	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
 		
 	//constraining values
 	finalEuFe_Min = -0.1;
@@ -56,7 +56,7 @@ ParameterPack::ParameterPack()
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
 	nuSFR = RandomisableParameter<double>(1.1,0.01,2.0,&global_mt);
 	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.01,2.0,&global_mt,true);
-	stellarDeathParameter = RandomisableParameter<double>(0.02,0.0001,0.1,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(0.02,0.001,0.1,&global_mt,true);
 	UpdateInfall();
 	massToDensityCorrection = 1;
 	densityToMassCorrection = 1;
@@ -64,19 +64,19 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(300.333,0,20,NGrid);
-	collWidth = RandomisableParameter<double>(7.333,0.01,10,&global_mt);
+	tauColls = IterableParameter<double>(3,0,14,NGrid);
+	collWidth = RandomisableParameter<double>(1,0.01,10,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.15,0.05,0.5,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.01,30,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.01,8,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt);
+	nuNSM = RandomisableParameter<double>(2.3,0.01,8,&global_mt);
 	
-	double hotMin = 0.4;
+	double hotMin = 0.7;
 	double hotMax = 0.99;
 	CollapsarHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
 	CCSNHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
 	SNIaHotFrac = RandomisableParameter<double>(0.99,hotMin,hotMax,&global_mt);
-	NSMHotFrac = RandomisableParameter<double>(0.5,hotMin,hotMax,&global_mt);
+	NSMHotFrac = RandomisableParameter<double>(0.5,0.2,hotMax,&global_mt);
 	
 	
 	double coolMin = 0.1;
@@ -107,7 +107,7 @@ void ParameterPack::ScrambleAll()
 	galaxyScaleLength.Scramble();
 	nuSFR.Scramble();
 	content_modified_nuSFR.Scramble();
-	collWidth.Scramble();
+	//collWidth.Scramble();
 	tauSNIa.Scramble();
 	nuSNIa.Scramble();
 	tauNSM.Scramble();
@@ -135,12 +135,12 @@ void ParameterPack::ValueChecks()
 {
 	if (collWidth.Value > tauColls.Value)
 	{
-		collWidth.Value = tauColls.Value*0.99;
+		//collWidth.Value = tauColls.Value/2;
 	}
 
 	if (sProcFrac.Value + collFrac.Value > 1.0)
 	{
-		//std::cout << "Emergency! Sprocess Reduced" << std::endl;
+		std::cout << "Emergency! Sprocess Reduced" << std::endl;
 		sProcFrac.Value = 1.0 - collFrac.Value;
 	}
 	
@@ -231,7 +231,7 @@ void ParameterPack::SaveState(std::string saveFileName)
 	
 	if (!saveFile.is_open() )
 	{
-		std::cout << "Could not open file " << saveFileName << " for saving." << std::endl;
+		std::cout << "Could not open file " << name << " for saving." << std::endl;
 	}
 	else
 	{

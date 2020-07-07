@@ -134,6 +134,7 @@ void Collapsar::GeneratePrefactors()
 	{
 		TotalConst = -TotalMid(0);
 	}
+	
 }
 
 

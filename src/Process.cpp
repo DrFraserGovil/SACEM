@@ -103,6 +103,20 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 		imaginaryPowers.push_back(0.0);
 	}
 	
+	for (int i = 0; i < realPowers.size(); ++i)
+	{
+		for (int j = i+1; j < realPowers.size(); ++j)
+		{
+			bool samePower = (fabs(realPowers[j] - realPowers[i])<10e-8) && fabs(imaginaryPowers[i] - imaginaryPowers[j]) < 10e-8;
+			std::vector<std::string> powNames = {"Constant","Omega plus", "Omega minus", "nuSFR(mod)", "nuCool", "nuDelay"};
+			if (samePower)
+			{
+				std::cout << "You have provided two powers of the same value (" << powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
+				exit(5);
+			}
+		}
+	}
+	
 	Powers = ComplexVector(realPowers, imaginaryPowers);
 	
 
