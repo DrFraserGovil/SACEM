@@ -65,11 +65,11 @@ ParameterPack::ParameterPack()
 	//uncalibrated stuff
 	
 	tauColls = IterableParameter<double>(3.333,0,20,NGrid);
-	collWidth = RandomisableParameter<double>(7.333,0.001,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.0001,0.5,&global_mt,true);
-	nuSNIa = RandomisableParameter<double>(30.01,0.00001,30,&global_mt,true);
+	collWidth = RandomisableParameter<double>(7.333,0.01,10,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.05,0.5,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.01,30,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt,true);
+	nuNSM = RandomisableParameter<double>(2.3,0.01,30,&global_mt);
 	
 	double hotMin = 0.4;
 	double hotMax = 0.99;
@@ -138,6 +138,10 @@ void ParameterPack::ValueChecks()
 		collWidth.Value = tauColls.Value*0.99;
 	}
 
+	if (sProcFrac.Value + collFrac.Value > 1.0)
+	{
+		sProcFrac.Value = 1.0 - collFrac.Value;
+	}
 	
 }
 

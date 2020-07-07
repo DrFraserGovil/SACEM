@@ -60,36 +60,49 @@ void SaveGrid(ParameterPack copy)
 
 void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid, int loopNumber, int id)
 {	
+	bool folderMade = false;
 	for (int i = 0; i < state.collFrac.NSteps; ++i)
 	{
 		state.collFrac.IterateValue(i);
 		for (int j = 0; j < state.tauColls.NSteps; ++j)
 		{
 			state.tauColls.IterateValue(j);
-						
+			
+			ParameterPack safeState = state;
+			safeState.ValueChecks();
 			//create + evaluate an annulus using the given parameters
-			Annulus A = Annulus(state);
-			state.WasSuccessful = A.QuickAnalysis();
+			Annulus A = Annulus(safeState);
+			safeState.WasSuccessful = A.QuickAnalysis();
 			
 		
 			if (state.WasSuccessful)
 			{
-				state.MeetsValueLimits = A.ValueAnalysis();
+				safeState.MeetsValueLimits = A.ValueAnalysis();
 				
-				if (state.MeetsValueLimits)
+				if (safeState.MeetsValueLimits)
 				{
 					
-					if (state.collFrac.Value > 0.7 & state.tauColls.Value < 4)
+					if (safeState.collFrac.Value > 0.7 & safeState.tauColls.Value < 4)
 					{
+						if (folderMade == false)
+						{
+							std::string commandStr= "mkdir FullPaths/Iteration" +std::to_string(loopNumber);
+							const char * command = commandStr.c_str();
+							
+							system(command); 
+							
+							folderMade = true;
+						}
+						
 						ostringstream simFileName;
-						simFileName << "FullPaths/Grid_" << loopNumber << "_" << i << "_" << j << "_" << state.WasSuccessful; 
+						simFileName << "FullPaths/Iteration " << loopNumber << "/Grid_" << i << "_" << j; 
 						
 						
 						A.SaveAnnulus(simFileName.str());
 						
 						ostringstream stateSave;
-						stateSave << "ParamSaves/Param_" << loopNumber << "_"  << i << "_" << j << "_" << state.WasSuccessful << ".dat";
-						state.SaveState(stateSave.str());
+						stateSave << "ParamSaves/Iteration" << loopNumber << "/Param_"  << i << "_" << j;
+						safeState.SaveState(stateSave.str());
 					}
 					
 					++miniGrid[0][i][j];

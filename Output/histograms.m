@@ -16,5 +16,5 @@ c = colorbar;
 c.Label.String = "Number of Successful Models";
 c.Label.FontSize = 24;
 c.Label.Interpreter = "Latex";
-%caxis([0 200])
+caxis([0 20])
 set(gca,'colorscale','linear')
