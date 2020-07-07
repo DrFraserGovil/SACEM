@@ -238,7 +238,7 @@ void VerificationMode(ParameterPack pp)
 	ParameterPack currentState;
 	for (int i = 0; i < N; ++i)
 	{
-		currentState = RandomiseGalaxy(pp);
+		currentState = pp;//RandomiseGalaxy(pp);
 		std::string name = "verificationRun_" + std::to_string(i);
 		Annulus A = Annulus(currentState);
 		A.Evolve();

@@ -41,7 +41,7 @@ Annulus::Annulus(ParameterPack pp)
 
 void Annulus::Calibrate()
 {
-		double tI = 15;
+		double tI = PP.tMax;
 		double t0Cutoff = 0.002;
 		//double t0 = std::max(std::min(std::min(PP.tauSNIa.Value, PP.tauColls.Value),PP.tauNSM),t0Cutoff);   // chooses the smallest time before weird stuff happens. Iff this owuld result in an answer below the cutoff, use cutoff instead
 	
@@ -83,7 +83,7 @@ void Annulus::Calibrate()
 		eta = alpha * pow(10.0,M0);
 		
 		
-
+		
 		
 		//RETROFIT TO USE TOTAL GENERATION
 
@@ -92,24 +92,26 @@ void Annulus::Calibrate()
 		double epsFrac = (alpha * SInf + beta * WInf) * pow(10.0,Et) /denominator;
 		
 		epsilon = nsmFrac * epsFrac;
-		if (epsilon < 0)
-		{
-			epsilon = 0;
-		}
+	
+		//~ if (epsilon < 0)
+		//~ {
+			//~ epsilon = 0;
+		//~ }
+	
 		gamma = xi * epsFrac * NTotal/STotal;
 		delta = Omega * epsFrac * NTotal / CTotal;
 	
 		double euInf = gamma * SInf + delta * CInf + epsilon * NInf;
 		double feInf = alpha * SInf + beta * WInf;
 		
-		//~ PrintCalibration();
-		//~ std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
-		//~ std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
+		PrintCalibration();
+		std::vector<std::string> vars = {"Final [Eu/H]", "Final [Fe/H]", "Final [Eu/Fe]", "Final Collapsar Frac", "Final s-Process Frac"};
+		std::vector<double> vals = {log10(euInf/Hmass), log10(feInf/Hmass), log10(euInf/feInf), delta*CTotal/(gamma*STotal + delta*CTotal + epsilon * NTotal), gamma*STotal/(gamma*STotal + delta*CTotal + epsilon * NTotal)};
 		
-		//~ for (int i = 0; i < vals.size(); ++i)
-		//~ {
-			//~ std::cout << vars[i] << ":\t" << vals[i] << std::endl;
-		//~ }
+		for (int i = 0; i < vals.size(); ++i)
+		{
+			std::cout << vars[i] << ":\t" << vals[i] << std::endl;
+		}
 }
 
 
@@ -284,7 +286,7 @@ bool Annulus::ValueAnalysis()
 			
 			
 			bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
-			bool noDrop = (eufe > (-4.5/5.0*feH + 0.2));
+			bool noDrop = (eufe > (-feH + 0.2)) && (feH < 0);
 			bool mgThickDiscMissing = (mgH-feH < PP.MgFe_SN.Value*0.9 & feH < -1.5);
 			bool loopedBack = (feH < maxReachFe - 0.05);
 			
@@ -292,22 +294,21 @@ bool Annulus::ValueAnalysis()
 			
 			if (autoFail)
 			{
-				//~ std::cout << "Autofailed at t = " << t << " for :\n";
-				//~ std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
-				//~ std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
-				//~ std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
-				//~ std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
-				//~ std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
-				//~ std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
+				std::cout << "Autofailed at t = " << t << " for :\n";
+				std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack};
+				std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
+				std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
+				std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
+				std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
+				std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString};
 				
-				//~ for (int i = 0; i < fails.size(); ++i)
-				//~ {
-					//~ std::cout << i << std::endl;
-					//~ if (fails[i] == true)
-					//~ {
-						//~ std::cout << "\t-" << reasons[i] <<std::endl;
-					//~ }
-				//~ }
+				for (int i = 0; i < fails.size(); ++i)
+				{
+					if (fails[i] == true)
+					{
+						std::cout << "\t-" << reasons[i] <<std::endl;
+					}
+				}
 				
 				return false;
 				
