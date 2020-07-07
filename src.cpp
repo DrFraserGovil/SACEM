@@ -89,6 +89,7 @@ void LaunchProcess(ParameterPack state, std::vector<std::vector<int>> * miniGrid
 						{
 							std::string commandStr= "mkdir FullPaths/Iteration" +std::to_string(loopNumber);
 							const char * command = commandStr.c_str();
+							std::cout << "Attempted to create a folder" << std::endl;
 							
 							system(command); 
 							
