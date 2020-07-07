@@ -284,7 +284,7 @@ bool Annulus::ValueAnalysis()
 			
 			
 			bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
-			bool noDrop = (eufe > (-6.0/5.0*feH + 0.3);
+			bool noDrop = (eufe > (-6.0/5.0*feH + 0.3));
 			bool mgThickDiscMissing = (mgH-feH < PP.MgFe_SN.Value*0.9 & feH < -1.5);
 			bool loopedBack = (feH < maxReachFe - 0.05);
 			
