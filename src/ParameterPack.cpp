@@ -41,7 +41,7 @@ ParameterPack::ParameterPack()
 	
 	//limiting values
 	EuFeCeiling = 0.6;
-	EuFeFloor = 0.35;
+	EuFeFloor = 0.37;
 	maxLoopBack = 0.05;
 
 	
