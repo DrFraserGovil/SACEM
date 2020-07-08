@@ -40,8 +40,8 @@ ParameterPack::ParameterPack()
 	finalFe_Max = 0.4;
 	
 	//limiting values
-	EuFeCeiling = 0.62;
-	EuFeFloor = 0.25;
+	EuFeCeiling = 0.6;
+	EuFeFloor = 0.35;
 	maxLoopBack = 0.05;
 
 	
