@@ -1,7 +1,7 @@
 #include "Process.h"
 
 
-Process::Process(ParameterPack pp, double nuCool, double nuDelay)
+Process::Process(ParameterPack * pp, double nuCool, double nuDelay)
 {
 	PP = pp;
 	ConstantID = 0;
@@ -12,25 +12,26 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 	DelayID = 5;
 	
 	//calculate the SFR parameters
-	double mu = PP.stellarDeathParameter.Value;
-	double nu = PP.nuSFR.Value;
-	double lambda = PP.CCSNCool.Value;
-	double f = PP.CCSNHotFrac.Value;
+	double mu = PP->stellarDeathParameter.Value;
+	double nu = PP->nuSFR.Value;
+	double lambda = PP->CCSNCool.Value;
+	double f = PP->CCSNHotFrac.Value;
+	double delta = PP->OutFlowFraction.Value;
 	
-	double p = mu + nu + lambda;
-	double q = mu*nu*f + lambda*(mu + nu);
+	double p = mu + nu*(1+delta) + lambda;
+	double q = mu*nu*(f+delta) + lambda*(mu + nu);
 	
-	MBar = PP.galaxyM0.Value;
+	MBar = PP->galaxyM0.Value;
 	std::vector<double> Ci;
-	for (int i = 0; i < PP.Betas.size(); ++i)
+	for (int i = 0; i < PP->Betas.size(); ++i)
 	{
-		double b = PP.Betas[i];
-		double numerator = -PP.galaxyMs[i]*(b*b - (mu + lambda)*b + mu*lambda);
+		double b = PP->Betas[i];
+		double numerator = -PP->galaxyMs[i]*(b*b - (mu + lambda)*b + mu*lambda);
 		
 		double denom= b*b - p * b + q;
 		
 		
-		MBar += PP.galaxyMs[i];
+		MBar += PP->galaxyMs[i];
 		Ci.push_back(numerator/denom);
 		
 		
@@ -45,13 +46,13 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 	
 	double D = mu*lambda*MBar/q;
 	
-	double J = PP.galaxyM0.Value - D;
-	double K = -nu*PP.galaxyM0.Value;
+	double J = PP->galaxyM0.Value - D;
+	double K = -nu*PP->galaxyM0.Value*(1.0+delta);
 	
-	for (int i = 0; i < PP.Betas.size(); ++i)
+	for (int i = 0; i < PP->Betas.size(); ++i)
 	{
 		J-=Ci[i];
-		K+=PP.Betas[i]*(PP.galaxyMs[i] + Ci[i]);
+		K+=PP->Betas[i]*(PP->galaxyMs[i] + Ci[i]);
 	}
 	if (ComplexDomain==false)
 	{
@@ -61,7 +62,7 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 
 		
 		std::vector<double> sfrTemp = {D,A,B,0,0,0};
-		for (int i = 0; i < PP.Betas.size(); ++i)
+		for (int i = 0; i < PP->Betas.size(); ++i)
 		{
 			sfrTemp.push_back(Ci[i]);
 		}
@@ -73,7 +74,7 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 		std::vector<double> sfrTempReal = {D,J/2,J/2,0,0,0};
 		std::vector<double> sfrTempImag = {0,(p*J + 2*K)/(4*Omega),-(p*J + 2*K)/(4*Omega),0,0,0};
 		
-		for (int i = 0; i < PP.Betas.size(); ++i)
+		for (int i = 0; i < PP->Betas.size(); ++i)
 		{
 			sfrTempReal.push_back(Ci[i]);
 			sfrTempImag.push_back(0);
@@ -81,8 +82,10 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 		
 		SFRVector = ComplexVector(sfrTempReal,sfrTempImag);
 	}
-
-	SFRVector = PP.nuSFR.Value * SFRVector;
+	
+	
+	
+	SFRVector = PP->nuSFR.Value * SFRVector;
 	
 	//generate power series
 	
@@ -93,13 +96,13 @@ Process::Process(ParameterPack pp, double nuCool, double nuDelay)
 		iTrig = Omega;
 		rTrig = 0;
 	}
-	std::vector<double> realPowers =  {0,p/2 + rTrig, p/2 - rTrig, PP.content_modified_nuSFR.Value,nuCool, nuDelay};
+	std::vector<double> realPowers =  {0,p/2 + rTrig, p/2 - rTrig, PP->content_modified_nuSFR.Value,nuCool, nuDelay};
 	std::vector<double> imaginaryPowers = {0,iTrig, -iTrig,0,0,0};
 
 	
 	for (int n = 0; n < Ci.size(); ++n)
 	{
-		realPowers.push_back(PP.Betas[n]);
+		realPowers.push_back(PP->Betas[n]);
 		imaginaryPowers.push_back(0.0);
 	}
 	

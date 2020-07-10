@@ -2,52 +2,48 @@
 #include "Annulus.h"
 
 
-Annulus::Annulus(ParameterPack pp)
+Annulus::Annulus(ParameterPack * pp)
 {
 	PP = pp;
 	
-	double tMax = pp.tauInf;
-	double deltaT = pp.timeStep;
+	PP->OriginalTau = PP->tauColls.Value;
+	if (PP->collFrac.Value < 10e-6)
+	{
+		PP->tauColls.Value = 5;
+	}
 	
-	NSteps = ceil(tMax/(deltaT));
+	double tMax = pp->tauInf;
+	double deltaT = pp->timeStep;
 	
-	PP.timeStep = tMax/(NSteps);
+		
 	
-	NSteps +=1;
-	
-	Europium.resize(NSteps);
-	Europium_S.resize(NSteps);
-	Europium_NSM.resize(NSteps);
-	Europium_Coll.resize(NSteps);
-	Iron.resize(NSteps);
-	Magnesium.resize(NSteps);
-	
-	
-	MassTracker = Accretion(pp);
-	CCSNTracker = CCSN(pp);
-	CollapsarTracker = Collapsar(pp);
+	MassTracker = GalaxyMass(PP);
+	CCSNTracker = CCSN(PP);
+	CollapsarTracker = Collapsar(PP);
 	
 	
-	NSMTracker = Decayer(pp, pp.NSMCool.Value, pp.nuNSM.Value, pp.tauNSM.Value, pp.NSMHotFrac.Value);
+	NSMTracker = Decayer(PP, PP->NSMCool.Value, PP->nuNSM.Value, PP->tauNSM.Value, PP->NSMHotFrac.Value);
 	
-	SFRTracker = StarFormation(pp,-0.1,-0.2);
+	SFRTracker = StarFormation(PP,-0.1,-0.2);
 
-	SNIaTracker = Decayer(pp, pp.SNIaCool.Value, pp.nuSNIa.Value, pp.tauSNIa.Value, pp.SNIaHotFrac.Value);
+	SNIaTracker = Decayer(PP, PP->SNIaCool.Value, PP->nuSNIa.Value, PP->tauSNIa.Value, PP->SNIaHotFrac.Value);
 	
 	Calibrate();
 	
 }
 
 
+
+
 void Annulus::Calibrate()
 {
-		double tI = PP.tMax;
+		double tI = PP->tMax;
 		double t0Cutoff = 0.002;
-		//double t0 = std::max(std::min(std::min(PP.tauSNIa.Value, PP.tauColls.Value),PP.tauNSM),t0Cutoff);   // chooses the smallest time before weird stuff happens. Iff this owuld result in an answer below the cutoff, use cutoff instead
+		//double t0 = std::max(std::min(std::min(PP->tauSNIa.Value, PP->tauColls.Value),PP->tauNSM),t0Cutoff);   // chooses the smallest time before weird stuff happens. Iff this owuld result in an answer below the cutoff, use cutoff instead
 	
 		double t0 = 0.002;
 	
-		double Hmass = PP.HFrac.Value * MassTracker.Mass(tI);
+		double Hmass = PP->HFrac.Value * MassTracker.ColdGasMass(tI);
 		
 		//CCSN counts
 		double S0 = CCSNTracker.Count(t0);
@@ -68,13 +64,20 @@ void Annulus::Calibrate()
 		double WInf = SNIaTracker.Count(tI);
 
 
-		double FInf = PP.FeH_Sat.Value;
-		double M0 = PP.MgFe_SN.Value;
-		double MInf = PP.MgFe_Sat.Value;
-		double Et = PP.EuFe_Sat.Value;
-		double xi = PP.sProcFrac.Value;
-		double Omega = PP.collFrac.Value;
+		double FInf = PP->FeH_Sat.Value;
+		double M0 = PP->MgFe_SN.Value;
+		double MInf = PP->MgFe_Sat.Value;
+		double Et = PP->EuFe_Sat.Value;
+		double xi = PP->sProcFrac.Value;
+		double Omega = PP->collFrac.Value;
 		double nsmFrac = 1.0 - xi - Omega;
+		
+		
+		if (nsmFrac < 0)
+		{
+			nsmFrac = 0;
+			xi = 1.0 - Omega;
+		}
 		
 		alpha = Hmass/SInf * pow(10.0,FInf + MInf - M0);
 		
@@ -116,6 +119,19 @@ void Annulus::Calibrate()
 }
 
 
+void Annulus::SaveDerivedParams()
+{
+	double tI = PP->tMax;
+	
+	double cg_Inf = MassTracker.ColdGasMass(tI);
+	double sg_Inf = MassTracker.StellarMass(tI);
+	
+	std::vector<double> params = {cg_Inf/sg_Inf};
+	
+	PP->derivedParams.push_back(params);
+	
+}
+
 void Annulus::PrintCalibration()
 {
 	std::vector<std::string> names = {"alpha","beta", "gamma", "delta", "epsilon", "eta"};
@@ -136,7 +152,7 @@ void Annulus::Evolve()
 	{
 
 		double qT = CCSNTracker.Count(t);
-		double H = PP.HFrac.Value * MassTracker.Mass(t);
+		double H = PP->HFrac.Value * MassTracker.ColdGasMass(t);
 		
 		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
 		double fe = alpha * qT + beta * SNIaTracker.Count(t);
@@ -150,7 +166,7 @@ void Annulus::Evolve()
 		Europium_NSM[i] = log10(epsilon*NSMTracker.Count(t)/H);
 		Europium_Coll[i] = log10(delta*CollapsarTracker.Count(t)/H);
 
-		t+=PP.timeStep;
+		t+=PP->timeStep;
 	}
 }
 
@@ -159,18 +175,18 @@ bool Annulus::QuickAnalysis()
 	//does a trivial check to see if model is successful or not
 	
 	
-	double t = PP.tauSNIa.Value;
+	double t = PP->tauSNIa.Value;
 	
 	
 	double qT = CCSNTracker.Count(t);
-	//double H = PP.HFrac.Value * MassTracker.Mass(t);
+	//double H = PP->HFrac.Value * MassTracker.Mass(t);
 	
 	double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
 	double fe = alpha * qT + beta * SNIaTracker.Count(t);
 	//double mg = eta*qT;
 	
 	
-	if ( log10(eu/fe) > PP.EuFeCeiling)
+	if ( log10(eu/fe) > PP->EuFeCeiling)
 	{
 		return false;
 	}
@@ -180,27 +196,50 @@ bool Annulus::QuickAnalysis()
 	//~ return successCondition;	
 }
 
+
+
+double cutter(double x, double cut1, double cut2, double y1, double y2)
+{
+	if (x < cut1)
+	{
+		return y1;
+	}
+	if (x > cut2)
+	{
+		return y2;
+	}
+	
+	return (y2-y1)/(cut2-cut1) * (x - cut2) + y2;
+	
+}
+
+double cutter(double x, std::vector<double> cutParams)
+{
+	return cutter(x, cutParams[1], cutParams[3], cutParams[0], cutParams[2]);
+}
+
+
 void Annulus::SaveAnnulus(std::string fileName)
 {
 	std::ofstream saveFile;
 	int width = 15;
 	
-	std::string saveFileName =PP.FILEROOT + fileName + ".dat";
+	std::string saveFileName =PP->FILEROOT + fileName + ".dat";
 	saveFile.open(saveFileName);
-	std::vector<std::string> titles = {"Time","Fe/H", "Mg/H", "Eu/H","Collapsar","NSM","s-Process","SFR","CCSN (cold)", "CCSN (all)" , "Collapsar (cold)", "Collapsar (All)"};
+	std::vector<std::string> titles = {"Time","Fe/H", "Mg/H", "Eu/H","Collapsar","NSM","s-Process","SFR","Mcg","Mhg", "Ms" };
 	
 	for (int i = 0; i < titles.size(); ++i)
 	{
-		saveFile << std::setw(width) << std::left << titles[i];  
+		saveFile << std::setw(width) << std::left << titles[i] << "\t";  
 	}
 	saveFile << "\n";
 	
 	double t = 0;
-	while (t < PP.tMax)
+	while (t < PP->tMax)
 	{
 		
 		double qT = CCSNTracker.Count(t);
-		double H = PP.HFrac.Value * MassTracker.Mass(t);
+		double H = PP->HFrac.Value * MassTracker.ColdGasMass(t);
 		
 		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
 		double fe = alpha * qT + beta * SNIaTracker.Count(t);
@@ -215,30 +254,42 @@ void Annulus::SaveAnnulus(std::string fileName)
 		double eu_Coll = log10(delta*CollapsarTracker.Count(t)/H);
 		
 		double sfr = SFRTracker.Rho(t);
-		double ccsnCold = CCSNTracker.Count(t);
-		double ccsnAll = CCSNTracker.Total(t);
-		double collapsarCold = CollapsarTracker.Count(t);
-		double collapsarAll = CollapsarTracker.Total(t);
+		//~ double ccsnCold = CCSNTracker.Count(t);
+		//~ double ccsnAll = CCSNTracker.Total(t);
+		//~ double collapsarCold = CollapsarTracker.Count(t);
+		//~ double collapsarAll = CollapsarTracker.Total(t);
 		
-		std::vector<double> vals = {t, feH,mgH,euH,eu_Coll,eu_NSM, eu_S,sfr,ccsnCold,ccsnAll,collapsarCold,collapsarAll};
+		//~ double eufeMin = cutter(feH, PP->EuFeMin);
+		//~ double eufeMax = cutter(feH, PP->EuFeMax);
+		
+		//~ double eumgMin = cutter(feH, PP->EuMgMin);
+		//~ double eumgMax = cutter(feH, PP->EuMgMax);
+		
+		//~ double mgfeMin = cutter(feH, PP->MgFeMin);
+		//~ double mgfeMax = cutter(feH, PP->MgFeMax);
+		double cgm = MassTracker.ColdGasMass(t);
+		double sm = MassTracker.StellarMass(t);
+		double hgm = MassTracker.TotalMass(t) - cgm - sm;
+		std::vector<double> vals = {t, feH,mgH,euH,eu_Coll,eu_NSM, eu_S,sfr,cgm,  hgm, sm};
 		for(int i = 0; i < vals.size(); ++i)
 		{
-			saveFile << std::setw(width) << vals[i];
+			saveFile << std::setw(width) << vals[i] << "\t";
 		}
 		saveFile << "\n";
 		
-		if (t < PP.tauSNIa.Value)
+		if (t < PP->tauSNIa.Value)
 		{
-			t+=PP.timeStep/100;
+			t+=PP->timeStep/100;
 		}
 		else
 		{
-			t+=PP.timeStep;
+			t+=PP->timeStep;
 		}
 	}
 	
 	saveFile.close();
 }
+
 
 
 bool Annulus::ValueAnalysis(bool printMode)
@@ -254,40 +305,38 @@ bool Annulus::ValueAnalysis(bool printMode)
 	bool beganMgFeDescent = false;
 	double previousMgFeValue = -9999;
 	
-	bool exceededFloor = false;
 
-	while (t <= PP.tMax)
+
+	while (t <= PP->tMax)
 	{
 
 		double qT = CCSNTracker.Count(t);
-		double H = PP.HFrac.Value * MassTracker.Mass(t);
-		
-		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+		double H = PP->HFrac.Value * MassTracker.ColdGasMass(t);
 		double fe = alpha * qT + beta * SNIaTracker.Count(t);
-		double mg = eta*qT;
-		
-		double euH = log10(eu/H);
 		double feH = log10(fe/H);
-		double mgH = log10(mg/H);
 		
-		double minimumCheckValue = -2.5;
+		
+		double minimumCheckValue = -1.5;
 		if (feH > minimumCheckValue)
 		{
+			double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
+			double mg = eta*qT;
+			
+			double euH = log10(eu/H);
+			double mgH = log10(mg/H);
+			
+			
 			double eufe = euH - feH;
-			if (eufe > maxReachEu)
-			{
-				maxReachEu = eufe;
-			}
+			double mgfe = mgH - feH;
+			double eumg = euH - mgH;
+			
+
 			if (feH > maxReachFe)
 			{
 				maxReachFe = feH;
 			}
 						
-			if (eufe > PP.EuFeFloor)
-			{
-				exceededFloor = true;
-			}
-			
+			//check for disallowed double loops
 			if ((previousEuFeValue > eufe)  & (feH > -1))
 			{
 				beganEuFeDescent = true;
@@ -300,7 +349,7 @@ bool Annulus::ValueAnalysis(bool printMode)
 			bool mgFeRisingAgain = false;
 			if (beganMgFeDescent == true)
 			{
-				if (previousMgFeValue < mgH - feH)
+				if (previousMgFeValue < mgfe - 0.02)
 				{
 					mgFeRisingAgain = true;
 				}
@@ -309,7 +358,7 @@ bool Annulus::ValueAnalysis(bool printMode)
 			bool euFeRisingAgain = false;
 			if (beganEuFeDescent == true)
 			{
-				if (previousEuFeValue < eufe)
+				if (previousEuFeValue < eufe-0.02)
 				{
 					euFeRisingAgain = true;
 				}
@@ -318,25 +367,32 @@ bool Annulus::ValueAnalysis(bool printMode)
 			previousMgFeValue=  mgH - feH;
 			
 			
-			bool exceededEuFeCeiling = (eufe > PP.EuFeCeiling);
-			bool noDrop = ((eufe > 0.3) && (feH > -0.2) ) || ( (feH > 0) && eufe > 0.2);
-			bool mgThickDiscMissing = (mgH-feH <0.2 & feH < -1.1);
-			bool loopedBack = (feH < maxReachFe);
-			bool euMgOutOfRange = (feH > -1) && ( euH-mgH < -0.1 || euH - mgH > 0.2);
-			bool autoFail = exceededEuFeCeiling || loopedBack || noDrop ||mgThickDiscMissing || euMgOutOfRange || euFeRisingAgain || mgFeRisingAgain;
+			
+			bool outOfEuFeBounds = (eufe < cutter(feH,PP->EuFeMin) ) || (eufe > cutter(feH,PP->EuFeMax) ) || isnan(eufe);
+			bool outOfMgFeBounds = (mgfe < cutter(feH,PP->MgFeMin) ) || (mgfe > cutter(feH,PP->MgFeMax) ) || isnan(mgfe);
+			bool outOfEuMgBounds = (eumg < cutter(feH, PP->EuMgMin) ) || (eumg > cutter(feH, PP->EuMgMax) ) || isnan(eumg);
+			
+
+			bool loopedBack = (feH < maxReachFe - 0.05);
+			
+			
+			bool autoFail = loopedBack || euFeRisingAgain || mgFeRisingAgain || outOfEuFeBounds || outOfMgFeBounds || outOfEuMgBounds;
 			
 			if (autoFail)
 			{
 				if (printMode == true)
 				{
 					std::cout << "Autofailed at t = " << t << " for :\n";
-					std::vector<bool> fails = {exceededEuFeCeiling,noDrop,mgThickDiscMissing, loopedBack,euMgOutOfRange,euFeRisingAgain, mgFeRisingAgain};
-					std::string ceilString = "Going above [Eu/Fe] ceiling: [Eu/Fe] = " + std::to_string(eufe) + ">" + std::to_string(PP.EuFeCeiling);  
-					std::string noDropString = "No [Eu/Fe] drop present: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH);
-					std::string mgMissString = "No [Mg/Fe] thick disc present: [Mg/Fe] = " + std::to_string(mgH - feH) + " at [FeH] = " + std::to_string(feH);
+					std::vector<bool> fails = {loopedBack,euFeRisingAgain, mgFeRisingAgain, outOfEuFeBounds, outOfMgFeBounds, outOfEuMgBounds};
 					std::string loopString = "Looped back too far: [Fe/H] previously reached " + std::to_string(maxReachFe) + ", now at [Fe/H] = " + std::to_string(feH);
-					std::string euMgString = "[Eu/Mg] went out of bounds: [Eu/Mg] = " + std::to_string(euH - mgH);
-					std::vector<std::string> reasons = {ceilString, noDropString, mgMissString, loopString,euMgString, "EuFe Looped Back Up", "MgFe Looped back up"};
+					std::string euLoop = "[Eu/Fe] looped back upwards";
+					std::string mgLoop = "[Mg/Fe] looped back upwards";
+					std::string eufeString = "[Eu/Fe] went out of bounds: [Eu/Fe] = " + std::to_string(eufe) + " at [Fe/H] = " + std::to_string(feH) + " ( bounds = " + std::to_string(cutter(feH,PP->EuFeMin)) + " < [Eu/Fe] < " + std::to_string(cutter(feH,PP->EuFeMax) ) + ")";
+					std::string mgfeString = "[Mg/Fe] went out of bounds: [Mg/Fe] = " + std::to_string(mgfe) + " at [Fe/H] = " + std::to_string(feH)+ " ( bounds = " + std::to_string(cutter(feH,PP->MgFeMin)) + " < [Mg/Fe] < " + std::to_string(cutter(feH,PP->MgFeMax) ) + ")";;
+					std::string eumgString = "[Eu/Mg] went out of bounds: [Eu/Mg] = " + std::to_string(eumg) + " at [Fe/H] = " + std::to_string(feH)+ " ( bounds = " + std::to_string(cutter(feH,PP->EuMgMin)) + " < [Eu/Mg] < " + std::to_string(cutter(feH,PP->EuMgMax) ) + ")";;
+					
+					
+					std::vector<std::string> reasons = {loopString, euLoop, mgLoop, eufeString, mgfeString, eumgString};
 					
 					for (int i = 0; i < fails.size(); ++i)
 					{
@@ -352,27 +408,16 @@ bool Annulus::ValueAnalysis(bool printMode)
 			}
 		}	
 		
-		if (t < PP.tauSNIa.Value)
+		if (t < PP->tauSNIa.Value)
 		{
-			t+=PP.timeStep/100;
+			t+=PP->timeStep/20;
 		}
 		else
 		{
-			t+=PP.timeStep;
+			t+=PP->timeStep;
 		}
 	}
 	
-	if (exceededFloor)
-	{
-		return true;
-	}
-	else
-	{
-		if (printMode == true)
-		{
-			std::cout << "Failed at end of analysis, as did not rise above the floor" << std::endl;
-		}
-		return false;
-	}
+	return true;
 	
 }

@@ -2,22 +2,44 @@
 #include "Process.h"
 
 
-class Accretion : public Process
+class GalaxyMass : public Process
 {
 	public:
-		Accretion(){};
-		Accretion(ParameterPack pp) : Process{pp,-0.001,-0.002}
+		GalaxyMass(){};
+		ComplexVector StarVector;
+		double StarConstant;
+		GalaxyMass(ParameterPack * pp) : Process{pp,-0.001,-0.002}
 		{
+			ComplexVector newVec = ComplexVector(Powers.size());
+
+			for (int i = 0; i < Powers.size(); ++i)
+			{
+	
+				double ar = PP->stellarDeathParameter.Value;
+				double ai = 0;
+				double br = Powers.Real[i];
+				double bi = Powers.Imaginary[i];
+				
+				double denom = (ar - br)*(ar - br) + (ai - bi)*(ai - bi);
+				
+				newVec.Real[i] = (ar - br)/denom;
+				newVec.Imaginary[i] = -(ai - bi)/denom;
+			}
 			
+			StarVector = Hadamard(newVec, SFRVector);
+			
+			StarConstant = - RealDot(StarVector,E(0));
 		};
 		
-		double Mass(double t);
+		double TotalMass(double t);
+		double StellarMass(double t);
+		double ColdGasMass(double t);
 };
 class StarFormation : public Process
 {
 	public:
 		StarFormation(){};
-		StarFormation(ParameterPack pp, double nuCool, double nuDelay) : Process {pp,nuCool, nuDelay}
+		StarFormation(ParameterPack * pp, double nuCool, double nuDelay) : Process {pp,nuCool, nuDelay}
 		{
 			//all automated?
 		};
@@ -38,9 +60,9 @@ class CCSN : public Process
 	
 	public:
 		CCSN(){};
-		CCSN(ParameterPack pp) : Process {pp,pp.CCSNCool.Value, -0.1}
+		CCSN(ParameterPack * pp) : Process {pp,pp->CCSNCool.Value, -0.1}
 		{
-			hotFrac = pp.CCSNHotFrac.Value;
+			hotFrac = pp->CCSNHotFrac.Value;
 			GeneratePrefactors();
 		};
 	
@@ -70,13 +92,13 @@ class Collapsar : public Process
 	
 	public:
 		Collapsar(){};
-		Collapsar(ParameterPack pp) : Process {pp,pp.CollapsarCool.Value, -0.1}
+		Collapsar(ParameterPack * pp) : Process {pp,pp->CollapsarCool.Value, -0.1}
 		{
-			hotFrac = pp.CollapsarHotFrac.Value;
+			hotFrac = pp->CollapsarHotFrac.Value;
 			
 			
-			T = pp.tauColls.Value;
-			Delta = pp.collWidth.Value;
+			T = pp->tauColls.Value;
+			Delta = pp->collWidth.Value;
 			
 			GeneratePrefactors();
 		};
@@ -103,7 +125,7 @@ class Decayer : public Process
 		
 	public:
 		Decayer(){};
-		Decayer(ParameterPack pp, double nuCool, double nuDelay, double tau, double decayHotFrac) : Process {pp, nuCool, nuDelay}
+		Decayer(ParameterPack * pp, double nuCool, double nuDelay, double tau, double decayHotFrac) : Process {pp, nuCool, nuDelay}
 		{
 			hotFrac = decayHotFrac;
 			

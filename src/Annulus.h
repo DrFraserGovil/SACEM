@@ -10,7 +10,7 @@
 class Annulus
 {
 	public:
-		Annulus(ParameterPack pp);
+		Annulus(ParameterPack * pp);
 
 		
 		void Evolve();
@@ -18,8 +18,10 @@ class Annulus
 		bool QuickAnalysis();
 		void SaveAnnulus(std::string fileName);
 		bool ValueAnalysis(bool printMode);
+		void SaveDerivedParams();
+		
 	private:
-		ParameterPack PP;
+		ParameterPack * PP;
 		int NSteps;
 		
 		std::vector<double> Europium;
@@ -31,7 +33,7 @@ class Annulus
 		std::vector<double> Iron;
 		std::vector<double> Magnesium;
 	
-		Accretion MassTracker;
+		GalaxyMass MassTracker;
 		StarFormation SFRTracker;
 		
 		CCSN CCSNTracker;

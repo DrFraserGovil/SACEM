@@ -1,16 +1,25 @@
 #include "ProcessClasses.h"
 
 
-double Accretion::Mass(double t)
+double GalaxyMass::TotalMass(double t)
 {
 	double M = MBar;
-	for (int i = 0; i < PP.galaxyMs.size(); ++i)
+	for (int i = 0; i < PP->galaxyMs.size(); ++i)
 	{
-		M-=PP.galaxyMs[i] * exp(-PP.Betas[i] * t);
+		M-=PP->galaxyMs[i] * exp(-PP->Betas[i] * t);
 	}
 	return M;
 }
 
+double GalaxyMass::ColdGasMass(double t)
+{
+	return 1.0/PP->nuSFR.Value * RealDot(SFRVector,E(t));
+}
+
+double GalaxyMass::StellarMass(double t)
+{
+	return StarConstant*exp(-PP->stellarDeathParameter.Value*t) + RealDot(StarVector,E(t));
+}
 double StarFormation::Rho(double t)
 {
 	return RealDot(SFRVector, E(t));

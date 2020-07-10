@@ -11,7 +11,7 @@ class Process
 	public:
 		ComplexVector Powers;
 		double hotFrac;
-		ParameterPack PP;
+		ParameterPack * PP;
 		double Omega;
 		
 		int ConstantID;
@@ -28,7 +28,7 @@ class Process
 	
 	
 		Process(){};
-		Process(ParameterPack PP, double nuCool, double nuDelay);
+		Process(ParameterPack * PP, double nuCool, double nuDelay);
 		
 		ComplexVector E(double t);
 	

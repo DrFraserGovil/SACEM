@@ -49,6 +49,13 @@ class ParameterPack
 			double EuFeFloor;	
 			double maxLoopBack;
 
+			//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
+			std::vector<double> EuFeMax;
+			std::vector<double> EuFeMin;
+			std::vector<double> MgFeMax;
+			std::vector<double> MgFeMin;
+			std::vector<double> EuMgMax;
+			std::vector<double> EuMgMin;
 			
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;
@@ -61,6 +68,7 @@ class ParameterPack
 			std::vector<double> galaxyMs;
 			
 			RandomisableParameter<double> galaxyScaleLength;
+			RandomisableParameter<double> OutFlowFraction;
 			RandomisableParameter<double> nuSFR;
 			RandomisableParameter<double> content_modified_nuSFR;
 			RandomisableParameter<double> stellarDeathParameter;
@@ -94,12 +102,25 @@ class ParameterPack
 
 			void ScrambleAll();
 			std::string PrintState();
+			
+			std::vector<std::string> PrinterHeaders();
+			std::vector<double> PrinterValues();
+			
 			void SaveState(std::string saveFile);
 			bool WasSuccessful;
 			bool MeetsValueLimits;
 			
+			double OriginalTau;
+			
+			double nSuccess;
+			std::vector<double> SuccessfulTaus;
+			std::vector<double> SuccessfulFracs;
+			
+			std::vector<std::vector<double>> derivedParams;
 			double defaultCollFrac;
 			double defaultTauColls;
+			
+			
 		private:
 			double Radius;
 			double Width;
