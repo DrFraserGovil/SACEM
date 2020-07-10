@@ -91,9 +91,9 @@ ParameterPack::ParameterPack()
 	
 
 	
-	double mod = 0.15;
-	double modMin = 1.0 - mod;
-	double modMax = 1.0 + mod;
+	double mod = 0.1;
+	double modMin =  - mod;
+	double modMax =  + mod;
 	CoolingFrequency = RandomisableParameter<double>(1,0.4,2.5,&global_mt);
 	CollapsarCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);

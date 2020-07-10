@@ -1,8 +1,8 @@
-tab1 = readmatrix("LunchTest/f_CCSN.dat","Delimiter",",");
-tab2 =  readmatrix("LunchTest/f_Coll.dat","Delimiter",",");
+tab1 = readmatrix("LunchTest/Coll_CoolFrac.dat","Delimiter",",");
+tab2 =  readmatrix("LunchTest/NSM_CoolFrac.dat","Delimiter",",");
 
-tab = tab1;
-%tab = table2array(tab);
+tab=tab2;
+%tab = tab1./tab2;
 
 N = 600;
 r = N*length(tab)^2;
