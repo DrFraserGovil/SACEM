@@ -102,7 +102,7 @@ void SaveGalaxies(ParameterPack copy)
 			{
 				for (int l = 0;  l < allHeaders[k].size(); ++l)
 				{
-					saveFile << std::setw(width) << std::left << allVals[k][l] << "\t";
+					//saveFile << std::setw(width) << std::left << allVals[k][l] << "\t";
 					if (k > 0)
 					{
 						
