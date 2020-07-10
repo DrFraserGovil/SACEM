@@ -91,10 +91,10 @@ class ParameterPack
 			RandomisableParameter<double> SNIaHotFrac;
 			RandomisableParameter<double> NSMHotFrac;
 			
-			RandomisableParameter<double> CollapsarCool;
-			RandomisableParameter<double> CCSNCool;
-			RandomisableParameter<double> SNIaCool;
-			RandomisableParameter<double> NSMCool;
+			RandomisableParameter<double> CoolingFrequency;
+			RandomisableParameter<double> CollapsarCoolMod;
+			RandomisableParameter<double> NSMCoolMod;
+			RandomisableParameter<double> SNIaCoolMod;
 	
 			void UpdateRadius(double r, double deltaR);
 			void UpdateInfall();

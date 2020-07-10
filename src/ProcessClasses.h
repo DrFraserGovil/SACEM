@@ -60,7 +60,7 @@ class CCSN : public Process
 	
 	public:
 		CCSN(){};
-		CCSN(ParameterPack * pp) : Process {pp,pp->CCSNCool.Value, -0.1}
+		CCSN(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1}
 		{
 			hotFrac = pp->CCSNHotFrac.Value;
 			GeneratePrefactors();
@@ -92,7 +92,7 @@ class Collapsar : public Process
 	
 	public:
 		Collapsar(){};
-		Collapsar(ParameterPack * pp) : Process {pp,pp->CollapsarCool.Value, -0.1}
+		Collapsar(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1}
 		{
 			hotFrac = pp->CollapsarHotFrac.Value;
 			

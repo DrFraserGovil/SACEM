@@ -21,12 +21,14 @@ Annulus::Annulus(ParameterPack * pp)
 	CCSNTracker = CCSN(PP);
 	CollapsarTracker = Collapsar(PP);
 	
+	double nsmCool = PP->CoolingFrequency.Value * (1.0 + PP->NSMCoolMod.Value);
+	double snIaCool = PP->CoolingFrequency.Value * (1.0 + PP->SNIaCoolMod.Value);
 	
-	NSMTracker = Decayer(PP, PP->NSMCool.Value, PP->nuNSM.Value, PP->tauNSM.Value, PP->NSMHotFrac.Value);
+	NSMTracker = Decayer(PP, nsmCool, PP->nuNSM.Value, PP->tauNSM.Value, PP->NSMHotFrac.Value);
 	
 	SFRTracker = StarFormation(PP,-0.1,-0.2);
 
-	SNIaTracker = Decayer(PP, PP->SNIaCool.Value, PP->nuSNIa.Value, PP->tauSNIa.Value, PP->SNIaHotFrac.Value);
+	SNIaTracker = Decayer(PP, snIaCool, PP->nuSNIa.Value, PP->tauSNIa.Value, PP->SNIaHotFrac.Value);
 	
 	Calibrate();
 	

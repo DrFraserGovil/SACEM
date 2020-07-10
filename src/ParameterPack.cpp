@@ -89,12 +89,15 @@ ParameterPack::ParameterPack()
 	NSMHotFrac = RandomisableParameter<double>(0.5,0.2,hotMax,&global_mt);
 	
 	
-	double coolMin = 0.1;
-	double coolMax = 2;
-	CollapsarCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
-	CCSNCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
-	SNIaCool = RandomisableParameter<double>(1.3,coolMin,coolMax,&global_mt);
-	NSMCool = RandomisableParameter<double>(1,coolMin,coolMax,&global_mt);
+
+	
+	double mod = 0.15;
+	double modMin = 1.0 - mod;
+	double modMax = 1.0 + mod;
+	CoolingFrequency = RandomisableParameter<double>(1,0.4,2.5,&global_mt);
+	CollapsarCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
+	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
+	NSMCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	
 	double nSuccess = 0;
 	WasSuccessful = false;
@@ -131,10 +134,10 @@ void ParameterPack::ScrambleAll()
 	SNIaHotFrac.Scramble();
 	NSMHotFrac.Scramble();
 	
-	CollapsarCool.Scramble();
-	CCSNCool.Scramble();
-	SNIaCool.Scramble();
-	NSMCool.Scramble();
+	CoolingFrequency.Scramble();
+	SNIaCoolMod.Scramble();
+	NSMCoolMod.Scramble();
+	CollapsarCoolMod.Scramble();
 	
 	UpdateRadius(Radius, Width);
 	UpdateInfall();
@@ -179,7 +182,7 @@ std::vector<std::string> ParameterPack::PrinterHeaders()
 	std::vector<std::string> calibrationTitles = {"X", "[Fe/H]_Inf", "[Mg/Fe]_0", "[Mg/Fe]_Inf", "[Eu/Fe]_Inf", "s-Fraction"};
 	std::vector<std::string> galaxyTitles = {"M0", "M1", "M2", "b1", "b2", "nu_SFR","Mu_Stellar"};
 	std::vector<std::string> processTitles = {"tau_SNIa", "nu_SNIa", "tau_NSM", "nu_NSM", "Delta_Colls","nu_modified"};
-	std::vector<std::string> coolingTitles = {"f_CCSN", "f_SNIa", "f_Coll", "f_NSM", "lambda_CCSN", "lambda_SNIa", "lambda_Coll", "lambda_NSM"};
+	std::vector<std::string> coolingTitles = {"f_CCSN", "f_SNIa", "f_Coll", "f_NSM", "BaseCooling", "SNIa_CoolFrac", "Coll_CoolFrac", "NSM_CoolFrac"};
 	
 	std::vector<std::string> output;
 	std::vector<std::vector<std::string>> vecs = {calibrationTitles, galaxyTitles, processTitles,coolingTitles};
@@ -196,7 +199,7 @@ std::vector<double> ParameterPack::PrinterValues()
 	std::vector<RandomisableParameter<double>> calibrationParams = {HFrac, FeH_Sat, MgFe_SN, MgFe_Sat, EuFe_Sat, sProcFrac};
 	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, nuSFR,stellarDeathParameter};
 	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth,content_modified_nuSFR};
-	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, SNIaHotFrac, CollapsarHotFrac, NSMHotFrac, CCSNCool, SNIaCool, CollapsarCool, NSMCool};
+	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, SNIaHotFrac, CollapsarHotFrac, NSMHotFrac, CoolingFrequency, SNIaCoolMod, CollapsarCoolMod, NSMCoolMod};
 
 	std::vector<std::vector<RandomisableParameter<double>>> vals = {calibrationParams, galaxyParams, processParams,coolingParams};
 	
