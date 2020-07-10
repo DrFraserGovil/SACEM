@@ -113,8 +113,8 @@ class ParameterPack
 			double OriginalTau;
 			
 			double nSuccess;
-			std::vector<double> SuccessfulTaus;
-			std::vector<double> SuccessfulFracs;
+			std::vector<int> SuccessfulTaus;
+			std::vector<int> SuccessfulFracs;
 			
 			std::vector<std::vector<double>> derivedParams;
 			double defaultCollFrac;

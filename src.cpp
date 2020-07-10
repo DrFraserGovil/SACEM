@@ -24,6 +24,9 @@ std::vector<double> TimeVector;
 std::vector<std::vector<int>> BigGrid;
 std::vector<ParameterPack> ActiveGalaxies;
 
+std::vector<std::string> paramGridNames;
+std::vector<std::vector<std::vector<double>>> ParamGrids;
+
 std::vector<ParameterPack> SolvedGalaxies;
 
 ParameterPack RandomiseGalaxy(ParameterPack pp)
@@ -51,13 +54,26 @@ void SaveGalaxies(ParameterPack copy)
 	std::vector<std::string> ppHeader = copy.PrinterHeaders();
 	std::vector<std::string> derivedHeader = {"GasStarRatio",};
 	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
+	
+	int n = ppHeader.size() + derivedHeader.size();
+
+	ParamGrids.resize(n);
+	paramGridNames = ppHeader;
+	paramGridNames.insert(paramGridNames.end(), derivedHeader.begin(), derivedHeader.end() );
+	
+	for (int i = 0; i < n; ++i)
+	{
+		double c = NAN;
+		ParamGrids[i] = std::vector(copy.NGrid, std::vector(copy.NGrid, c));
+	}
+	
+	
 	for (int i = 0; i < allHeaders.size(); ++i)
 	{
 		for (int j = 0; j < allHeaders[i].size(); ++j)
 		{
 			saveFile <<  std::setw(width) << std::left << allHeaders[i][j] << "\t";
 		}
-		
 	}
 	saveFile << "\n";
 	//save file contents
@@ -73,34 +89,64 @@ void SaveGalaxies(ParameterPack copy)
 		
 		for (int j = 0; j < gal->nSuccess; ++j)
 		{
-			
-			std::vector<double> basicInfo = {i, gal->SuccessfulFracs[j], gal->SuccessfulTaus[j]};
+			int fracIndex = gal->SuccessfulFracs[j];
+			int tauIndex = gal->SuccessfulTaus[j];
+			std::vector<double> basicInfo = {i, gal->collFrac.getStepValue(fracIndex), gal->tauColls.getStepValue(tauIndex)};
 			
 			
 			
 			std::vector<std::vector<double>> allVals = {basicInfo, ppVals, gal->derivedParams[j]};
 			
-			
+			int totalIdx = 0;
 			for (int k = 0; k < allHeaders.size(); ++k)
 			{
 				for (int l = 0;  l < allHeaders[k].size(); ++l)
 				{
 					saveFile << std::setw(width) << std::left << allVals[k][l] << "\t";
+					if (k > 0)
+					{
+						
+						
+						double v = ParamGrids[totalIdx][fracIndex][tauIndex];
+						if (isnan(v))
+						{
+							ParamGrids[totalIdx][fracIndex][tauIndex] = 0;
+						}
+						ParamGrids[totalIdx][fracIndex][tauIndex] += allVals[k][l];
+						++totalIdx;
+					}
 				}
 			}
 			saveFile << "\n";
 		}
 	}
+	
+	
+
 }
 
 void SaveGrid(ParameterPack copy)
 {
 	std::cout << "Simulation finished.\n\tSaving Success-Count Grid" << std::endl;
 	
+	SaveGalaxies(copy);
+	
 	std::ofstream saveFile;
 	std::string saveFileName =copy.FILEROOT + "/SuccessGrid.dat";
 	saveFile.open(saveFileName);
-	int width = 15;
+	
+	std::vector<std::ofstream> paramFiles(paramGridNames.size() );
+	for (int i = 0; i < paramGridNames.size(); ++i)
+	{
+		
+		std::string name= copy.FILEROOT  + paramGridNames[i] + ".dat";
+
+		paramFiles[i].open(name);
+	}
+	
+	
+	
+	int width = 8;
 	for (int i = 0; i < copy.collFrac.NSteps; ++i)
 	{
 		for (int j = 0; j < copy.tauColls.NSteps; ++j)
@@ -111,13 +157,30 @@ void SaveGrid(ParameterPack copy)
 			}
 			saveFile << std::setw(width) << std::left << BigGrid[i][j];
 			
+			for (int k = 0; k < paramGridNames.size(); ++k)
+			{
+				if (j > 0)
+				{
+					paramFiles[k] << ", ";
+				}
+				paramFiles[k] << std::setw(width) << std::left << ParamGrids[k][i][j]/BigGrid[i][j] << "\t";
+			}
 		}
 		saveFile << "\n";
+		for (int k = 0; k < paramGridNames.size(); ++k)
+			{
+				
+				paramFiles[k] << "\n";
+			}
 	}
 	
 	saveFile.close();
+	for (int i=0; i < paramGridNames.size(); ++i)
+	{
+		paramFiles[i].close();
+	}
 	
-	SaveGalaxies(copy);
+	
 }
 
 
@@ -149,8 +212,8 @@ void LaunchProcess(std::vector<std::vector<int>> * miniGrid, int loopNumber, int
 				{
 					++miniGrid[0][i][j];
 					++state->nSuccess;
-					state->SuccessfulFracs.push_back(state->collFrac.Value);
-					state->SuccessfulTaus.push_back(state->OriginalTau);
+					state->SuccessfulFracs.push_back(i);
+					state->SuccessfulTaus.push_back(j);
 					A.SaveDerivedParams();
 				}
 				

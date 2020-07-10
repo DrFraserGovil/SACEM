@@ -1,6 +1,6 @@
-tab = readtable("LunchTest/SuccessGrid.dat");
+tab = readmatrix("LunchTest/SuccessGrid.dat","Delimiter",",");
 
-tab = table2array(tab);
+%tab = table2array(tab);
 
 N = 600;
 r = N*length(tab)^2;
