@@ -412,7 +412,7 @@ bool Annulus::ValueAnalysis(bool printMode)
 		
 		if (t < PP->tauSNIa.Value)
 		{
-			t+=PP->timeStep/20;
+			t+=PP->timeStep/5;
 		}
 		else
 		{
