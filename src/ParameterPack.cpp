@@ -28,8 +28,8 @@ ParameterPack::ParameterPack()
 	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
-	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.05,&global_mt);
+	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.07,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.1,&global_mt);
 	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
 		
@@ -54,6 +54,7 @@ ParameterPack::ParameterPack()
 	EuMgMax = {0.3,-0.7,0.2,0};
 	EuMgMin = {-0.2,-0.7,-0.15,-0.4};
 	minGasFrac = 0.05;
+	maxFasFrac = 0.25;
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
@@ -64,9 +65,9 @@ ParameterPack::ParameterPack()
 	galaxyB2 = RandomisableParameter<double>(14,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
 	nuSFR = RandomisableParameter<double>(1,0.01,3.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.01,2.0,&global_mt,true);
-	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.2,&global_mt,true);
-	OutFlowFraction = RandomisableParameter<double>(2.5,0.001,2,&global_mt,true);
+	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.01,3.0,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.4,&global_mt,true);
+	OutFlowFraction = RandomisableParameter<double>(2.5,0.001,2,&global_mt);
 	UpdateInfall();
 	massToDensityCorrection = 1;
 	densityToMassCorrection = 1;
@@ -74,10 +75,10 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(3,0,14,NGrid);
+	tauColls = IterableParameter<double>(3,0,15,NGrid);
 	collWidth = RandomisableParameter<double>(1,0.01,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.05,0.5,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.01,8,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.005,0.5,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.01,5,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
 	nuNSM = RandomisableParameter<double>(2.3,0.01,5,&global_mt);
 	

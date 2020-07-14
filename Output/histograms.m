@@ -1,7 +1,7 @@
 
 
-tab1 = readmatrix("Weekend/GasStarRatio.dat","Delimiter",",");
-tab2 =  readmatrix("Weekend/M1.dat","Delimiter",",");
+tab1 = readmatrix("NewTest/ColdStarRatio.dat","Delimiter",",");
+tab2 =  readmatrix("NewTest/b1.dat","Delimiter",",");
 
 tab=tab1;
 %tab = tab1./tab2;
@@ -13,7 +13,7 @@ successFrac = round(100*q/r,2);
 fprintf("%f %% success\n", successFrac)
 cla;
 %colormap(flipud(gray));
-image([0,1],[0,20],transpose(tab),'CDataMapping','scaled')
+image([0,1],[0,14],transpose(tab),'CDataMapping','scaled')
 set(gca,'YDir','normal')
 title("Model Counting","Interpreter","latex","FontSize",20)
 xlabel("Collapsar Fraction, $f_{coll}$","Interpreter","latex","FontSize",20);

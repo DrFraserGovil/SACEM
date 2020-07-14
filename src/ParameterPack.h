@@ -49,6 +49,7 @@ class ParameterPack
 			double EuFeFloor;	
 			double maxLoopBack;
 			double minGasFrac;
+			double maxGasFrac;
 
 			//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
 			std::vector<double> EuFeMax;

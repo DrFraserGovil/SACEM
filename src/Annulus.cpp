@@ -203,7 +203,8 @@ bool Annulus::QuickAnalysis()
 		return false;
 	}
 
-	if (cg_Inf/sg_Inf < PP->minGasFrac)
+	double cSRatio = cg_Inf/sg_Inf;
+	if (cSRatio < PP->minGasFrac || cSRatio > PP->maxGasFrac)
 	{
 		return false;
 	}
