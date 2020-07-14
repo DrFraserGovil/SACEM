@@ -54,7 +54,7 @@ ParameterPack::ParameterPack()
 	EuMgMax = {0.3,-0.7,0.2,0};
 	EuMgMin = {-0.2,-0.7,-0.15,-0.4};
 	minGasFrac = 0.05;
-	maxFasFrac = 0.25;
+	maxGasFrac = 0.25;
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
