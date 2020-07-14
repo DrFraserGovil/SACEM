@@ -1,24 +1,24 @@
-M1 = 5;
+M1 = 8;
 M2 = 46;
-b1 = 0.3;
+b1 = 0.8;
 b2 = 14;
 M0 = 0.8;
 
 Masses = [M1,M2];
 betas = [1.0/b1, 1.0/b2];
 
-nu = 1;
-lambda = 1;
+nu = 1.8;
+lambda = 1.4;
 fh = 0.75	;
-mu = 0.1;
-dOut = 2.5;
+mu = 0.03;
+dOut = 0.4;
 
-dt = 0.0001;
+dt = 0.01;
 ts = 0:dt:14;
 
-Mc = M0;
+Mc = M0*(1-fh);
 Mh = 0;
-Ms = 0;
+Ms = M0*fh;
 
 for i = 2:length(ts)
    t = ts(i-1);
@@ -36,31 +36,50 @@ end
 
 cla;
 hold on;
-plot(ts,Mc);
-plot(ts, Mh);
-plot(ts,Ms);
+plot(ts,Mc*nu./(Mc+Ms));
+% plot(ts, Mh);
+% plot(ts,Ms);
+%plot(ts,Mc+Ms)
 
+f = readtable("massotime.dat");
+g = readtable("SFmstat.dat");
+nonIn = (f.Var3~=0);
+f(nonIn,:) = [];
 
-r = detectImportOptions("LunchTest/SingleEvaluation.dat");
-f = readtable("LunchTest/SingleEvaluation.dat",r);
-plot(f.Time,f.Mcg);
-plot(f.Time,f.Mhg);
-plot(f.Time,f.Ms);
-
-
-p = mu + nu + lambda*(1+dOut);
-q = mu*nu*(fh+dOut)+ lambda*(mu + nu);
-zi = -Masses.*(betas.^2 - (mu + lambda)*betas + mu*lambda);
-D= mu*lambda*(M0 + sum(Masses))/q;
-C = zi./(betas.^2 - p*betas + q);
-omega = sqrt(p^2/4 - q);
-J = M0 - D - sum(C);
-K = sum(betas.*(Masses + C)) - nu*(1+dOut)*M0;
-
-A = J/2 - (p*J + 2*K)/(4*omega);
-B = J/2 + (p*J + 2*K)/(4*omega);
-
-mcg = D + exp(-p*ts/2).*(A*exp(-omega*ts) + B*exp(omega*ts) ) + C(1)*exp(-ts/b1) + C(2)*exp(-ts/b2);
-
-plot(ts,mcg+0.01)
-legend(["Cold Gas", "Hot Gas", "Stars", "Cold Gas Sim", "Hot Gas Sim", "Stars Sm","Reanalysis"]);
+rT = [];
+rC = [];
+rH = [];
+rS = [];
+sfr = [];
+for i = 1:height(f)
+   t = f.Var1(i);
+   if (isempty(rT) || t ~= rT(end) )
+      rT(end+1) = f.Var1(i);
+      rS(end+1) = f.Var4(i);
+      rC(end+1) = f.Var5(i);
+      rH(end+1) = f.Var6(i);
+      sfr(end+1) = g.Var4(i);
+   else
+      rS(end) = rS(end) + f.Var4(i);
+      rC(end) = rC(end) + f.Var5(i);
+      rH(end) = rH(end) + f.Var6(i);
+      sfr(end) = sfr(end) + g.Var4(i)*g.Var6(i)/0.015;
+   end
+   
+end
+rT = rT*15e-3;
+rC = rC/10^10;
+rH = rH/10^10;
+rS = rS/10^10;
+sfr = sfr/10^10;
+clear f
+clear g
+plot(rT,rS)
+plot(rT,rC)
+%plot(rT,rH)
+%plot(rT,rS + rC + rH)
+plot(rT,sfr./(rC + rH + rS))
+legend({"C","H","S","Total","Total 2"})
+ylabel("SFR (10^{10} / Gyr")
+xlabel("Time (GYr)")
+set(gca,"yscale","linear")

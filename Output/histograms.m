@@ -1,7 +1,9 @@
-tab1 = readmatrix("LunchTest/Coll_CoolFrac.dat","Delimiter",",");
-tab2 =  readmatrix("LunchTest/NSM_CoolFrac.dat","Delimiter",",");
 
-tab=tab2;
+
+tab1 = readmatrix("Weekend/GasStarRatio.dat","Delimiter",",");
+tab2 =  readmatrix("Weekend/M1.dat","Delimiter",",");
+
+tab=tab1;
 %tab = tab1./tab2;
 
 N = 600;
@@ -20,7 +22,7 @@ c = colorbar;
 %c.Label.String = "Number of Successful Models";
 c.Label.FontSize = 24;
 c.Label.Interpreter = "Latex";
-%caxis([0 600])
+%caxis([0 10])
 % 
 % x = 0:0.01:1;
 % m = 12;

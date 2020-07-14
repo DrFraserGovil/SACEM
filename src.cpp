@@ -52,7 +52,7 @@ void SaveGalaxies(ParameterPack copy)
 	//save file headers
 	std::vector<std::string> basicHeader = {"Iteration", "collFrac", "tauColl"};
 	std::vector<std::string> ppHeader = copy.PrinterHeaders();
-	std::vector<std::string> derivedHeader = {"GasStarRatio",};
+	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatop","SFR"};
 	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
 	
 	int n = ppHeader.size() + derivedHeader.size();
@@ -117,7 +117,7 @@ void SaveGalaxies(ParameterPack copy)
 					}
 				}
 			}
-			saveFile << "\n";
+			//saveFile << "\n";
 		}
 	}
 	

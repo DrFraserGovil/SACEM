@@ -127,8 +127,11 @@ void Annulus::SaveDerivedParams()
 	
 	double cg_Inf = MassTracker.ColdGasMass(tI);
 	double sg_Inf = MassTracker.StellarMass(tI);
+	double Mt_Inf = MassTracker.TotalMass(tI);
+	double hg_Inf = Mt_Inf - sg_Inf -cg_Inf ;
 	
-	std::vector<double> params = {cg_Inf/sg_Inf};
+	
+	std::vector<double> params = {cg_Inf/sg_Inf,hg_Inf/sg_Inf,sg_Inf/Mt_Inf, PP->nuSFR.Value*cg_Inf};
 	
 	PP->derivedParams.push_back(params);
 	
@@ -188,11 +191,22 @@ bool Annulus::QuickAnalysis()
 	//double mg = eta*qT;
 	
 	
+	double tI = PP->tMax;
+	
+	double cg_Inf = MassTracker.ColdGasMass(tI);
+	double sg_Inf = MassTracker.StellarMass(tI);
+	
+	
+	
 	if ( log10(eu/fe) > PP->EuFeCeiling)
 	{
 		return false;
 	}
 
+	if (cg_Inf/sg_Inf < PP->minGasFrac)
+	{
+		return false;
+	}
 
 	return true;
 	//~ return successCondition;	

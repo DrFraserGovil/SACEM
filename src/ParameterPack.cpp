@@ -25,7 +25,7 @@ ParameterPack::ParameterPack()
 
 	NGrid = 101;
 	
-	HFrac = RandomisableParameter<double>(0.7,0.68,0.8,&global_mt);
+	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.1,&global_mt);
@@ -53,7 +53,7 @@ ParameterPack::ParameterPack()
 	
 	EuMgMax = {0.3,-0.7,0.2,0};
 	EuMgMin = {-0.2,-0.7,-0.15,-0.4};
-	
+	minGasFrac = 0.05;
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
@@ -79,7 +79,7 @@ ParameterPack::ParameterPack()
 	tauSNIa = RandomisableParameter<double>(0.15,0.05,0.5,&global_mt);
 	nuSNIa = RandomisableParameter<double>(30.01,0.01,8,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.01,8,&global_mt);
+	nuNSM = RandomisableParameter<double>(2.3,0.01,5,&global_mt);
 	
 	double hotMin = 0.7;
 	double hotMax = 0.99;
@@ -179,7 +179,7 @@ void ParameterPack::UpdateRadius(double radius, double width)
 std::vector<std::string> ParameterPack::PrinterHeaders()
 {
 	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
-	std::vector<std::string> calibrationTitles = {"X", "[Fe/H]_Inf", "[Mg/Fe]_0", "[Mg/Fe]_Inf", "[Eu/Fe]_Inf", "s-Fraction"};
+	std::vector<std::string> calibrationTitles = {"X", "FeH_Inf", "MgFe_0", "MgFe_Inf", "EuFe_Inf", "s-Fraction"};
 	std::vector<std::string> galaxyTitles = {"M0", "M1", "M2", "b1", "b2", "nu_SFR","Mu_Stellar"};
 	std::vector<std::string> processTitles = {"tau_SNIa", "nu_SNIa", "tau_NSM", "nu_NSM", "Delta_Colls","nu_modified"};
 	std::vector<std::string> coolingTitles = {"f_CCSN", "f_SNIa", "f_Coll", "f_NSM", "BaseCooling", "SNIa_CoolFrac", "Coll_CoolFrac", "NSM_CoolFrac"};
