@@ -77,7 +77,7 @@ ParameterPack::ParameterPack()
 	
 	tauColls = IterableParameter<double>(3,0,15,NGrid);
 	collWidth = RandomisableParameter<double>(1,0.01,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.005,0.5,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.005,0.4,&global_mt);
 	nuSNIa = RandomisableParameter<double>(30.01,0.5,10,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
 	nuNSM = RandomisableParameter<double>(2.3,0.5,10,&global_mt);
