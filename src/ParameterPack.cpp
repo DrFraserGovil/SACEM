@@ -25,7 +25,7 @@ ParameterPack::ParameterPack()
 
 	NGrid = 101;
 	
-	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
+	HFrac = RandomisableParameter<double>(0.7,0.68,0.74,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.05,&global_mt);
@@ -61,7 +61,7 @@ ParameterPack::ParameterPack()
 	galaxyM0 = RandomisableParameter<double>(0.8,0.1,1.0,&global_mt);
 	galaxyM1 = RandomisableParameter<double>(5,1,10.0,&global_mt);
 	galaxyM2 = RandomisableParameter<double>(46,20,60.0,&global_mt);
-	galaxyB1 = RandomisableParameter<double>(0.3,0.01,1.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(0.3,0.1,1.5,&global_mt);
 	galaxyB2 = RandomisableParameter<double>(14,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
 	nuSFR = RandomisableParameter<double>(1,0.01,3.0,&global_mt);
@@ -78,9 +78,9 @@ ParameterPack::ParameterPack()
 	tauColls = IterableParameter<double>(3,0,15,NGrid);
 	collWidth = RandomisableParameter<double>(1,0.01,10,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.15,0.005,0.5,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.01,5,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.5,10,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.01,5,&global_mt);
+	nuNSM = RandomisableParameter<double>(2.3,0.5,10,&global_mt);
 	
 	double hotMin = 0.7;
 	double hotMax = 0.99;
@@ -92,7 +92,7 @@ ParameterPack::ParameterPack()
 	
 
 	
-	double mod = 0.1;
+	double mod = 0.2;
 	double modMin =  - mod;
 	double modMax =  + mod;
 	CoolingFrequency = RandomisableParameter<double>(1,0.4,2.5,&global_mt);
@@ -181,7 +181,7 @@ std::vector<std::string> ParameterPack::PrinterHeaders()
 {
 	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
 	std::vector<std::string> calibrationTitles = {"X", "FeH_Inf", "MgFe_0", "MgFe_Inf", "EuFe_Inf", "s-Fraction"};
-	std::vector<std::string> galaxyTitles = {"M0", "M1", "M2", "b1", "b2", "nu_SFR","Mu_Stellar"};
+	std::vector<std::string> galaxyTitles = {"M0", "M1", "M2", "b1", "b2", "nu_SFR","Mu_Stellar","OutflowFrac"};
 	std::vector<std::string> processTitles = {"tau_SNIa", "nu_SNIa", "tau_NSM", "nu_NSM", "Delta_Colls","nu_modified"};
 	std::vector<std::string> coolingTitles = {"f_CCSN", "f_SNIa", "f_Coll", "f_NSM", "BaseCooling", "SNIa_CoolFrac", "Coll_CoolFrac", "NSM_CoolFrac"};
 	
@@ -198,7 +198,7 @@ std::vector<std::string> ParameterPack::PrinterHeaders()
 std::vector<double> ParameterPack::PrinterValues()
 {
 	std::vector<RandomisableParameter<double>> calibrationParams = {HFrac, FeH_Sat, MgFe_SN, MgFe_Sat, EuFe_Sat, sProcFrac};
-	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, nuSFR,stellarDeathParameter};
+	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, nuSFR,stellarDeathParameter,OutflowFrac};
 	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth,content_modified_nuSFR};
 	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, SNIaHotFrac, CollapsarHotFrac, NSMHotFrac, CoolingFrequency, SNIaCoolMod, CollapsarCoolMod, NSMCoolMod};
 
