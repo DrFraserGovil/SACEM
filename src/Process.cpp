@@ -106,16 +106,18 @@ Process::Process(ParameterPack * pp, double nuCool, double nuDelay)
 		imaginaryPowers.push_back(0.0);
 	}
 	
-	for (int i = 0; i < realPowers.size(); ++i)
+	for (int i = 0; i < realPowers.size()-1; ++i)
 	{
 		for (int j = i+1; j < realPowers.size(); ++j)
 		{
 			bool samePower = (fabs(realPowers[j] - realPowers[i])<10e-8) && fabs(imaginaryPowers[i] - imaginaryPowers[j]) < 10e-8;
-			std::vector<std::string> powNames = {"Constant","Omega plus", "Omega minus", "nuSFR(mod)", "nuCool", "nuDelay"};
+			std::vector<std::string> powNames = {"Constant","Omega plus", "Omega minus", "nuSFR(mod)", "nuCool", "nuDelay","ob1","ob2"};
 			if (samePower)
 			{
 				std::cout << "You have provided two powers of the same value (" << powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
-				realPowers[i] = realPowers[i] * 1.002;
+				realPowers[i] = realPowers[i] * 1.01;
+				imaginaryPowers[i] = imaginaryPowers[i] * 0.99;
+				std::cout << "\tNew values: "<< powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
 			}
 		}
 	}
