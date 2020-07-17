@@ -25,12 +25,12 @@ ParameterPack::ParameterPack()
 
 	NGrid = 101;
 	
-	HFrac = RandomisableParameter<double>(0.7,0,1,&global_mt);
-	FeH_Sat = RandomisableParameter<double>(0.3,-1,1,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.35,0.2,0.6,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.3,0.2,&global_mt);
-	EuFe_Sat = RandomisableParameter<double>(0,-0.3,0.2,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.01,0.000000001,0.5,&global_mt);
+	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
+	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.05,&global_mt);
+	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.07,&global_mt);
+	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.1,&global_mt);
 	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
 		
 	//constraining values
@@ -40,9 +40,9 @@ ParameterPack::ParameterPack()
 	finalFe_Max = 0.4;
 	
 	//limiting values
-	//~ EuFeCeiling = 0.8;
-	//~ EuFeFloor = 0.37;
-	//~ maxLoopBack = 0.05;
+	EuFeCeiling = 0.6;
+	EuFeFloor = 0.37;
+	maxLoopBack = 0.05;
 
 	//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
 	EuFeMax = {0.62,-0.7,0.15,0};
@@ -58,15 +58,15 @@ ParameterPack::ParameterPack()
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
-	galaxyM0 = RandomisableParameter<double>(0.8,0.01,10.0,&global_mt);
-	galaxyM1 = RandomisableParameter<double>(5,0.001,30.0,&global_mt);
-	galaxyM2 = RandomisableParameter<double>(46,0.001,90.0,&global_mt);
-	galaxyB1 = RandomisableParameter<double>(0.3,0.01,5,&global_mt);
+	galaxyM0 = RandomisableParameter<double>(0.8,0.1,1.0,&global_mt);
+	galaxyM1 = RandomisableParameter<double>(5,1,10.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(46,20,60.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(0.3,0.1,1.5,&global_mt);
 	galaxyB2 = RandomisableParameter<double>(14,5,25,&global_mt);
 	galaxyScaleLength = RandomisableParameter<double>(3.0,1.0,5.0,&global_mt);
-	nuSFR = RandomisableParameter<double>(1,0.001,8.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.001,8.0,&global_mt,true);
-	stellarDeathParameter = RandomisableParameter<double>(0.1,0.0001,2,&global_mt,true);
+	nuSFR = RandomisableParameter<double>(1,0.01,3.0,&global_mt);
+	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.01,3.0,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.4,&global_mt,true);
 	OutFlowFraction = RandomisableParameter<double>(2.5,0.001,2,&global_mt);
 	UpdateInfall();
 	massToDensityCorrection = 1;
@@ -75,26 +75,26 @@ ParameterPack::ParameterPack()
 	
 	//uncalibrated stuff
 	
-	tauColls = IterableParameter<double>(3,0,20,NGrid);
+	tauColls = IterableParameter<double>(3,0,15,NGrid);
 	collWidth = RandomisableParameter<double>(1,0.01,10,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.001,1,&global_mt,true);
-	nuSNIa = RandomisableParameter<double>(30.01,0.05,20,&global_mt);
-	tauNSM = RandomisableParameter<double>(0.0001,0.00001,1,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.05,20,&global_mt);
+	tauSNIa = RandomisableParameter<double>(0.15,0.005,0.4,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.5,10,&global_mt);
+	tauNSM = RandomisableParameter<double>(0.0001,0.00001,0.3,&global_mt,true);
+	nuNSM = RandomisableParameter<double>(2.3,0.5,10,&global_mt);
 	
-	double hotMin = 0.001;
-	double hotMax = 0.999;
+	double hotMin = 0.7;
+	double hotMax = 0.99;
 	CollapsarHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
 	CCSNHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
 	SNIaHotFrac = RandomisableParameter<double>(0.99,hotMin,hotMax,&global_mt);
-	NSMHotFrac = RandomisableParameter<double>(0.5,hotMin,hotMax,&global_mt);
+	NSMHotFrac = RandomisableParameter<double>(0.5,0.2,hotMax,&global_mt);
 	
 	
 
 	
 	double mod = 0.2;
-	double modMin =  - 0.99;
-	double modMax =  + 5;
+	double modMin =  - mod;
+	double modMax =  + mod;
 	CoolingFrequency = RandomisableParameter<double>(1,0.4,2.5,&global_mt);
 	CollapsarCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
