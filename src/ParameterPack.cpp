@@ -40,7 +40,7 @@ ParameterPack::ParameterPack()
 	finalFe_Max = 0.4;
 	
 	//limiting values
-	EuFeCeiling = 0.62;
+	EuFeCeiling = 0.6;
 	maxLoopBack = 0.05;
 
 	//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
@@ -52,8 +52,8 @@ ParameterPack::ParameterPack()
 	
 	EuMgMax = {0.3,-0.7,0.2,0};
 	EuMgMin = {-0.2,-0.7,-0.15,-0.4};
-	minGasFrac = 0.05;
-	maxGasFrac = 0.25;
+	minGasFrac = 0.00005;
+	maxGasFrac = 2;
 	//accretion/infall parameters
 	
 	// initial mass (10^10 solar mass)
