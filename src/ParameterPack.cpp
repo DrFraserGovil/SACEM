@@ -28,8 +28,8 @@ ParameterPack::ParameterPack()
 	HFrac = RandomisableParameter<double>(0.7,0.1,0.9,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.3,-1,1,&global_mt);
 	MgFe_SN = RandomisableParameter<double>(0.35,0.2,0.6,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0.05,&global_mt);
-	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.07,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.3,0.2,&global_mt);
+	EuFe_Sat = RandomisableParameter<double>(0,-0.3,0.2,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.6,&global_mt);
 	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
 		
