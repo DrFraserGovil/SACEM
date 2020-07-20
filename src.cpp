@@ -308,7 +308,7 @@ void IterationMode(ParameterPack pp)
 		
 		noThreadAssigned = true;	
 		
-		int nPrints = pp.NThreads + 1;
+		const int nPrints = pp.NThreads * 5;
 		if(k%nPrints == 0)
 		{
 			printTimeSince(start,k,NLoops);

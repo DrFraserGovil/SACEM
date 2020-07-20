@@ -1,7 +1,7 @@
 
 
-tab1 = readmatrix("NewTest/X.dat","Delimiter",",");
-tab2 =  readmatrix("NewTest/M2.dat","Delimiter",",");
+tab1 = readmatrix("VeryLaxConstraints/FeH_Inf.dat","Delimiter",",");
+tab2 = readmatrix("VeryLaxConstraints/M0.dat","Delimiter",",");
 
 tab=tab1;
 %tab = tab1./tab2;
@@ -13,11 +13,12 @@ successFrac = round(100*q/r,2);
 fprintf("%f %% success\n", successFrac)
 cla;
 %colormap(flipud(gray));
-image([0,1],[0,15],transpose(tab),'CDataMapping','scaled')
+image([0,1],[0,20],transpose(tab),'CDataMapping','scaled')
 set(gca,'YDir','normal')
 title("Model Counting","Interpreter","latex","FontSize",20)
 xlabel("Collapsar Fraction, $f_{coll}$","Interpreter","latex","FontSize",20);
 ylabel("Collapsar Cutoff time, $\tau_{coll}$", "Interpreter","latex","FontSize",20);
+colormap([1 1 1; parula(512)])
 c = colorbar;
 %c.Label.String = "Number of Successful Models";
 c.Label.FontSize = 24;

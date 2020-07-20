@@ -390,7 +390,7 @@ bool Annulus::ValueAnalysis(bool printMode)
 			bool outOfEuMgBounds = (eumg < cutter(feH, PP->EuMgMin) ) || (eumg > cutter(feH, PP->EuMgMax) ) || isnan(eumg);
 			
 
-			bool loopedBack = (feH < maxReachFe - 0.05);
+			bool loopedBack = (feH < maxReachFe - PP->maxLoopBack);
 			
 			
 			bool autoFail = loopedBack || euFeRisingAgain || mgFeRisingAgain || outOfEuFeBounds || outOfMgFeBounds || outOfEuMgBounds;
