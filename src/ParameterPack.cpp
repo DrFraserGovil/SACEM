@@ -210,7 +210,7 @@ void ParameterPack::UseLaxConstraints()
 	NSMCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	
 	minGasFrac = 0.0000001;
-	maxGasFrac = 10;
+	maxGasFrac = 1;
 }
 
 
