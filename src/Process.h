@@ -28,7 +28,7 @@ class Process
 	
 	
 		Process(){};
-		Process(ParameterPack * PP, double nuCool, double nuDelay);
+		Process(ParameterPack * PP, double nuCool, double nuDelay, bool printStatus);
 		
 		ComplexVector E(double t);
 	

@@ -8,7 +8,7 @@ class GalaxyMass : public Process
 		GalaxyMass(){};
 		ComplexVector StarVector;
 		double StarConstant;
-		GalaxyMass(ParameterPack * pp) : Process{pp,-0.001,-0.002}
+		GalaxyMass(ParameterPack * pp) : Process{pp,-0.001,-0.002,true}
 		{
 			ComplexVector newVec = ComplexVector(Powers.size());
 
@@ -39,7 +39,7 @@ class StarFormation : public Process
 {
 	public:
 		StarFormation(){};
-		StarFormation(ParameterPack * pp, double nuCool, double nuDelay) : Process {pp,nuCool, nuDelay}
+		StarFormation(ParameterPack * pp, double nuCool, double nuDelay) : Process {pp,nuCool, nuDelay,false}
 		{
 			//all automated?
 		};
@@ -60,7 +60,7 @@ class CCSN : public Process
 	
 	public:
 		CCSN(){};
-		CCSN(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1}
+		CCSN(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1,false}
 		{
 			hotFrac = pp->CCSNHotFrac.Value;
 			GeneratePrefactors();
@@ -92,7 +92,7 @@ class Collapsar : public Process
 	
 	public:
 		Collapsar(){};
-		Collapsar(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1}
+		Collapsar(ParameterPack * pp) : Process {pp,pp->CoolingFrequency.Value, -0.1,false}
 		{
 			hotFrac = pp->CollapsarHotFrac.Value;
 			
@@ -125,7 +125,7 @@ class Decayer : public Process
 		
 	public:
 		Decayer(){};
-		Decayer(ParameterPack * pp, double nuCool, double nuDelay, double tau, double decayHotFrac) : Process {pp, nuCool, nuDelay}
+		Decayer(ParameterPack * pp, double nuCool, double nuDelay, double tau, double decayHotFrac) : Process {pp, nuCool, nuDelay,false}
 		{
 			hotFrac = decayHotFrac;
 			

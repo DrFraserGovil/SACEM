@@ -188,8 +188,8 @@ void SaveGrid(ParameterPack copy)
 void LaunchProcess(std::vector<std::vector<int>> * miniGrid, int loopNumber, int id)
 {	
 	ParameterPack * state = &ActiveGalaxies[id];
-	double sprocFrac = state->sProcFrac.Value;
-	bool folderMade = false;
+	Annulus A = Annulus(state);
+	
 	for (int i = 0; i < state->collFrac.NSteps; ++i)
 	{
 		state->collFrac.IterateValue(i);
@@ -197,9 +197,11 @@ void LaunchProcess(std::vector<std::vector<int>> * miniGrid, int loopNumber, int
 		{
 			state->tauColls.IterateValue(j);
 			
+			A.Calibrate();
+			
 			
 			//create + evaluate an annulus using the given parameters
-			Annulus A = Annulus(state);
+			
 			state->WasSuccessful = A.QuickAnalysis();
 		
 			//std::cout << state->WasSuccessful << std::endl;
@@ -308,7 +310,7 @@ void IterationMode(ParameterPack pp)
 		
 		noThreadAssigned = true;	
 		
-		const int nPrints = pp.NThreads * 5;
+		const int nPrints = pp.NThreads;
 		if(k%nPrints == 0)
 		{
 			printTimeSince(start,k,NLoops);
@@ -358,7 +360,8 @@ void VerificationMode(ParameterPack pp)
 		
 		std::string name = "verificationRun_" + std::to_string(i);
 		Annulus A = Annulus(&currentState);
-		A.Evolve();
+	
+	
 		A.SaveAnnulus(name);
 		
 		bool success = A.ValueAnalysis(true);
@@ -405,7 +408,6 @@ int main(int argc, char** argv)
 	{	
 		
 		Annulus A = Annulus(&pp);
-		A.Evolve();
 		A.SaveAnnulus("SingleEvaluation");
 		
 	}

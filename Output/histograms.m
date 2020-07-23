@@ -1,12 +1,12 @@
 
 
-tab1 = readmatrix("VeryLaxConstraints/FeH_Inf.dat","Delimiter",",");
-tab2 = readmatrix("VeryLaxConstraints/M0.dat","Delimiter",",");
+tab1 = readmatrix("LunchTest/SuccessGrid.dat","Delimiter",",");
+tab2 = readmatrix("LunchTest/b2.dat","Delimiter",",");
 
-tab=tab1;
+tab=tab2;
 %tab = tab1./tab2;
 
-N = 40000;
+N = 5000;
 r = N*length(tab)^2;
 q = sum(sum(~isnan(tab)));
 successFrac = round(100*q/r,2);

@@ -11,27 +11,18 @@ class Annulus
 {
 	public:
 		Annulus(ParameterPack * pp);
+		ParameterPack * PP;
 
-		
-		void Evolve();
-		
 		bool QuickAnalysis();
 		void SaveAnnulus(std::string fileName);
 		bool ValueAnalysis(bool printMode);
 		void SaveDerivedParams();
-		
+		void Calibrate();
 	private:
-		ParameterPack * PP;
+		
 		int NSteps;
 		
-		std::vector<double> Europium;
 		
-		std::vector<double> Europium_NSM;
-		std::vector<double> Europium_Coll;
-		std::vector<double> Europium_S;
-		
-		std::vector<double> Iron;
-		std::vector<double> Magnesium;
 	
 		GalaxyMass MassTracker;
 		StarFormation SFRTracker;
@@ -50,7 +41,7 @@ class Annulus
 		double eta;
 		
 	
-		void Calibrate();
+		
 		void PrintCalibration();
 };
 

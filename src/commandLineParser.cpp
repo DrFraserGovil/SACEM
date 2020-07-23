@@ -28,14 +28,14 @@ std::vector<string> fractionPairGlobalTriggers = {};
 std::vector<std::vector<double *>> fractionPairGlobalPointers= {};
 
 
-std::vector<string> booleanGlobalTriggers = {};
-std::vector<bool *> booleanGlobalPointers = {};
+std::vector<string> booleanGlobalTriggers = {"-allfrac"};
+std::vector<bool *> booleanGlobalPointers = {&pp.allTimeFractionToggle};
 
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
 //special functions are forward-declared in the .h file. 
-std::vector<string> specialGlobalTriggers= {"-h", "-dir","-grid"};
-parseFunctions specialFuncs[] = {help, changeFileRoot,changeGridSize};
+std::vector<string> specialGlobalTriggers= {"-h", "-dir","-grid","-constrain"};
+parseFunctions specialFuncs[] = {help, changeFileRoot,changeGridSize, changeConstraints};
 
 
 
@@ -185,6 +185,36 @@ bool changeGridSize(char* arg)
 	}
 }
 
+bool changeConstraints(char * arg)
+{
+	try
+	{
+		std::string option = string(arg);
+		
+		if (option == "m" || option == "M")
+		{
+			pp.UseMediumConstraints();
+			std::cout << "Medium Constraints chosen" << std::endl;
+		}
+		if (option == "l" || option == "L")
+		{
+			pp.UseLaxConstraints();
+			std::cout << "Lax Constraints chosen" << std::endl;
+		}
+		if (option == "t" || option == "T")
+		{
+			pp.UseTightConstraints();
+			std::cout << "Tight Constraints chosen" << std::endl;
+		}
+		return true;
+	} 
+	catch (const std::exception& e)
+	{
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse the gridchanges. Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
+		return false;
+	}
+}
 bool changeFileRoot(char* arg)
 {
 

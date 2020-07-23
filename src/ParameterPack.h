@@ -29,6 +29,8 @@ class ParameterPack
 			double tMax;
 			double timeStep; 
 			double tauInf;
+			
+			bool allTimeFractionToggle;
 			//calibration data
 			
 			RandomisableParameter<double> HFrac;
@@ -39,14 +41,9 @@ class ParameterPack
 			RandomisableParameter<double> sProcFrac;
 			IterableParameter<double> collFrac;
 			
-			//constraining values
-			double finalEuFe_Min;
-			double finalEuFe_Max;
-			double finalFe_Min;
-			double finalFe_Max;
 			
-			double EuFeCeiling;
-			double EuFeFloor;	
+			
+			double EuFeCeiling;	
 			double maxLoopBack;
 			double minGasFrac;
 			double maxGasFrac;
@@ -98,6 +95,11 @@ class ParameterPack
 			RandomisableParameter<double> NSMCoolMod;
 			RandomisableParameter<double> SNIaCoolMod;
 	
+	
+			void UseLaxConstraints();
+			void UseTightConstraints();
+			void UseMediumConstraints();
+			
 			void UpdateRadius(double r, double deltaR);
 			void UpdateInfall();
 			void ValueChecks();

@@ -39,32 +39,41 @@ Annulus::Annulus(ParameterPack * pp)
 
 void Annulus::Calibrate()
 {
+		//Collapsar must update as tau coll changes 
+		CollapsarTracker = Collapsar(PP);
+	
 		double tI = PP->tMax;
-		double t0Cutoff = 0.002;
+		double t0Cutoff = 0.1;
 		//double t0 = std::max(std::min(std::min(PP->tauSNIa.Value, PP->tauColls.Value),PP->tauNSM),t0Cutoff);   // chooses the smallest time before weird stuff happens. Iff this owuld result in an answer below the cutoff, use cutoff instead
 	
-		double t0 = 0.002;
+		double t0 = std::min(t0Cutoff, PP->tauSNIa.Value);
 	
 		double Hmass = PP->HFrac.Value * MassTracker.ColdGasMass(tI);
 		
 		//CCSN counts
 		double S0 = CCSNTracker.Count(t0);
 		double SInf = CCSNTracker.Count(tI);
-		double STotal = SInf; //CCSNTracker.Total(tI);
+		double STotal = CCSNTracker.Total(tI);
 		
 		//collapsar counts
 		double C0 = CollapsarTracker.Count(t0);
 		double CInf = CollapsarTracker.Count(tI);
-		double CTotal = CInf; //CollapsarTracker.Total(tI);
+		double CTotal = CollapsarTracker.Total(tI);
 		
 		//nsm counts
 		double N0 = NSMTracker.Count(t0);
 		double NInf = NSMTracker.Count(tI);
-		double NTotal = NInf; //NSMTracker.Total(tI);
+		double NTotal = NSMTracker.Total(tI);
 		
 		//SNIa counts
 		double WInf = SNIaTracker.Count(tI);
 
+		if (PP->allTimeFractionToggle == false)
+		{
+			STotal = SInf;
+			CTotal = CInf;
+			NTotal = NInf;
+		}
 
 		double FInf = PP->FeH_Sat.Value;
 		double M0 = PP->MgFe_SN.Value;
@@ -149,31 +158,6 @@ void Annulus::PrintCalibration()
 	
 }
 
-void Annulus::Evolve()
-{
-	//clean vectors
-	double t = 0;
-	for (int i = 0; i < NSteps; ++i)
-	{
-
-		double qT = CCSNTracker.Count(t);
-		double H = PP->HFrac.Value * MassTracker.ColdGasMass(t);
-		
-		double eu = gamma*qT + delta*CollapsarTracker.Count(t) + epsilon*NSMTracker.Count(t);
-		double fe = alpha * qT + beta * SNIaTracker.Count(t);
-		double mg = eta*qT;
-		
-		Europium[i] = log10(eu/H);
-		Iron[i] = log10(fe/H);
-		Magnesium[i] = log10(mg/H);
-
-		Europium_S[i] = log10(gamma*qT/H);
-		Europium_NSM[i] = log10(epsilon*NSMTracker.Count(t)/H);
-		Europium_Coll[i] = log10(delta*CollapsarTracker.Count(t)/H);
-
-		t+=PP->timeStep;
-	}
-}
 
 bool Annulus::QuickAnalysis()
 {

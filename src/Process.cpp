@@ -1,7 +1,7 @@
 #include "Process.h"
 
 
-Process::Process(ParameterPack * pp, double nuCool, double nuDelay)
+Process::Process(ParameterPack * pp, double nuCool, double nuDelay, bool printActive)
 {
 	PP = pp;
 	ConstantID = 0;
@@ -114,11 +114,13 @@ Process::Process(ParameterPack * pp, double nuCool, double nuDelay)
 			std::vector<std::string> powNames = {"Constant","Omega plus", "Omega minus", "nuSFR(mod)", "nuCool", "nuDelay","ob1","ob2"};
 			if (samePower)
 			{
-				std::cout << i << "  " << j << "  " << realPowers.size() << "   " << powNames.size() << std::endl;
-				std::cout << "You have provided two powers of the same value (" << powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
+				if (printActive)
+				{
+					std::cout << i << "  " << j << "  " << realPowers.size() << "   " << powNames.size() << std::endl;
+					std::cout << "You have provided two powers of the same value (" << powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
+				}
 				realPowers[i] = realPowers[i] * 1.01;
 				imaginaryPowers[i] = imaginaryPowers[i] * 0.99;
-				std::cout << "\tNew values: "<< powNames[i] << "=" << realPowers[i] << " & " << powNames[j] << " = " << realPowers[j] << "), this is being corrected." << std::endl;
 			}
 		}
 	}
