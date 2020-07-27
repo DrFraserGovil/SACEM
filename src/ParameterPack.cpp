@@ -16,7 +16,7 @@ ParameterPack::ParameterPack()
 	NRandomGalaxies = 2000;
 	tMax = 14;
 	timeStep = 0.05;
-	IterationSaveInterval = 10;
+	IterationSaveInterval = 100;
 	tauInf = 14;
 	
 	
@@ -32,8 +32,8 @@ ParameterPack::ParameterPack()
 	
 	
 	//limiting values
-	EuFeCeiling = 1.6;
-	maxLoopBack = 0.25;
+	EuFeCeiling = 0.6;
+	maxLoopBack = 0.05;
 
 	//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
 	EuFeMax = {EuFeCeiling,-0.7,0.15,0};
