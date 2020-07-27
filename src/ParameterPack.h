@@ -26,6 +26,7 @@ class ParameterPack
 			int Mode;
 			int NRandomGalaxies;
 			int NGrid;
+			int IterationSaveInterval;
 			double tMax;
 			double timeStep; 
 			double tauInf;

@@ -16,7 +16,7 @@ ParameterPack::ParameterPack()
 	NRandomGalaxies = 2000;
 	tMax = 14;
 	timeStep = 0.05;
-	
+	IterationSaveInterval = 10;
 	tauInf = 14;
 	
 	

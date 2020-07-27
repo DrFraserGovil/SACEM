@@ -98,7 +98,11 @@ void Annulus::Calibrate()
 		
 		
 		
-		
+		if (Omega == 0)
+		{
+			CTotal = 1;
+			CInf = 1;
+		}
 		//RETROFIT TO USE TOTAL GENERATION
 
 	
@@ -140,6 +144,7 @@ void Annulus::SaveDerivedParams()
 	double hg_Inf = Mt_Inf - sg_Inf -cg_Inf ;
 	
 	
+
 	std::vector<double> params = {cg_Inf/sg_Inf,hg_Inf/sg_Inf,sg_Inf/Mt_Inf, PP->nuSFR.Value*cg_Inf};
 	
 	PP->derivedParams.push_back(params);

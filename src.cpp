@@ -38,21 +38,15 @@ ParameterPack RandomiseGalaxy(ParameterPack pp)
 	return copy;
 }
 
-
-void SaveGalaxies(ParameterPack copy)
+void InitialiseSaveGrids(ParameterPack copy)
 {
-	std::ofstream saveFile;
-	std::string saveFileName =copy.FILEROOT + "/Galaxies.dat";
-	saveFile.open(saveFileName);
-	int width = 15;
+	BigGrid = std::vector(copy.collFrac.NSteps,std::vector(copy.tauColls.NSteps,0));
 	
-	
-
 	
 	//save file headers
 	std::vector<std::string> basicHeader = {"Iteration", "collFrac", "tauColl"};
 	std::vector<std::string> ppHeader = copy.PrinterHeaders();
-	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatop","SFR"};
+	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatio","SFR"};
 	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
 	
 	int n = ppHeader.size() + derivedHeader.size();
@@ -66,16 +60,20 @@ void SaveGalaxies(ParameterPack copy)
 		double c = NAN;
 		ParamGrids[i] = std::vector(copy.NGrid, std::vector(copy.NGrid, c));
 	}
+}
+
+void StoreGalaxies(ParameterPack copy)
+{
+
+	std::vector<std::string> basicHeader = {"Iteration", "collFrac", "tauColl"};
+	std::vector<std::string> ppHeader = copy.PrinterHeaders();
+	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatop","SFR"};
+	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
 	
 	
-	for (int i = 0; i < allHeaders.size(); ++i)
-	{
-		for (int j = 0; j < allHeaders[i].size(); ++j)
-		{
-			saveFile <<  std::setw(width) << std::left << allHeaders[i][j] << "\t";
-		}
-	}
-	saveFile << "\n";
+	
+	
+
 	//save file contents
 	for (int i = 0; i < SolvedGalaxies.size(); ++i)
 	{
@@ -125,14 +123,26 @@ void SaveGalaxies(ParameterPack copy)
 
 }
 
-void SaveGrid(ParameterPack copy)
+void SaveGrid(ParameterPack copy,bool trueFinish,int storedModels)
 {
-	std::cout << "Simulation finished.\n\tSaving Success-Count Grid" << std::endl;
+	if (trueFinish)
+	{
+		std::cout << "Simulation finished.\n\tSaving Success-Count Grid" << std::endl;
+	}
+
+	//Save number of models that have been searched
+	std::ofstream progress;
+	std::string progressName =copy.FILEROOT + "Progress.dat";
+	progress.open(progressName);
+	progress << storedModels << std::endl;
+	progress.close();
 	
-	SaveGalaxies(copy);
+	//load in the saved grids for analysis
+	StoreGalaxies(copy);
 	
+	//save to file
 	std::ofstream saveFile;
-	std::string saveFileName =copy.FILEROOT + "/SuccessGrid.dat";
+	std::string saveFileName =copy.FILEROOT + "SuccessCounts.dat";
 	saveFile.open(saveFileName);
 	
 	std::vector<std::ofstream> paramFiles(paramGridNames.size() );
@@ -155,7 +165,7 @@ void SaveGrid(ParameterPack copy)
 			{
 				saveFile << ", ";
 			}
-			saveFile << std::setw(width) << std::left << BigGrid[i][j];
+			saveFile << std::setw(width) << std::left << BigGrid[i][j] << "\t";
 			
 			for (int k = 0; k < paramGridNames.size(); ++k)
 			{
@@ -166,12 +176,14 @@ void SaveGrid(ParameterPack copy)
 				paramFiles[k] << std::setw(width) << std::left << ParamGrids[k][i][j]/BigGrid[i][j] << "\t";
 			}
 		}
+		
+		//endlines
 		saveFile << "\n";
 		for (int k = 0; k < paramGridNames.size(); ++k)
-			{
-				
-				paramFiles[k] << "\n";
-			}
+		{
+			
+			paramFiles[k] << "\n";
+		}
 	}
 	
 	saveFile.close();
@@ -294,6 +306,11 @@ void IterationMode(ParameterPack pp)
 						if (ActiveGalaxies[j].nSuccess > 0)
 						{
 							SolvedGalaxies.push_back(ActiveGalaxies[j]);
+							if (SolvedGalaxies.size() > copy.IterationSaveInterval)
+							{
+								SaveGrid(copy,false,k);
+								SolvedGalaxies.resize(0);
+							}
 						}
 					}
 					currentThread = j;
@@ -414,9 +431,9 @@ int main(int argc, char** argv)
 	
 	if (pp.Mode == 1)
 	{
-		BigGrid = std::vector(pp.collFrac.NSteps,std::vector(pp.tauColls.NSteps,0));
+		InitialiseSaveGrids(pp);
 		IterationMode(pp);
-		SaveGrid(pp);
+		SaveGrid(pp,true,pp.NRandomGalaxies);
 	}
 
 	if (pp.Mode == 2)

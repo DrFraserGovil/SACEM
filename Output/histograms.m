@@ -1,16 +1,17 @@
 
+root = "LunchTest/";
+success = readmatrix(root + "SuccessCounts.dat","Delimiter",",");
+tab1 = readmatrix(root + "b1.dat","Delimiter",",");
+tab2 = readmatrix(root + "EuStoredRatio.dat","Delimiter",",");
 
-tab1 = readmatrix("LunchTest/SuccessGrid.dat","Delimiter",",");
-tab2 = readmatrix("LunchTest/b2.dat","Delimiter",",");
-
-tab=tab2;
+tab=success;
 %tab = tab1./tab2;
 
-N = 5000;
+N = readmatrix(root + "Progress");
 r = N*length(tab)^2;
-q = sum(sum(~isnan(tab)));
+q = sum(sum(~isnan(success)));
 successFrac = round(100*q/r,2);
-fprintf("%f %% success\n", successFrac)
+fprintf("%d Galaxies generated for %d models.\n %d Successful models for %f %% success\n", N,r,q,successFrac)
 cla;
 %colormap(flipud(gray));
 image([0,1],[0,20],transpose(tab),'CDataMapping','scaled')
@@ -23,7 +24,14 @@ c = colorbar;
 %c.Label.String = "Number of Successful Models";
 c.Label.FontSize = 24;
 c.Label.Interpreter = "Latex";
-%caxis([0 1.5])
+
+newMin = min(min(tab))*0.99;
+
+newMax = max(max(tab));
+if newMin == 0
+    newMin = -newMax/100;
+end
+caxis([newMin, newMax])
 % 
 % x = 0:0.01:1;
 % m = 12;
