@@ -98,6 +98,7 @@ class ParameterPack
 	
 	
 			void UseLaxConstraints();
+			void UseMixedConstraints();
 			void UseTightConstraints();
 			void UseMediumConstraints();
 			

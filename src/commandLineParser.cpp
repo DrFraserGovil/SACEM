@@ -208,7 +208,7 @@ bool changeConstraints(char * arg)
 		}
 		if (option == "s" || option == "S")
 		{
-			pp.UseTightConstraints();
+			pp.UseMixedConstraints();
 			std::cout << "Tight-Main, Lax-SFR Constraints chosen" << std::endl;
 		}
 		return true;
