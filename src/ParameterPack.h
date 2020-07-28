@@ -70,7 +70,7 @@ class ParameterPack
 			RandomisableParameter<double> galaxyScaleLength;
 			RandomisableParameter<double> OutFlowFraction;
 			RandomisableParameter<double> nuSFR;
-			RandomisableParameter<double> content_modified_nuSFR;
+			RandomisableParameter<double> sfrModifier;
 			RandomisableParameter<double> stellarDeathParameter;
 			
 			

@@ -206,6 +206,11 @@ bool changeConstraints(char * arg)
 			pp.UseTightConstraints();
 			std::cout << "Tight Constraints chosen" << std::endl;
 		}
+		if (option == "s" || option == "S")
+		{
+			pp.UseTightConstraints();
+			std::cout << "Tight-Main, Lax-SFR Constraints chosen" << std::endl;
+		}
 		return true;
 	} 
 	catch (const std::exception& e)

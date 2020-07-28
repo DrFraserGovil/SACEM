@@ -96,7 +96,8 @@ Process::Process(ParameterPack * pp, double nuCool, double nuDelay, bool printAc
 		iTrig = Omega;
 		rTrig = 0;
 	}
-	std::vector<double> realPowers =  {0,p/2 + rTrig, p/2 - rTrig, PP->content_modified_nuSFR.Value,nuCool, nuDelay};
+	double modifiedNu = PP->sfrModifier.Value * 	 PP->nuSFR.Value;
+	std::vector<double> realPowers =  {0,p/2 + rTrig, p/2 - rTrig, modifiedNu,nuCool, nuDelay};
 	std::vector<double> imaginaryPowers = {0,iTrig, -iTrig,0,0,0};
 
 	

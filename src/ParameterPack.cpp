@@ -70,7 +70,7 @@ void ParameterPack::UseTightConstraints()
 	
 	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
 	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.35,0.3,0.4,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(0.35,0.32,0.38,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0,&global_mt);
 	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
 	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.05,&global_mt);
@@ -84,17 +84,17 @@ void ParameterPack::UseTightConstraints()
 	galaxyB2 = RandomisableParameter<double>(14,10,30,&global_mt);
 
 	nuSFR = RandomisableParameter<double>(1,0.05,5.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.001,8.0,&global_mt,true);
+	sfrModifier = RandomisableParameter<double>(0.5,0.1,1.0,&global_mt,true);
 	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.5,&global_mt,true);
 	OutFlowFraction = RandomisableParameter<double>(2.5,0.01,1.5,&global_mt,true);
 	
 	
 	//Process parameters
-	collWidth = RandomisableParameter<double>(1,0.1,15,&global_mt);
+	collWidth = RandomisableParameter<double>(1,0.4,15,&global_mt);
 	tauSNIa = RandomisableParameter<double>(0.15,0.1,0.3,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.05,25,&global_mt);
+	nuSNIa = RandomisableParameter<double>(30.01,0.5,10,&global_mt);
 	tauNSM = RandomisableParameter<double>(0.0001,0.0001,0.2,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.05,25,&global_mt);
+	nuNSM = RandomisableParameter<double>(2.3,0.5,10,&global_mt);
 	
 	double hotMin = 0.7;
 	double hotMax = 0.9999;
@@ -106,13 +106,34 @@ void ParameterPack::UseTightConstraints()
 	double mod = 0.1;
 	double modMin =  - mod;
 	double modMax =  + mod;
-	CoolingFrequency = RandomisableParameter<double>(1,0.4,2.5,&global_mt);
+	CoolingFrequency = RandomisableParameter<double>(1,0.6,1.5,&global_mt);
 	CollapsarCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	NSMCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	
-	minGasFrac = 0.05;
+	minGasFrac = 0.07;
 	maxGasFrac = 0.15;
+}
+
+
+void ParameterPack::UseMixedConstraints()
+{
+	//uses tight constraints on everything but SFR stuff
+	UseTightConstraints();
+	
+	galaxyM0 = RandomisableParameter<double>(0.8,0.0001,200.0,&global_mt);
+	galaxyM1 = RandomisableParameter<double>(5,0.000001,20.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(46,0.000001,200.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(0.3,0.0001,10,&global_mt);
+	galaxyB2 = RandomisableParameter<double>(14,5,50,&global_mt);
+
+	nuSFR = RandomisableParameter<double>(1,0.01,8.0,&global_mt);
+	sfrModifier = RandomisableParameter<double>(0.5,0.00001,2.0,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,2,&global_mt,true);
+	OutFlowFraction = RandomisableParameter<double>(2.5,0.0001,5,&global_mt,true);
+	minGasFrac = 0.0000001;
+	maxGasFrac = 1;
+	
 }
 
 void ParameterPack::UseMediumConstraints()
@@ -133,7 +154,7 @@ void ParameterPack::UseMediumConstraints()
 	galaxyB2 = RandomisableParameter<double>(14,10,50,&global_mt);
 
 	nuSFR = RandomisableParameter<double>(1,0.05,5.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.001,8.0,&global_mt,true);
+	sfrModifier = RandomisableParameter<double>(0.5,0.0001,1.0,&global_mt,true);
 	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.5,&global_mt,true);
 	OutFlowFraction = RandomisableParameter<double>(2.5,0.01,2,&global_mt);
 	
@@ -182,7 +203,7 @@ void ParameterPack::UseLaxConstraints()
 	galaxyB2 = RandomisableParameter<double>(14,5,50,&global_mt);
 
 	nuSFR = RandomisableParameter<double>(1,0.01,8.0,&global_mt);
-	content_modified_nuSFR = RandomisableParameter<double>(0.01,0.001,8.0,&global_mt,true);
+	sfrModifier = RandomisableParameter<double>(0.5,0.00001,2.0,&global_mt,true);
 	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,2,&global_mt,true);
 	OutFlowFraction = RandomisableParameter<double>(2.5,0.0001,5,&global_mt,true);
 	
@@ -230,7 +251,7 @@ void ParameterPack::ScrambleAll()
 	galaxyB2.Scramble();
 
 	nuSFR.Scramble();
-	content_modified_nuSFR.Scramble();
+	sfrModifier.Scramble();
 	collWidth.Scramble();
 	tauSNIa.Scramble();
 	nuSNIa.Scramble();
@@ -291,7 +312,7 @@ std::vector<std::string> ParameterPack::PrinterHeaders()
 	std::vector<std::string> keyTitles = {"Collapsar Fraction", "Collapsar Turn-off"};
 	std::vector<std::string> calibrationTitles = {"X", "FeH_Inf", "MgFe_0", "MgFe_Inf", "EuFe_Inf", "s-Fraction"};
 	std::vector<std::string> galaxyTitles = {"M0", "M1", "M2", "b1", "b2", "nu_SFR","Mu_Stellar","OutflowFrac"};
-	std::vector<std::string> processTitles = {"tau_SNIa", "nu_SNIa", "tau_NSM", "nu_NSM", "Delta_Colls","nu_modified"};
+	std::vector<std::string> processTitles = {"tau_SNIa", "nu_SNIa", "tau_NSM", "nu_NSM", "Delta_Colls","nu_modifier"};
 	std::vector<std::string> coolingTitles = {"f_CCSN", "f_SNIa", "f_Coll", "f_NSM", "BaseCooling", "SNIa_CoolFrac", "Coll_CoolFrac", "NSM_CoolFrac"};
 	
 	std::vector<std::string> output;
@@ -308,7 +329,7 @@ std::vector<double> ParameterPack::PrinterValues()
 {
 	std::vector<RandomisableParameter<double>> calibrationParams = {HFrac, FeH_Sat, MgFe_SN, MgFe_Sat, EuFe_Sat, sProcFrac};
 	std::vector<RandomisableParameter<double>> galaxyParams = {galaxyM0, galaxyM1, galaxyM2, galaxyB1, galaxyB2, nuSFR,stellarDeathParameter,OutFlowFraction};
-	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth,content_modified_nuSFR};
+	std::vector<RandomisableParameter<double>> processParams = {tauSNIa, nuSNIa, tauNSM, nuNSM, collWidth,sfrModifier};
 	std::vector<RandomisableParameter<double>> coolingParams = {CCSNHotFrac, SNIaHotFrac, CollapsarHotFrac, NSMHotFrac, CoolingFrequency, SNIaCoolMod, CollapsarCoolMod, NSMCoolMod};
 
 	std::vector<std::vector<RandomisableParameter<double>>> vals = {calibrationParams, galaxyParams, processParams,coolingParams};
