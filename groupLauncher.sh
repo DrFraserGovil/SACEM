@@ -12,7 +12,6 @@ do
 			fi
 			command="${base} -random 10000000 -grid 101 -dir Output/Model${model}_${fractionMode}_${gradientMode} -mode 1 -dt 0.2 -constrain ${model} -allfrac ${fractionMode} -gradient ${gradientMode}"
 			$command
-			sleep 20
 		done
 		
 	done
