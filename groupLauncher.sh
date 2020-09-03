@@ -1,4 +1,4 @@
-
+#!/bin/bash
 for model in L M T S
 do
 	for fractionMode in 0 1
@@ -11,7 +11,7 @@ do
 				base="./submitShort -threads 16"
 			fi
 			command="${base} -random 10000000 -grid 101 -dir Output/Model${model}_${fractionMode}_${gradientMode} -mode 1 -dt 0.2 -constrain ${model} -allfrac ${fractionMode} -gradient ${gradientMode}"
-			echo $command
+			$command
 		done
 		
 	done
