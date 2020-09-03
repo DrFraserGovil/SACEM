@@ -31,7 +31,17 @@ class ParameterPack
 			double timeStep; 
 			double tauInf;
 			
+			bool useGradientToggle;
 			bool allTimeFractionToggle;
+			
+			//observables
+			double EuFeCeiling;	
+			double maxLoopBack;
+			double minGasFrac;
+			double maxGasFrac;
+			double maxGradient;
+			double minGradient;
+			
 			//calibration data
 			
 			RandomisableParameter<double> HFrac;
@@ -44,10 +54,7 @@ class ParameterPack
 			
 			
 			
-			double EuFeCeiling;	
-			double maxLoopBack;
-			double minGasFrac;
-			double maxGasFrac;
+			
 
 			//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
 			std::vector<double> EuFeMax;
@@ -56,6 +63,8 @@ class ParameterPack
 			std::vector<double> MgFeMin;
 			std::vector<double> EuMgMax;
 			std::vector<double> EuMgMin;
+			
+			
 			
 			//accretion/infall parameter
 			RandomisableParameter<double> galaxyM0;

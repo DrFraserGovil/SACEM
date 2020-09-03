@@ -28,8 +28,8 @@ std::vector<string> fractionPairGlobalTriggers = {};
 std::vector<std::vector<double *>> fractionPairGlobalPointers= {};
 
 
-std::vector<string> booleanGlobalTriggers = {"-allfrac"};
-std::vector<bool *> booleanGlobalPointers = {&pp.allTimeFractionToggle};
+std::vector<string> booleanGlobalTriggers = {"-allfrac","-gradient"};
+std::vector<bool *> booleanGlobalPointers = {&pp.allTimeFractionToggle,&pp.useGradientToggle};
 
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
@@ -189,27 +189,32 @@ bool changeConstraints(char * arg)
 {
 	try
 	{
-		std::string option = string(arg);
+		std::string options = string(arg);
 		
-		if (option == "m" || option == "M")
+		for (int  i = 0; i < options.size(); ++i)
 		{
-			pp.UseMediumConstraints();
-			std::cout << "Medium Constraints chosen" << std::endl;
-		}
-		if (option == "l" || option == "L")
-		{
-			pp.UseLaxConstraints();
-			std::cout << "Lax Constraints chosen" << std::endl;
-		}
-		if (option == "t" || option == "T")
-		{
-			pp.UseTightConstraints();
-			std::cout << "Tight Constraints chosen" << std::endl;
-		}
-		if (option == "s" || option == "S")
-		{
-			pp.UseMixedConstraints();
-			std::cout << "Tight-Main, Lax-SFR Constraints chosen" << std::endl;
+			std::string option = string(1,options.at(i));
+			
+			if (option == "m" || option == "M")
+			{
+				pp.UseMediumConstraints();
+				std::cout << "Medium Constraints chosen" << std::endl;
+			}
+			if (option == "l" || option == "L")
+			{
+				pp.UseLaxConstraints();
+				std::cout << "Lax Constraints chosen" << std::endl;
+			}
+			if (option == "t" || option == "T")
+			{
+				pp.UseTightConstraints();
+				std::cout << "Tight Constraints chosen" << std::endl;
+			}
+			if (option == "s" || option == "S")
+			{
+				pp.UseMixedConstraints();
+				std::cout << "Tight-Main, Lax-SFR Constraints chosen" << std::endl;
+			}
 		}
 		return true;
 	} 

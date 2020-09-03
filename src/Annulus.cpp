@@ -198,6 +198,30 @@ bool Annulus::QuickAnalysis()
 		return false;
 	}
 
+	if (PP->useGradientToggle)
+	{
+		double tBack = 2;
+		
+		double t2 = PP->tMax - tBack;
+		
+		double qTOld = CCSNTracker.Count(t2);
+		double euOld = gamma*qTOld + delta*CollapsarTracker.Count(t2) + epsilon*NSMTracker.Count(t2);
+		double feOld = alpha * qTOld + beta * SNIaTracker.Count(t2);
+		
+		double eufeOld = log10(euOld/feOld);
+		double eufeEnd = PP->EuFe_Sat.Value;
+		
+		double dX = (eufeOld-eufeEnd);
+		
+		double gradient = dX/tBack;
+		
+		if (gradient < PP->minGradient || gradient > PP->maxGradient)
+		{
+			return false;
+		}
+	}
+	
+
 	return true;
 	//~ return successCondition;	
 }
