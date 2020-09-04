@@ -28,14 +28,14 @@ std::vector<string> fractionPairGlobalTriggers = {};
 std::vector<std::vector<double *>> fractionPairGlobalPointers= {};
 
 
-std::vector<string> booleanGlobalTriggers = {"-allfrac","-gradient"};
-std::vector<bool *> booleanGlobalPointers = {&pp.allTimeFractionToggle,&pp.useGradientToggle};
+std::vector<string> booleanGlobalTriggers = {"-allfrac"};
+std::vector<bool *> booleanGlobalPointers = {&pp.allTimeFractionToggle};
 
 
 //special triggers are those which need a dedicated function to do their job, such as -dir, which needs to create directories etc. 
 //special functions are forward-declared in the .h file. 
-std::vector<string> specialGlobalTriggers= {"-h", "-dir","-grid","-constrain"};
-parseFunctions specialFuncs[] = {help, changeFileRoot,changeGridSize, changeConstraints};
+std::vector<string> specialGlobalTriggers= {"-h", "-dir","-grid","-constrain","-gradient"};
+parseFunctions specialFuncs[] = {help, changeFileRoot,changeGridSize, changeConstraints, changeGradientBounds};
 
 
 
@@ -221,6 +221,23 @@ bool changeConstraints(char * arg)
 	catch (const std::exception& e)
 	{
 		std::cout << "\n\n\nERROR: A problem was encountered trying to parse the gridchanges. Error message is as follows" << std::endl;
+		std::cout << e.what() << std::endl;
+		return false;
+	}
+}
+
+
+bool changeGradientBounds(char * arg)
+{
+	try
+	{
+		int n = stoi(arg);
+		pp.gradientSeverity = n;
+		pp.SetGradientBounds();
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "\n\n\nERROR: A problem was encountered trying to parse the changes to gradient severity. Error message is as follows" << std::endl;
 		std::cout << e.what() << std::endl;
 		return false;
 	}

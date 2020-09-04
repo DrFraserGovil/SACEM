@@ -31,7 +31,7 @@ class ParameterPack
 			double timeStep; 
 			double tauInf;
 			
-			bool useGradientToggle;
+			int gradientSeverity;
 			bool allTimeFractionToggle;
 			
 			//observables
@@ -111,6 +111,7 @@ class ParameterPack
 			void UseTightConstraints();
 			void UseMediumConstraints();
 			
+			void SetGradientBounds();
 			void UpdateRadius(double r, double deltaR);
 			void UpdateInfall();
 			void ValueChecks();

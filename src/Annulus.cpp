@@ -198,7 +198,9 @@ bool Annulus::QuickAnalysis()
 		return false;
 	}
 
-	if (PP->useGradientToggle)
+	//change gradient
+
+	if (PP->gradientSeverity > 0)
 	{
 		double tBack = 2;
 		

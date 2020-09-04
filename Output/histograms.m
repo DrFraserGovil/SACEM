@@ -5,7 +5,8 @@
 files = ["b1","b2","BaseCooling","ColdStarRatio","Coll_CoolFrac","Delta_Colls","EuFe_Inf",...,
     "f_CCSN","f_Coll","f_NSM","f_SNIa","FeH_Inf","HotStarRatio","M0","M1","M2","MgFe_0","MgFe_Inf","Mu_Stellar","NSM_CoolFrac",...,
     "nu_modifier","nu_NSM","nu_SFR","nu_SNIa","OutflowFrac","SFR","s-Fraction","SNIa_CoolFrac","StarMassRatio","tau_NSM","tau_SNIa","X"];
- F = figure('units','normalized','outerposition',[0 0 1 1]);
+ F = figure(1);
+ set(F,'units','normalized','outerposition',[0 0 1 1]);
 for a = 1 :length(files)-1
     
     f1 = files(a);
@@ -29,46 +30,58 @@ end
 function tilePrint(f1,f2,duoMode)
     cla;
     roots = ["L", "M", "T", "S"];
-    modes = ["All","Cold"];
-    for j = 1:length(modes)
-        mode = modes(j);
+    fracmodes = ["0","1"];
+    gradmodes = ["0","1"];
+    for j = 1:length(fracmodes)
+        for k = 1:length(gradmodes)
+            mode = [fracmodes(j), gradmodes(k)];
 
-       
 
-        for i = 1:length(roots)
-            subplot(2,2,i);
-            matrixPrint(f1,f2,roots(i),duoMode,mode);
 
+            for i = 1:length(roots)
+                subplot(2,2,i);
+                matrixPrint(f1,f2,roots(i),duoMode,mode);
+
+
+
+            end
             
+             modeNames = ["a","c"];
+             if mode(1) == "0"
+                modeNames = ["b","d"];
+             end
+             n = 1+str2num(mode(2));
+             rooter = modeNames(n);
+              svT = "Images2/Mode_"+rooter+"/";
 
-        end
-          svT = "Images/"+mode+"/";
-         
-        if duoMode == true
-            svT = svT + f1 + "_AND_" + f2;
-        else
-            svT = svT + "just_" + f1;
-        end
-        
-        svT = svT + ".png";
-        
-        saveas(gca,svT);
-        
+            if duoMode == true
+                svT = svT + f1 + "_AND_" + f2;
+            else
+                svT = svT + "just_" + f1;
+            end
 
+            svT = svT + ".png";
+
+            saveas(gca,svT);
+        
+        end
     end
 end
 function matrixPrint(f1,f2,root,divider,mode)
-
-    modeName = "a";
-    if mode == "Cold"
-        modeName = "b";
+  
+     modeNames = ["a","c"];
+    if mode(1) == "0"
+        modeNames = ["b","d"];
     end
-
-    fileRoot = "Model" + root + "_" + mode + "/";
+    modeName = modeNames(1+str2num(mode(2)));
+    fileRoot = "JointModels/Model" + root + "_" + mode(1) + "_" + mode(2) + "/";
     %success = readmatrix(root + "SuccessCounts.dat","Delimiter",",");
     tab1 = readmatrix(fileRoot + f1 + ".dat","Delimiter",",");
     tab2 = readmatrix(fileRoot + f2 + ".dat","Delimiter",",");
 
+    if all(size(tab1) == size(tab2)) == 0
+        return
+    end
     %tab=success;
 
     if divider == true

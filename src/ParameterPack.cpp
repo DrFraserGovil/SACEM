@@ -26,7 +26,8 @@ ParameterPack::ParameterPack()
 	NGrid = 101;
 	
 	allTimeFractionToggle = true;
-	useGradientToggle = false;
+	gradientSeverity = 0;
+	
 	
 	//Grid Parameters
 	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
@@ -53,7 +54,7 @@ ParameterPack::ParameterPack()
 	
 	
 	UseTightConstraints();
-	
+	SetGradientBounds();
 	//uncalibrated stuff
 	
 	
@@ -64,6 +65,15 @@ ParameterPack::ParameterPack()
 	WasSuccessful = false;
 }
 
+void ParameterPack::SetGradientBounds()
+{
+	std::vector<double> mins = {-999, -0.05, -0.02, -0.01};
+	std::vector<double> maxes = {999, 0.05, 0.02, 0.01};
+	
+	minGradient = mins[gradientSeverity];
+	maxGradient = maxes[gradientSeverity];
+	
+}
 
 
 void ParameterPack::UseTightConstraints()
@@ -113,10 +123,8 @@ void ParameterPack::UseTightConstraints()
 	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	NSMCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
 	
-	minGasFrac = 0.07;
+	minGasFrac = 0.05;
 	maxGasFrac = 0.15;
-	minGradient = -0.01;
-	maxGradient = 0.01;
 }
 
 
@@ -138,8 +146,6 @@ void ParameterPack::UseMixedConstraints()
 	minGasFrac = 0.0000001;
 	maxGasFrac = 1;
 	
-	minGradient = -0.01;
-	maxGradient = 0.01;
 }
 
 void ParameterPack::UseMediumConstraints()
@@ -189,9 +195,7 @@ void ParameterPack::UseMediumConstraints()
 	
 	minGasFrac = 0.05;
 	maxGasFrac = 0.25;
-	
-	minGradient = -0.02;
-	maxGradient = 0.02;
+
 }
 
 void ParameterPack::UseLaxConstraints()
@@ -241,8 +245,6 @@ void ParameterPack::UseLaxConstraints()
 	
 	minGasFrac = 0.0000001;
 	maxGasFrac = 1;
-	minGradient = -1;
-	maxGradient = 1;
 }
 
 

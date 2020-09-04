@@ -13,6 +13,7 @@ bool help(char* arg);
 bool changeFileRoot(char* arg);
 bool changeGridSize(char* arg);
 bool changeConstraints(char * arg);
+bool changeGradientBounds(char * arg);
 //Caller
 ParameterPack parseCommandLine(int argc, char** argv);
 
