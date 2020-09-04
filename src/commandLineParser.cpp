@@ -234,6 +234,7 @@ bool changeGradientBounds(char * arg)
 		int n = stoi(arg);
 		pp.gradientSeverity = n;
 		pp.SetGradientBounds();
+		return true;
 	}
 	catch (const std::exception& e)
 	{
