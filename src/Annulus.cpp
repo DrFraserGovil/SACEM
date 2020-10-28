@@ -5,7 +5,7 @@
 Annulus::Annulus(ParameterPack * pp)
 {
 	PP = pp;
-	
+
 	PP->OriginalTau = PP->tauColls.Value;
 	if (PP->collFrac.Value < 10e-6)
 	{
@@ -23,6 +23,8 @@ Annulus::Annulus(ParameterPack * pp)
 	
 	double nsmCool = PP->CoolingFrequency.Value * (1.0 + PP->NSMCoolMod.Value);
 	double snIaCool = PP->CoolingFrequency.Value * (1.0 + PP->SNIaCoolMod.Value);
+	
+
 	
 	NSMTracker = Decayer(PP, nsmCool, PP->nuNSM.Value, PP->tauNSM.Value, PP->NSMHotFrac.Value);
 	
@@ -49,7 +51,7 @@ void Annulus::Calibrate()
 		double t0 = std::min(t0Cutoff, PP->tauSNIa.Value);
 	
 		double Hmass = PP->HFrac.Value * MassTracker.ColdGasMass(tI);
-		
+
 		//CCSN counts
 		double S0 = CCSNTracker.Count(t0);
 		double SInf = CCSNTracker.Count(tI);

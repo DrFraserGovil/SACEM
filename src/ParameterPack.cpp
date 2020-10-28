@@ -10,7 +10,7 @@ ParameterPack::ParameterPack()
 	InitialisedCorrectly = true;
 
 	FILEROOT = "Output/";
-	
+	constraintMode = 0;
 	NThreads = 4;
 	Mode = 0;
 	NRandomGalaxies = 2000;
@@ -30,8 +30,8 @@ ParameterPack::ParameterPack()
 	
 	
 	//Grid Parameters
-	collFrac = IterableParameter<double>(0.2,0,1.0,NGrid);
-	tauColls = IterableParameter<double>(3,0,16,NGrid);
+	collFrac = IterableParameter<double>(1,0,1.0,NGrid);
+	tauColls = IterableParameter<double>(30,0,16,NGrid);
 	
 	
 	//limiting values
@@ -53,14 +53,47 @@ ParameterPack::ParameterPack()
 	// initial mass (10^10 solar mass)
 	
 	
-	UseTightConstraints();
-	SetGradientBounds();
+	
 	//uncalibrated stuff
+	nominal_HFrac = 0.72;
+	nominal_FeH_Sat = 0.15;
+	nominal_MgFe_SN = 0.36;
+	nominal_MgFe_Sat = -0.05;
+	nominal_EuFe_Sat = 0;
+	nominal_sProcFrac = 0.04;
+	nominal_collFrac = 0.96;
 	
+	nominal_galaxyM0 = 3;
+	nominal_galaxyM1 = 4.5;
+	nominal_galaxyM2 = 29;
+	nominal_galaxyB1 = 0.3;
+	nominal_galaxyB2 = 14;
 	
+	nominal_galaxyScaleLength = 3;
+	nominal_OutFlowFraction = 0.3;
+	nominal_nuSFR = 0.3;
+	nominal_sfrModifier = 0.3;
+	nominal_stellarDeathParameter = 0.001;
 	
+	nominal_tauColls = 30;
+	nominal_collWidth = 0.3;
+	nominal_tauSNIa = 0.2;
+	nominal_nuSNIa = 0.5;
+	nominal_tauNSM = 0.01;
+	nominal_nuNSM = 0.5;
 	
-	UpdateInfall();
+	nominal_CollapsarHotFrac = 0.75;
+	nominal_CCSNHotFrac = 0.75;
+	nominal_SNIaHotFrac = 0.99;
+	nominal_NSMHotFrac = 0.4;
+	
+
+	nominal_CoolingFrequency = 1.0;
+	nominal_CollapsarCoolMod = 0.01;
+	nominal_NSMCoolMod = 0.02;
+	nominal_SNIaCoolMod = 0.03;
+
+	
 	double nSuccess = 0;
 	WasSuccessful = false;
 }
@@ -78,53 +111,55 @@ void ParameterPack::SetGradientBounds()
 
 void ParameterPack::UseTightConstraints()
 {
+	
 	// calibration params
 	
-	HFrac = RandomisableParameter<double>(0.7,0.68,0.75,&global_mt);
-	FeH_Sat = RandomisableParameter<double>(0.3,0.05,0.3,&global_mt);
-	MgFe_SN = RandomisableParameter<double>(0.35,0.32,0.38,&global_mt);
-	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.1,0,&global_mt);
-	EuFe_Sat = RandomisableParameter<double>(0,-0.1,0.05,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.05,&global_mt);
+	HFrac = RandomisableParameter<double>(nominal_HFrac,0.68,0.75,&global_mt);
+	FeH_Sat = RandomisableParameter<double>(nominal_FeH_Sat,0.05,0.3,&global_mt);
+	MgFe_SN = RandomisableParameter<double>(nominal_MgFe_SN,0.32,0.38,&global_mt);
+	MgFe_Sat = RandomisableParameter<double>(nominal_MgFe_Sat,-0.1,0,&global_mt);
+	EuFe_Sat = RandomisableParameter<double>(nominal_EuFe_Sat,-0.1,0.05,&global_mt);
+	sProcFrac = RandomisableParameter<double>(nominal_sProcFrac,0.0000001,0.05,&global_mt);
 	
 	
 	// infall params
-	galaxyM0 = RandomisableParameter<double>(0.8,0.1,1.0,&global_mt,true);
-	galaxyM1 = RandomisableParameter<double>(5,1,10.0,&global_mt);
-	galaxyM2 = RandomisableParameter<double>(46,20,70.0,&global_mt);
-	galaxyB1 = RandomisableParameter<double>(0.3,0.1,3,&global_mt);
-	galaxyB2 = RandomisableParameter<double>(14,10,30,&global_mt);
+	galaxyM0 = RandomisableParameter<double>(nominal_galaxyM0,0.1,1.0,&global_mt,true);
+	galaxyM1 = RandomisableParameter<double>(nominal_galaxyM1,1,10.0,&global_mt);
+	galaxyM2 = RandomisableParameter<double>(nominal_galaxyM2,20,70.0,&global_mt);
+	galaxyB1 = RandomisableParameter<double>(nominal_galaxyB1,0.1,3,&global_mt);
+	galaxyB2 = RandomisableParameter<double>(nominal_galaxyB2,10,30,&global_mt);
 
-	nuSFR = RandomisableParameter<double>(1,0.05,5.0,&global_mt);
-	sfrModifier = RandomisableParameter<double>(0.5,0.1,1.0,&global_mt,true);
-	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,0.5,&global_mt,true);
-	OutFlowFraction = RandomisableParameter<double>(2.5,0.01,1.5,&global_mt,true);
+	nuSFR = RandomisableParameter<double>(nominal_nuSFR,0.05,5.0,&global_mt);
+	sfrModifier = RandomisableParameter<double>(nominal_sfrModifier,0.1,1.0,&global_mt,true);
+	stellarDeathParameter = RandomisableParameter<double>(nominal_stellarDeathParameter,0.001,0.5,&global_mt,true);
+	OutFlowFraction = RandomisableParameter<double>(nominal_OutFlowFraction,0.01,1.5,&global_mt,true);
 	
 	
 	//Process parameters
-	collWidth = RandomisableParameter<double>(1,0.4,15,&global_mt);
-	tauSNIa = RandomisableParameter<double>(0.15,0.1,0.3,&global_mt);
-	nuSNIa = RandomisableParameter<double>(30.01,0.5,10,&global_mt);
-	tauNSM = RandomisableParameter<double>(0.0001,0.0001,0.2,&global_mt,true);
-	nuNSM = RandomisableParameter<double>(2.3,0.5,10,&global_mt);
+	collWidth = RandomisableParameter<double>(nominal_collWidth,0.4,15,&global_mt);
+	tauSNIa = RandomisableParameter<double>(nominal_tauSNIa,0.1,0.3,&global_mt);
+	nuSNIa = RandomisableParameter<double>(nominal_nuSNIa,0.5,10,&global_mt);
+	tauNSM = RandomisableParameter<double>(nominal_tauNSM,0.0001,0.2,&global_mt,true);
+	nuNSM = RandomisableParameter<double>(nominal_nuNSM,0.5,10,&global_mt);
 	
 	double hotMin = 0.7;
 	double hotMax = 0.9999;
-	CollapsarHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
-	CCSNHotFrac = RandomisableParameter<double>(0.75,hotMin,hotMax,&global_mt);
-	SNIaHotFrac = RandomisableParameter<double>(0.99,hotMin,hotMax,&global_mt);
-	NSMHotFrac = RandomisableParameter<double>(0.5,0.3,hotMax,&global_mt);
+	CollapsarHotFrac = RandomisableParameter<double>(nominal_CollapsarHotFrac,hotMin,hotMax,&global_mt);
+	CCSNHotFrac = RandomisableParameter<double>(nominal_CCSNHotFrac,hotMin,hotMax,&global_mt);
+	SNIaHotFrac = RandomisableParameter<double>(nominal_SNIaHotFrac,hotMin,hotMax,&global_mt);
+	NSMHotFrac = RandomisableParameter<double>(nominal_NSMHotFrac,0.3,hotMax,&global_mt);
 	
 	double mod = 0.1;
 	double modMin =  - mod;
 	double modMax =  + mod;
-	CoolingFrequency = RandomisableParameter<double>(1,0.6,1.5,&global_mt);
-	CollapsarCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
-	SNIaCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
-	NSMCoolMod = RandomisableParameter<double>(0,modMin,modMax,&global_mt);
+	CoolingFrequency = RandomisableParameter<double>(nominal_CoolingFrequency,0.6,1.5,&global_mt);
+	CollapsarCoolMod = RandomisableParameter<double>(nominal_CollapsarCoolMod,modMin,modMax,&global_mt);
+	SNIaCoolMod = RandomisableParameter<double>(nominal_SNIaCoolMod,modMin,modMax,&global_mt);
+	NSMCoolMod = RandomisableParameter<double>(nominal_NSMCoolMod,modMin,modMax,&global_mt);
 	
 	minGasFrac = 0.05;
 	maxGasFrac = 0.15;
+
 }
 
 
@@ -205,7 +240,7 @@ void ParameterPack::UseLaxConstraints()
 	MgFe_SN = RandomisableParameter<double>(0.35,0.2,0.6,&global_mt);
 	MgFe_Sat = RandomisableParameter<double>(-0.05,-0.2,0.2,&global_mt);
 	EuFe_Sat = RandomisableParameter<double>(0,-0.3,0.2,&global_mt);
-	sProcFrac = RandomisableParameter<double>(0.01,0.0000001,0.4,&global_mt);
+	sProcFrac = RandomisableParameter<double>(0.02,0.0000001,0.4,&global_mt);
 	
 	
 	// infall params
@@ -215,7 +250,7 @@ void ParameterPack::UseLaxConstraints()
 	galaxyB1 = RandomisableParameter<double>(0.3,0.0001,10,&global_mt);
 	galaxyB2 = RandomisableParameter<double>(14,5,50,&global_mt);
 
-	nuSFR = RandomisableParameter<double>(1,0.01,8.0,&global_mt);
+	nuSFR = RandomisableParameter<double>(0,0.01,8.0,&global_mt);
 	sfrModifier = RandomisableParameter<double>(0.5,0.00001,2.0,&global_mt,true);
 	stellarDeathParameter = RandomisableParameter<double>(0.1,0.001,2,&global_mt,true);
 	OutFlowFraction = RandomisableParameter<double>(2.5,0.0001,5,&global_mt,true);
@@ -423,4 +458,31 @@ void ParameterPack::SaveState(std::string saveFileName)
 	}
 	
 	saveFile.close();
+}
+
+void ParameterPack::LoadVariables()
+{
+	switch (constraintMode)
+	{
+		case 0:
+			UseTightConstraints();
+			break;
+		case 1:
+			UseMediumConstraints();
+			break;
+		case 2:
+			UseLaxConstraints();
+			break;
+		case 3:
+			UseMixedConstraints();
+			break;
+		default:
+			UseTightConstraints();
+			break;
+	
+	}
+	collFrac = IterableParameter<double>(nominal_collFrac,0,1.0,NGrid);
+	tauColls = IterableParameter<double>(nominal_tauColls,0,16,NGrid);
+	SetGradientBounds();
+	UpdateInfall();
 }

@@ -18,7 +18,7 @@ class ParameterPack
 		
 			ParameterPack();
 			bool InitialisedCorrectly;
-			
+			int constraintMode;
 			// global variable store for command-line modification
 			std::string FILEROOT;
 		
@@ -52,8 +52,13 @@ class ParameterPack
 			RandomisableParameter<double> sProcFrac;
 			IterableParameter<double> collFrac;
 			
-			
-			
+			double nominal_HFrac;
+			double nominal_FeH_Sat;
+			double nominal_MgFe_SN;
+			double nominal_MgFe_Sat;
+			double nominal_EuFe_Sat;
+			double nominal_sProcFrac;
+			double nominal_collFrac;
 			
 
 			//parameters are { original_yVal, original_xLimit, final_yVal, final_xLimit} 
@@ -73,6 +78,12 @@ class ParameterPack
 			RandomisableParameter<double> galaxyB1;
 			RandomisableParameter<double> galaxyB2;
 			
+			double nominal_galaxyM0;
+			double nominal_galaxyM1;
+			double nominal_galaxyM2;
+			double nominal_galaxyB1;
+			double nominal_galaxyB2;
+			
 			std::vector<double> Betas;
 			std::vector<double> galaxyMs;
 			
@@ -81,6 +92,12 @@ class ParameterPack
 			RandomisableParameter<double> nuSFR;
 			RandomisableParameter<double> sfrModifier;
 			RandomisableParameter<double> stellarDeathParameter;
+			
+			double nominal_galaxyScaleLength;
+			double nominal_OutFlowFraction;
+			double nominal_nuSFR;
+			double nominal_sfrModifier;
+			double nominal_stellarDeathParameter;
 			
 			
 			double massToDensityCorrection;
@@ -95,16 +112,33 @@ class ParameterPack
 			RandomisableParameter<double> tauNSM;
 			RandomisableParameter<double> nuNSM;
 	
+			double nominal_tauColls;
+			double nominal_collWidth;
+			double nominal_tauSNIa;
+			double nominal_nuSNIa;
+			double nominal_tauNSM;
+			double nominal_nuNSM;
+			
+			
 			RandomisableParameter<double> CollapsarHotFrac;
 			RandomisableParameter<double> CCSNHotFrac;
 			RandomisableParameter<double> SNIaHotFrac;
 			RandomisableParameter<double> NSMHotFrac;
+			
+			double nominal_CollapsarHotFrac;
+			double nominal_CCSNHotFrac;
+			double nominal_SNIaHotFrac;
+			double nominal_NSMHotFrac;
 			
 			RandomisableParameter<double> CoolingFrequency;
 			RandomisableParameter<double> CollapsarCoolMod;
 			RandomisableParameter<double> NSMCoolMod;
 			RandomisableParameter<double> SNIaCoolMod;
 	
+			double nominal_CoolingFrequency;
+			double nominal_CollapsarCoolMod;
+			double nominal_NSMCoolMod;
+			double nominal_SNIaCoolMod;
 	
 			void UseLaxConstraints();
 			void UseMixedConstraints();
@@ -136,7 +170,7 @@ class ParameterPack
 			double defaultCollFrac;
 			double defaultTauColls;
 			
-			
+			void LoadVariables();
 		private:
 			double Radius;
 			double Width;

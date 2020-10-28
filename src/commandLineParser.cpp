@@ -9,13 +9,13 @@
 #include <stdlib.h> 
 
 ParameterPack pp = ParameterPack();
-
+int jq = pp.nominal_HFrac;
 std::vector<string> integerGlobalTriggers = {"-mode","-threads","-random"};
 std::vector<int *> integerGlobalPointers = {&pp.Mode,&pp.NThreads,&pp.NRandomGalaxies};
 
 
-std::vector<string> doubleGlobalTriggers =  {"-dt"};
-std::vector<double *> doubleGlobalPointers = {&pp.timeStep };
+std::vector<string> doubleGlobalTriggers =  {"-dt","-collfrac","-nusfr","-nusnIa","-tauSN","-tauColls"};
+std::vector<double *> doubleGlobalPointers = {&pp.timeStep,&pp.nominal_collFrac,&pp.nominal_nuSFR,&pp.nominal_nuSNIa,&pp.nominal_tauSNIa ,&pp.nominal_tauColls};
 
 
 //fractions are doubles that are constrained to be between zero and 1
@@ -197,23 +197,19 @@ bool changeConstraints(char * arg)
 			
 			if (option == "m" || option == "M")
 			{
-				pp.UseMediumConstraints();
-				std::cout << "Medium Constraints chosen" << std::endl;
+				pp.constraintMode = 1;
 			}
 			if (option == "l" || option == "L")
 			{
-				pp.UseLaxConstraints();
-				std::cout << "Lax Constraints chosen" << std::endl;
+				pp.constraintMode = 2;
 			}
 			if (option == "t" || option == "T")
 			{
-				pp.UseTightConstraints();
-				std::cout << "Tight Constraints chosen" << std::endl;
+				pp.constraintMode = 0;
 			}
 			if (option == "s" || option == "S")
 			{
-				pp.UseMixedConstraints();
-				std::cout << "Tight-Main, Lax-SFR Constraints chosen" << std::endl;
+				pp.constraintMode = 3;
 			}
 		}
 		return true;
@@ -233,7 +229,6 @@ bool changeGradientBounds(char * arg)
 	{
 		int n = stoi(arg);
 		pp.gradientSeverity = n;
-		pp.SetGradientBounds();
 		return true;
 	}
 	catch (const std::exception& e)
@@ -309,8 +304,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 {
 	//parse command line arguments
 	bool linesParsed = true;
-	
-	
+
 	if (helpNeeded(argc,argv))
 	{
 		help(argv[0]);
@@ -385,7 +379,7 @@ ParameterPack parseCommandLine(int argc, char** argv)
 	{
 		std::cout << "\nWARNING: An uneven number of parameters was passed, so the final command (" << argv[argc-1] << ") was not examined. \nThis is a non-critical error, so code will continue.\n\n" << std::endl; 
 	}
-	
+	pp.LoadVariables();
 	pp.InitialisedCorrectly = linesParsed;
 	return pp;
 }

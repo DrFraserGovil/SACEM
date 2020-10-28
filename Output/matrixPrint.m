@@ -8,6 +8,21 @@ function matrixPrint(f1,f2,root,divider,mode,sourceRoot)
     modeName = fracCode + string(mode(2));
    
     fileRoot = sourceRoot + "Model" + root + "_Fraction" + mode(1) + "_Gradient" + mode(2) + "/";
+    nModels = readmatrix(fileRoot + "Progress.dat");
+    pow = floor(log10(nModels));
+    models = "";
+    if pow > 3
+        base = round(nModels/10^(pow - 1))/10;
+        if base > 1
+            models = num2str(base) + "$\times";
+        else
+            models = "$";
+        end
+        models = models + "10^{" + num2str(pow) + "}$";
+    else
+        models = num2str(nModels);
+    end
+    
     %success = readmatrix(root + "SuccessCounts.dat","Delimiter",",");
     tab1 = readmatrix(fileRoot + f1 + ".dat","Delimiter",",");
     tab2 = readmatrix(fileRoot + f2 + ".dat","Delimiter",",");
@@ -47,7 +62,7 @@ function matrixPrint(f1,f2,root,divider,mode,sourceRoot)
     tab(I) = newMin - abs(0.05*newMax);
     image([0,1],[0,16],transpose(tab),'CDataMapping','scaled')
     set(gca,'YDir','normal')
-    t = "Model \texttt{" + root + modeName+ "}";
+    t = "Model \texttt{" + root + modeName+ "}" + " (" + models + " models)";
     title(t,"Interpreter","latex","FontSize",20)
     xlabel("Collapsar Fraction, $f_{coll}$","Interpreter","latex","FontSize",20);
     ylabel("Collapsar Cutoff time, $\tau_{coll}$", "Interpreter","latex","FontSize",20);
