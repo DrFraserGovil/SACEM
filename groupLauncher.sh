@@ -8,7 +8,7 @@ do
 		do 
 			base="./submitShort -threads 16"
 			
-			command="${base} -random 10000000 -grid 101 -dir Output/Model${model}_Fraction${fractionMode}_Gradient${gradientMode} -mode 1 -dt 0.2 -constrain ${model} -allfrac ${i} -gradient ${gradientMode}"
+			command="${base} -random 10000000 -grid 101 -dir Output_NEW/Model${model}_Fraction${fractionMode}_Gradient${gradientMode} -mode 1 -dt 0.2 -constrain ${model} -allfrac ${i} -gradient ${gradientMode}"
 			echo $command
 
 		done
