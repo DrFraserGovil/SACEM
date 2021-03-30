@@ -140,10 +140,10 @@ class ParameterPack
 			double nominal_NSMCoolMod;
 			double nominal_SNIaCoolMod;
 	
-			void UseLaxConstraints();
+			void UseNoConstraints();
 			void UseMixedConstraints();
-			void UseTightConstraints();
-			void UseMediumConstraints();
+			void UseViableConstraints();
+			void UseWeakConstraints();
 			
 			void SetGradientBounds();
 			void UpdateRadius(double r, double deltaR);
@@ -174,5 +174,7 @@ class ParameterPack
 		private:
 			double Radius;
 			double Width;
+			
+			void UseLaxSFR();
 };
 

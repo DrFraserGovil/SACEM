@@ -140,14 +140,16 @@ void Annulus::SaveDerivedParams()
 {
 	double tI = PP->tMax;
 	
+	double cg_0 = MassTracker.ColdGasMass(0);
+	double cg_mid = MassTracker.ColdGasMass(2);
 	double cg_Inf = MassTracker.ColdGasMass(tI);
 	double sg_Inf = MassTracker.StellarMass(tI);
 	double Mt_Inf = MassTracker.TotalMass(tI);
 	double hg_Inf = Mt_Inf - sg_Inf -cg_Inf ;
 	
-	
+	double nu = PP->nuSFR.Value;
 
-	std::vector<double> params = {cg_Inf/sg_Inf,hg_Inf/sg_Inf,sg_Inf/Mt_Inf, PP->nuSFR.Value*cg_Inf};
+	std::vector<double> params = {cg_Inf/sg_Inf,hg_Inf/sg_Inf,sg_Inf/Mt_Inf, nu*cg_0, nu*cg_mid, nu * cg_Inf};
 	
 	PP->derivedParams.push_back(params);
 	
