@@ -1,2 +1,0 @@
-#!/bin/bash
-eval 'addqueue -q "bigmem" -c "SChEM: < 1 week" -m 1 -n 1x16 -s ./hydraLaunch $@'
