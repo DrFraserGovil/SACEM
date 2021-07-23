@@ -195,19 +195,19 @@ bool changeConstraints(char * arg)
 		{
 			std::string option = string(1,options.at(i));
 			
-			if (option == "m" || option == "M")
+			if (option == "w" || option == "W")
 			{
 				pp.constraintMode = 1;
 			}
-			if (option == "l" || option == "L")
+			if (option == "u" || option == "U")
 			{
 				pp.constraintMode = 2;
 			}
-			if (option == "t" || option == "T")
+			if (option == "v" || option == "V")
 			{
 				pp.constraintMode = 0;
 			}
-			if (option == "s" || option == "S")
+			if (option == "m" || option == "M")
 			{
 				pp.constraintMode = 3;
 			}

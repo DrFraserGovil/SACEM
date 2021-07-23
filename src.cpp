@@ -46,7 +46,7 @@ void InitialiseSaveGrids(ParameterPack copy)
 	//save file headers
 	std::vector<std::string> basicHeader = {"Iteration", "collFrac", "tauColl"};
 	std::vector<std::string> ppHeader = copy.PrinterHeaders();
-	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatio","SFR"};
+	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatio","SFR_start","SFR_mid","SFR_end"};
 	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
 	
 	int n = ppHeader.size() + derivedHeader.size();
@@ -67,7 +67,7 @@ void StoreGalaxies(ParameterPack copy)
 
 	std::vector<std::string> basicHeader = {"Iteration", "collFrac", "tauColl"};
 	std::vector<std::string> ppHeader = copy.PrinterHeaders();
-	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatop","SFR"};
+	std::vector<std::string> derivedHeader = {"ColdStarRatio","HotStarRatio","StarMassRatop","SFR_start","SFR_mid","SFR_end"};
 	std::vector<std::vector<std::string>> allHeaders = {basicHeader, ppHeader,derivedHeader};
 	
 	
