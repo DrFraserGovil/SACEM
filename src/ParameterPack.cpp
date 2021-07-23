@@ -14,10 +14,10 @@ ParameterPack::ParameterPack()
 	NThreads = 4;
 	Mode = 0;
 	NRandomGalaxies = 2000;
-	tMax = 14;
+	tMax = 13;
 	timeStep = 0.05;
 	IterationSaveInterval = 100;
-	tauInf = 14;
+	tauInf = 13;
 	
 	
 	// global variable store for command-line modification
@@ -57,22 +57,23 @@ ParameterPack::ParameterPack()
 	//uncalibrated stuff
 	nominal_HFrac = 0.72;
 	nominal_FeH_Sat = 0.15;
-	nominal_MgFe_SN = 0.36;
-	nominal_MgFe_Sat = -0.05;
+	nominal_MgFe_SN = 0.35;
+	nominal_MgFe_Sat = -0.02;
 	nominal_EuFe_Sat = 0;
 	nominal_sProcFrac = 0.04;
 	nominal_collFrac = 0.96;
 	
-	nominal_galaxyM0 = 3;
+
+	nominal_galaxyM0 = 1.3;
 	nominal_galaxyM1 = 4.5;
 	nominal_galaxyM2 = 29;
 	nominal_galaxyB1 = 0.3;
 	nominal_galaxyB2 = 14;
 	
 	nominal_galaxyScaleLength = 3;
-	nominal_OutFlowFraction = 0.3;
-	nominal_nuSFR = 0.3;
-	nominal_sfrModifier = 0.3;
+	nominal_OutFlowFraction = 2.8;
+	nominal_nuSFR = 0.5;
+	nominal_sfrModifier = 0.7;
 	nominal_stellarDeathParameter = 0.001;
 	
 	nominal_tauColls = 30;
@@ -88,10 +89,10 @@ ParameterPack::ParameterPack()
 	nominal_NSMHotFrac = 0.4;
 	
 
-	nominal_CoolingFrequency = 1.0;
+	nominal_CoolingFrequency = 0.9;
 	nominal_CollapsarCoolMod = 0.01;
-	nominal_NSMCoolMod = 0.02;
-	nominal_SNIaCoolMod = 0.03;
+	nominal_NSMCoolMod = 0.01;
+	nominal_SNIaCoolMod = -0.1;
 
 	
 	double nSuccess = 0;

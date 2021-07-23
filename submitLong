@@ -1,2 +1,0 @@
-#!/bin/bash
-eval 'addqueue -q "long" -c "SChEM: < 1 week" -m 1 -n 1x28 -s ./hydraLaunch $@'
